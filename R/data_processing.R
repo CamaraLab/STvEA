@@ -1,4 +1,82 @@
 
+# Function wrappers using mapping data holder
+
+#' Wraps FilterCODEX.internal using MappingDataHolder class
+#'
+#' @param mapping_object MappingDataHolder class with CODEX data
+#' @param size_lim lower and upper limits on size of each cell. If blank, set to 0.025 and 0.99 quantiles
+#' @param blank_upper a vector with an upper bound expression cutoff for each blank channel.
+#' If NULL, blank upper bounds are set as the 0.995 quantile for each blank
+#' @param blank_lower a vector with a lower bound expression cutoff for each blank channel.
+#' If NULL, blank lower bounds are set as the 0.002 quantile for each blank
+#'
+#' @export
+#'
+FilterCODEX <- function(mapping_object,
+                                size_lim = NULL,
+                                blank_upper = NULL,
+                                blank_lower = NULL) {
+  mapping_object@codex_filter <- FilterCODEX.internal(mapping_object@codex_protein,
+                                                      mapping_object@codex_size,
+                                                      mapping_object@codex_blanks,
+                                                      size_lim=size_lim,
+                                                      blank_upper=blank_upper,
+                                                      blank_lower=blank_lower)
+  return(mapping_object)
+}
+
+
+#' Wraps CleanCODEX.internal using MappingDataHolder class
+#'
+#' @param mapping_object MappingDataHolder class with CODEX data after FilterCODEX
+#'
+#' @export
+#'
+CleanCODEX <- function(mapping_object) {
+  mapping_object@codex_clean <- CleanCODEX.internal(mapping_object@codex_filter)
+  return(mapping_object)
+}
+
+
+#' Wraps CleanCITE.internal using MappingDataHolder class
+#'
+#' @param mapping_object MappingDataHolder class with CITE-seq protein data
+#' @param maxit maximum number of iterations for optim function
+#' @param factr accuracty of optim function
+#' @param optim_inits a matrix of (proteins x params) with initialization
+#' parameters for each protein to input to the optim function. If NULL,
+#' starts at two default parameter sets and picks the better one
+#' @param num_cores number of cores to use for parallelized fits
+#'
+#' @export
+#'
+CleanCITE <- function(mapping_object,
+                      maxit = 500,
+                      factr = 1e-9,
+                      optim_inits = NULL,
+                      num_cores = 1) {
+  mapping_object@cite_clean <- CleanCITE.internal(mapping_object@cite_protein,
+                                                  factr=factr,
+                                                  optim_inits=optim_inits,
+                                                  num_cores=num_cores)
+  return(mapping_object)
+}
+
+#' Wraps NormalizeCITE.internal using MappingDataHolder class
+#'
+#' @param mapping_object MappingDataHOlder class with CITE-seq protein data after CleanCITE
+#'
+#' @export
+#'
+NormalizeCITE <- function(mapping_object) {
+  mapping_object@cite_norm <- NormalizeCITE.internal(mapping_object@cite_clean,
+                                                     mapping_object@cite_protein)
+  return(mapping_object)
+}
+
+
+
+# Functions with matrix parameters, not using DataHolder object
 
 #' Removes points from CODEX matrix that are not cells
 #' as determined by the gating strategy on the blank channels
@@ -17,7 +95,7 @@
 #'
 #' @export
 #'
-filter_codex <- function(codex_raw, size, blanks,
+FilterCODEX.internal <- function(codex_raw, size, blanks,
                          size_lim = NULL,
                          blank_upper = NULL,
                          blank_lower = NULL) {
@@ -71,7 +149,7 @@ filter_codex <- function(codex_raw, size, blanks,
 #'
 #' @export
 #'
-clean_codex <- function(codex_filtered) {
+CleanCODEX.internal <- function(codex_filtered) {
   # compute Gaussian mixture on each protein
   # compute cleaned data from cumulative of higher mean Gaussian
   # return cleaned data (maybe as part of object)
@@ -98,7 +176,7 @@ clean_codex <- function(codex_filtered) {
 #' @param optim_inits a matrix of (proteins x params) with initialization
 #' parameters for each protein to input to the optim function. If NULL,
 #' starts at two default parameter sets and picks the better one
-#' @param verbose print out each iteration of negative binomial fit loop
+#' @param num_cores number of cores to use for parallelized fits
 #'
 #' @return Cleaned CITE-seq protein data matrix (cell x protein)
 #'
@@ -106,7 +184,7 @@ clean_codex <- function(codex_filtered) {
 #'
 #' @export
 #'
-clean_cite <- function(cite_protein,
+CleanCITE.internal <- function(cite_protein,
                        maxit = 500,
                        factr = 1e-9,
                        optim_inits = NULL,
@@ -116,17 +194,21 @@ clean_cite <- function(cite_protein,
 
   if (!is.null(optim_inits)) {
     cite_protein_list <- mclapply(1:ncol(cite_protein),
-                                  function(i) fit_protein(cite_protein[,i],
+                                  function(i) FitNB(cite_protein[,i],
                                                           maxit=maxit, factr=factr,
                                                           optim_init = optim_inits[i,]),
                                   mc.cores=num_cores)
   } else {
     cite_protein_list <- mclapply(1:ncol(cite_protein),
-                                  function(i) fit_protein(cite_protein[,i],
+                                  function(i) FitNB(cite_protein[,i],
                                                           maxit=maxit, factr=factr),
                                   mc.cores=num_cores)
   }
-  cite_protein_clean <- do.call(cbind,cite_protein_list)
+
+  cite_protein_clean <- cite_protein
+  for (i in 1:ncol(cite_protein)) {
+    cite_protein_clean[,i] <- cite_protein_list[[i]]
+  }
   return(cite_protein_clean)
 }
 
@@ -142,7 +224,7 @@ clean_cite <- function(cite_protein,
 #'
 #' @importFrom stats optim
 #'
-fit_protein <- function(protein_expr,
+FitNB <- function(protein_expr,
                         maxit = 500,
                         factr = 1e-9,
                         optim_init = NULL) {
@@ -150,21 +232,21 @@ fit_protein <- function(protein_expr,
 
   if (is.null(optim_init)) {
     # sometimes negative binomial doesn't fit well with certain starting parameters, so try 2
-    fit1 <- optim(c(5,50,2,0.5,0.5), sse_fn, p_obs = p_obs,
+    fit1 <- optim(c(5,50,2,0.5,0.5), SSE, p_obs = p_obs,
                   method="L-BFGS-B", lower=rep(1e-8,5), upper=c(Inf, Inf,Inf,Inf,1),
                   control=list(maxit=maxit, factr=factr))
-    fit2 <- optim(c(5,50,0.5,2,0.5), sse_fn, p_obs = p_obs,
+    fit2 <- optim(c(5,50,0.5,2,0.5), SSE, p_obs = p_obs,
                   method="L-BFGS-B", lower=rep(1e-8,5), upper=c(Inf, Inf,Inf,Inf,1),
                   control=list(maxit=maxit, factr=factr))
-    score1 <- sse_fn(fit1$par, p_obs)
-    score2 <- sse_fn(fit2$par, p_obs)
+    score1 <- SSE(fit1$par, p_obs)
+    score2 <- SSE(fit2$par, p_obs)
     if (score1 < score2) {
       fit <- fit1$par
     } else {
       fit <- fit2$par
     }
   } else {
-    fit <- optim(optim_init, sse_fn, p_obs = p_obs,
+    fit <- optim(optim_init, SSE, p_obs = p_obs,
                  method="L-BFGS-B", lower=rep(1e-8,5), upper=c(Inf, Inf,Inf,Inf,1),
                  control=list(maxit=maxit, factr=factr))$par
   }
@@ -183,7 +265,7 @@ fit_protein <- function(protein_expr,
 #' @param p_obs a named vector of the probabilities of observing a given count
 #'  in gene expression data, as output by running table() on the gene count data
 #'
-sse_fn <- function(args, p_obs) {
+SSE <- function(args, p_obs) {
   p_exp <- args[5]*dnbinom(as.numeric(names(p_obs)), mu=args[1], size=1/args[3]) +
     (1-args[5])*dnbinom(as.numeric(names(p_obs)), mu=args[2], size=1/args[4])
   sse <- min(sum((p_exp - p_obs)^2), .Machine$integer.max)
@@ -194,8 +276,8 @@ sse_fn <- function(args, p_obs) {
 #' Normalize CITE-seq ADT expression by original cell expression totals before cleaning
 #' Then perform batch correction using the MNN method from Haghverdi et al.
 #'
+#' @param cite_protein_clean Cleaned CITE-seq protein data (cell x protein) output by CleanCITE()
 #' @param cite_protein_raw Raw CITE-seq protein data (cell x protein)
-#' @param cite_protein_clean Cleaned CITE-seq protein data (cell x protein) output by clean_cite()
 #' @param batch Batch indices for running MNN batch correction
 #' @param k.batch k to use for MNN batch correction
 #'
@@ -203,7 +285,7 @@ sse_fn <- function(args, p_obs) {
 #'
 #' @export
 #'
-normalize_cite <- function(cite_protein_clean,
+NormalizeCITE.internal <- function(cite_protein_clean,
                            cite_protein_raw,
                            batch = rep(1, nrow(cite_protein_raw)),
                            k.batch = 20) {
