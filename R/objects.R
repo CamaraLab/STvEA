@@ -1,27 +1,35 @@
 
 #' Class to hold all data matrices needed for mapping CODEX to CITE-seq
+#' and following analysis
 #'
-MappingDataHolder <- setClass(
-  Class = 'MappingDataHolder',
+STvEA.data <- setClass(
+  Class = 'STvEA.data',
   slots = c(
-    cite_latent = 'ANY', # cite x low
-    cite_protein = 'ANY', # cite x 30
-    cite_clean = 'ANY', # cite x 30
-    cite_norm = 'ANY', #cite x 30
+    cite_mRNA = 'ANY', # cite_cells x genes
+    cite_latent = 'ANY', # cite cells x low
+    cite_emb = 'ANY', # cite cells x 2
+    cite_clusters = 'vector',
+    cite_protein = 'ANY', # cite cells x proteins
+    cite_clean = 'ANY', # cite cells x proteins
+    cite_norm = 'ANY', # cite cells x proteins
 
-    codex_protein = 'ANY', # codex x 30
+    codex_protein = 'ANY', # codex cells x proteins
     codex_size = 'numeric',
-    codex_blanks = 'ANY',
-    codex_filter = 'ANY', # codex x 30
-    codex_clean = 'ANY', # codex x 30
+    codex_blanks = 'ANY', # codex cells x blank channels
+    codex_spatial = 'ANY', # codex cells x 3
+    codex_clusters = 'vector',
+    codex_emb = 'ANY', # codex cells x 2
+    codex_clean = 'ANY', # codex cells x proteins
 
-    corrected_codex = 'ANY', # codex x 30 (can only do this if CITE always ref)
-    codex_nn = 'dgCMatrix', # cite x codex
-    cite_nn = 'dgCMatrix' # codex x cite
+    corrected_codex = 'ANY', # codex cells x proteins
+    codex_nn = 'dgCMatrix', # cite cells x codex cells
+    cite_nn = 'dgCMatrix', # codex cells x cite cells
+    codex_mRNA = 'ANY' # codex cells x genes
   )
 )
 
-#' Check input data and create MappingDataHolder
+
+#' Check input data and create STvEA.data object
 #'
 #' @param cite_protein Raw expression data for CITE-seq proteins (cell x protein)
 #' @param cite_latent Low dimensional latent space for CITE-seq mRNA (cell x dim)
@@ -31,7 +39,7 @@ MappingDataHolder <- setClass(
 #'
 #' @export
 #'
-SetDataMapping <- function(cite_protein, cite_latent, codex_protein, codex_size, codex_blanks) {
+SetData <- function(cite_protein, cite_latent, codex_protein, codex_size, codex_blanks) {
   if (any(colnames(cite_protein) != colnames(codex_protein))) {
     stop("CITE-seq and CODEX datasets must have the same proteins in the same order")
   }
@@ -41,15 +49,15 @@ SetDataMapping <- function(cite_protein, cite_latent, codex_protein, codex_size,
   if (nrow(codex_protein) != length(codex_size) || nrow(codex_blanks) != length(codex_size)) {
     stop("CODEX protein, size, and blanks must have same number of cells")
   }
-  mapping_object <- new(
-    Class = "MappingDataHolder",
+  stvea_object <- new(
+    Class = "STvEA.data",
     cite_protein = cite_protein,
     cite_latent = cite_latent,
     codex_protein = codex_protein,
     codex_size = codex_size,
     codex_blanks = codex_blanks
   )
-  return(mapping_object)
+  return(stvea_object)
 }
 
 

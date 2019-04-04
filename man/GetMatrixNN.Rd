@@ -2,15 +2,14 @@
 % Please edit documentation in R/mapping.R
 \name{GetMatrixNN}
 \alias{GetMatrixNN}
-\title{Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in MappingDataHolder}
+\title{Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in STvEA.data}
 \usage{
-GetMatrixNN(mapping_object,
-  k.codex = floor(nrow(mapping_object@cite_clean) * 0.002),
-  k.cite = floor(nrow(mapping_object@corrected_codex) * 0.002),
+GetMatrixNN(stvea_object, k.codex = floor(nrow(stvea_object@cite_clean) *
+  0.002), k.cite = floor(nrow(stvea_object@corrected_codex) * 0.002),
   c.codex = 0.1, c.cite = 0.1)
 }
 \arguments{
-\item{mapping_object}{MappingDataHolder class with mapping correction run}
+\item{stvea_object}{STvEA.data class with mapping correction run}
 
 \item{k.codex}{number of nearest CITE-seq neighbors to find for each CODEX cell}
 
@@ -21,5 +20,5 @@ GetMatrixNN(mapping_object,
 \item{c.cite}{width of Gaussian kernel in CITE-seq dataset}
 }
 \description{
-Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in MappingDataHolder
+Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in STvEA.data
 }

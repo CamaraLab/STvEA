@@ -2,13 +2,13 @@
 % Please edit documentation in R/data_processing.R
 \name{FilterCODEX}
 \alias{FilterCODEX}
-\title{Wraps FilterCODEX.internal using MappingDataHolder class}
+\title{Wraps FilterCODEX.internal using STvEA.data class}
 \usage{
-FilterCODEX(mapping_object, size_lim = NULL, blank_upper = NULL,
+FilterCODEX(stvea_object, size_lim = NULL, blank_upper = NULL,
   blank_lower = NULL)
 }
 \arguments{
-\item{mapping_object}{MappingDataHolder class with CODEX data}
+\item{stvea_object}{STvEA.data class with CODEX data}
 
 \item{size_lim}{lower and upper limits on size of each cell. If blank, set to 0.025 and 0.99 quantiles}
 
@@ -19,5 +19,5 @@ If NULL, blank upper bounds are set as the 0.995 quantile for each blank}
 If NULL, blank lower bounds are set as the 0.002 quantile for each blank}
 }
 \description{
-Wraps FilterCODEX.internal using MappingDataHolder class
+Wraps FilterCODEX.internal using STvEA.data class
 }

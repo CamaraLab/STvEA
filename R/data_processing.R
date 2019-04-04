@@ -1,9 +1,9 @@
 
-# Function wrappers using mapping data holder
+# Function wrappers using STvEA data class
 
-#' Wraps FilterCODEX.internal using MappingDataHolder class
+#' Wraps FilterCODEX.internal using STvEA.data class
 #'
-#' @param mapping_object MappingDataHolder class with CODEX data
+#' @param stvea_object STvEA.data class with CODEX data
 #' @param size_lim lower and upper limits on size of each cell. If blank, set to 0.025 and 0.99 quantiles
 #' @param blank_upper a vector with an upper bound expression cutoff for each blank channel.
 #' If NULL, blank upper bounds are set as the 0.995 quantile for each blank
@@ -12,35 +12,58 @@
 #'
 #' @export
 #'
-FilterCODEX <- function(mapping_object,
+FilterCODEX <- function(stvea_object,
                                 size_lim = NULL,
                                 blank_upper = NULL,
                                 blank_lower = NULL) {
-  mapping_object@codex_filter <- FilterCODEX.internal(mapping_object@codex_protein,
-                                                      mapping_object@codex_size,
-                                                      mapping_object@codex_blanks,
+  if (is.null(stvea_object@codex_protein) || is.null(stvea_object@codex_size) || is.null(stvea_object@codex_blanks)) {
+    stop("Input object must contain size of each CODEX cell and expression for CODEX protein and blank channels")
+  }
+  if (is.null(row.names(stvea_object@codex_protein))) {
+    row.names(stvea_object@codex_protein) <- as.character(1:nrow(stvea_object@codex_protein))
+  }
+  filter_matrix <- FilterCODEX.internal(stvea_object@codex_protein,
+                                                      stvea_object@codex_size,
+                                                      stvea_object@codex_blanks,
                                                       size_lim=size_lim,
                                                       blank_upper=blank_upper,
                                                       blank_lower=blank_lower)
-  return(mapping_object)
+  filter <- row.names(stvea_object@codex_protein) %in% row.names(filter_matrix)
+  stvea_object@codex_protein <- filter_matrix
+  stvea_object@codex_size <- stvea_object@codex_size[filter]
+  stvea_object@codex_blanks <- stvea_object@codex_blanks[filter,]
+
+  if (!is.null(stvea_object@codex_spatial)) {
+    stvea_object@codex_spatial <- stvea_object@codex_spatial[filter,]
+  }
+  if (!is.null(stvea_object@codex_clusters)) {
+    stvea_object@codex_clusters <- stvea_object@codex_clusters[filter]
+  }
+  if (!is.null(stvea_object@codex_emb)) {
+    stvea_object@codex_emb <- stvea_object@codex_emb[filter,]
+  }
+  return(stvea_object)
 }
 
 
-#' Wraps CleanCODEX.internal using MappingDataHolder class
+#' Wraps CleanCODEX.internal using STvEA.data class
 #'
-#' @param mapping_object MappingDataHolder class with CODEX data after FilterCODEX
+#' @param stvea_object STvEA.data class with CODEX data after FilterCODEX
 #'
 #' @export
 #'
-CleanCODEX <- function(mapping_object) {
-  mapping_object@codex_clean <- CleanCODEX.internal(mapping_object@codex_filter)
-  return(mapping_object)
+CleanCODEX <- function(stvea_object) {
+  if (is.null(stvea_object@codex_filter)) {
+    stop("FilterCODEX must have been run on the input object first")
+  }
+  stvea_object@codex_clean <- CleanCODEX.internal(stvea_object@codex_filter)
+  return(stvea_object)
 }
 
 
-#' Wraps CleanCITE.internal using MappingDataHolder class
+#' Wraps CleanCITE.internal using STvEA.data class
 #'
-#' @param mapping_object MappingDataHolder class with CITE-seq protein data
+#' @param stvea_object STvEA.data class with CITE-seq protein data
 #' @param maxit maximum number of iterations for optim function
 #' @param factr accuracty of optim function
 #' @param optim_inits a matrix of (proteins x params) with initialization
@@ -50,28 +73,34 @@ CleanCODEX <- function(mapping_object) {
 #'
 #' @export
 #'
-CleanCITE <- function(mapping_object,
+CleanCITE <- function(stvea_object,
                       maxit = 500,
                       factr = 1e-9,
                       optim_inits = NULL,
                       num_cores = 1) {
-  mapping_object@cite_clean <- CleanCITE.internal(mapping_object@cite_protein,
+  if (is.null(stvea_object@cite_protein)) {
+    stop("Input object must contain CITE-seq protein expression")
+  }
+  stvea_object@cite_clean <- CleanCITE.internal(stvea_object@cite_protein,
                                                   factr=factr,
                                                   optim_inits=optim_inits,
                                                   num_cores=num_cores)
-  return(mapping_object)
+  return(stvea_object)
 }
 
-#' Wraps NormalizeCITE.internal using MappingDataHolder class
+#' Wraps NormalizeCITE.internal using STvEA.data class
 #'
-#' @param mapping_object MappingDataHOlder class with CITE-seq protein data after CleanCITE
+#' @param stvea_object STvEA.data class with CITE-seq protein data after CleanCITE
 #'
 #' @export
 #'
-NormalizeCITE <- function(mapping_object) {
-  mapping_object@cite_norm <- NormalizeCITE.internal(mapping_object@cite_clean,
-                                                     mapping_object@cite_protein)
-  return(mapping_object)
+NormalizeCITE <- function(stvea_object) {
+  if(is.null(stvea_object@cite_clean)) {
+    stop("CleanCITE must have been run on the input object first")
+  }
+  stvea_object@cite_norm <- NormalizeCITE.internal(stvea_object@cite_clean,
+                                                     stvea_object@cite_protein)
+  return(stvea_object)
 }
 
 

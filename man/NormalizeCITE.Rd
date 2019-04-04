@@ -2,13 +2,13 @@
 % Please edit documentation in R/data_processing.R
 \name{NormalizeCITE}
 \alias{NormalizeCITE}
-\title{Wraps NormalizeCITE.internal using MappingDataHolder class}
+\title{Wraps NormalizeCITE.internal using STvEA.data class}
 \usage{
-NormalizeCITE(mapping_object)
+NormalizeCITE(stvea_object)
 }
 \arguments{
-\item{mapping_object}{MappingDataHOlder class with CITE-seq protein data after CleanCITE}
+\item{stvea_object}{STvEA.data class with CITE-seq protein data after CleanCITE}
 }
 \description{
-Wraps NormalizeCITE.internal using MappingDataHolder class
+Wraps NormalizeCITE.internal using STvEA.data class
 }

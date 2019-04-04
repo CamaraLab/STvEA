@@ -1,25 +1,122 @@
-
-#' compute UMAP embedding of x and plot
+#' @import ggplot2
 #'
-run_umap <- function(x) {
+NULL
+
+#' Plot expression of a gene or protein in the CITE-seq UMAP embedding
+#'
+#' @param stvea_object STvEA.data class with CITE-seq expression and embedding
+#' @param name gene or protein name to plot
+#' @param type which type of expression data should be plotted? "RNA" or "protein"
+#'
+#' @export
+#'
+PlotExprCITE <- function(stvea_object, name, type="RNA") {
+  if (type == "RNA") {
+    ggplot(stvea_object@cite_emb,
+           aes(x=V1,y=V2,color=stvea_object@cite_mRNA[,name])) +
+      geom_point(size=0.8) +
+      scale_color_gradient(low="gray", high="red", guide=FALSE) +
+      theme_void()
+  } else if (type == "protein") {
+    ggplot(stvea_object@cite_emb,
+           aes(x=V1,y=V2,color=stvea_object@cite_protein[,name])) +
+      geom_point(size=0.8) +
+      scale_color_gradient(low="gray", high="blue", guide=FALSE) +
+      theme_void()
+  } else {
+    stop("Invalid type setting")
+  }
+}
+
+
+#' Plot location of a CITE-seq cell in the CITE-seq UMAP embedding
+#'
+#' @param stvea_object STvEA.data class with CITE-seq embedding
+#' @param index index of CITE-seq cell to plot
+#'
+#' @export
+#'
+PlotIndexCITE <- function(stvea_object, index) {
+  temp_df <- as.data.frame(rbind(stvea_object@cite_emb[-index,],stvea_object@cite_emb[index]))
+  ggplot(temp_df,
+         aes(x=V1,y=V2,color=c(rep("other",nrow(temp_df)-1),"this"))) +
+    geom_point(size=0.8) +
+    scale_color_manual(low="gray", high="red", guide=FALSE) +
+    theme_void()
+}
+
+
+#' Plot expression of a gene or protein in the CODEX UMAP embedding
+#'
+#' @param stvea_object STvEA.data class with CODEX expression and embedding
+#' @param name gene or protein name to plot
+#' @param type which type of expression data should be plotted? "RNA" or "protein"
+#'
+#' @export
+#'
+PlotExprCODEXumap <- function(stvea_object, name, type="protein") {
+  if (type == "RNA") {
+    ggplot(stvea_object@codex_emb,
+           aes(x=V1,y=V2,color=stvea_object@cite_mRNA[,name])) +
+      geom_point(size=0.8) +
+      scale_color_gradient(low="gray", high="red", guide=FALSE) +
+      theme_void()
+  } else if (type == "protein") {
+    ggplot(stvea_object@codex_emb,
+           aes(x=V1,y=V2,color=stvea_object@cite_protein[,name])) +
+      geom_point(size=0.8) +
+      scale_color_gradient(low="gray", high="purple", guide=FALSE) +
+      theme_void()
+  } else {
+    stop("Invalid type setting")
+  }
+}
+
+
+#' Plot expression of a gene or protein in the CITE-seq spatial coordinates
+#'
+#' @param stvea_object STvEA.data class with CITE-seq expression and spatial xy
+#' @param name gene or protein name to plot
+#' @param type which type of expression data should be plotted? "RNA" or "protein"
+#'
+#' @export
+#'
+PlotExprCODEXspatial <- function(stvea_object, name, type="protein") {
+
+}
+
+
+#' Plot location of a CODEX cell in the CODEX UMAP embedding
+#'
+#' @param stvea_object STvEA.data class with CODEX embedding
+#' @param index index of CODEX cell to plot
+#'
+#' @export
+#'
+PlotIndexCODEXumap <- function(stvea_object, index) {
+
+}
+
+PlotIndexCODEXspatial <- function(stvea_object, index) {
+
 }
 
 #' Plot the CODEX neighbors of a set of CITE-seq cells
 #' in the spatial coordinates
 #'
-plot_neighbors_spatial <- function(cite_cells) {
+PlotSpatialNeighbors <- function(cite_cells) {
 }
 
 #' Plot CITE-seq neighbors of a set of CODEX cells
 #' in the CITE-seq mRNA UMAP
 #'
-plot_neighbors_umap <- function(codex_cells) {
+PlotUmapNeighbors <- function(codex_cells) {
 }
 
 #' Plot CITE-seq gene expression on
 #' CODEX spatial coordinates
 #'
-plot_mrna_spatial <- function(gene_name) {
+PlotSpatialRNA <- function(gene_name) {
 }
 
 #' Plot heatmap of cluster feature scores

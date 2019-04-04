@@ -2,13 +2,13 @@
 % Please edit documentation in R/data_processing.R
 \name{CleanCITE}
 \alias{CleanCITE}
-\title{Wraps CleanCITE.internal using MappingDataHolder class}
+\title{Wraps CleanCITE.internal using STvEA.data class}
 \usage{
-CleanCITE(mapping_object, maxit = 500, factr = 1e-09,
+CleanCITE(stvea_object, maxit = 500, factr = 1e-09,
   optim_inits = NULL, num_cores = 1)
 }
 \arguments{
-\item{mapping_object}{MappingDataHolder class with CITE-seq protein data}
+\item{stvea_object}{STvEA.data class with CITE-seq protein data}
 
 \item{maxit}{maximum number of iterations for optim function}
 
@@ -21,5 +21,5 @@ starts at two default parameter sets and picks the better one}
 \item{num_cores}{number of cores to use for parallelized fits}
 }
 \description{
-Wraps CleanCITE.internal using MappingDataHolder class
+Wraps CleanCITE.internal using STvEA.data class
 }

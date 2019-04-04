@@ -2,13 +2,13 @@
 % Please edit documentation in R/data_processing.R
 \name{CleanCODEX}
 \alias{CleanCODEX}
-\title{Wraps CleanCODEX.internal using MappingDataHolder class}
+\title{Wraps CleanCODEX.internal using STvEA.data class}
 \usage{
-CleanCODEX(mapping_object)
+CleanCODEX(stvea_object)
 }
 \arguments{
-\item{mapping_object}{MappingDataHolder class with CODEX data after FilterCODEX}
+\item{stvea_object}{STvEA.data class with CODEX data after FilterCODEX}
 }
 \description{
-Wraps CleanCODEX.internal using MappingDataHolder class
+Wraps CleanCODEX.internal using STvEA.data class
 }

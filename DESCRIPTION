@@ -13,4 +13,5 @@ Imports:
     irlba,
     mclust,
     RANN,
-    tidyr
+    tidyr,
+    ggplot2

@@ -1,8 +1,8 @@
-# Function wrappers using mapping data holder
+# Function wrappers using STvEA data class
 
-#' Wraps CorrectChunksCODEX.internal using MappingDataHolder class
+#' Wraps MapCODEXtoCITE.internal using STvEA.data class
 #'
-#' @param mapping_object MappingDataHolder class with CODEX and CITE-seq data
+#' @param stvea_object STvEA.data class with CODEX and CITE-seq data
 #' @param num_chunks number of equal sized chunks to split CODEX dataset into for correction
 #' @param seed set.seed before randomly sampling chunks of CODEX dataset
 #' @param num_cores number of cores to use in parallelized correction of CODEX dataset
@@ -14,7 +14,7 @@
 #'
 #' @export
 #'
-CorrectChunksCODEX <- function(mapping_object,
+MapCODEXtoCITE <- function(stvea_object,
                                num_chunks,
                                seed = NULL,
                                num_cores = 1,
@@ -23,20 +23,26 @@ CorrectChunksCODEX <- function(mapping_object,
                                k.filter=100,
                                k.score=80,
                                k.weight=100) {
-  mapping_object@corrected_codex <- CorrectChunksCODEX.internal(mapping_object@cite_norm,
-                                                                mapping_object@codex_clean,
-                                                                mapping_object@cite_latent,
+  if (is.null(stvea_object@cite_norm) || is.null(stvea_object@codex_clean)) {
+    stop("NormalizeCITE and CleanCODEX must have been run on input object first")
+  }
+  if (is.null(stvea_object@cite_latent)) {
+    stop("Input object must contain lower dimensional latent space of the CITE-seq mRNA data")
+  }
+  stvea_object@corrected_codex <- MapCODEXtoCITE.internal(stvea_object@cite_norm,
+                                                                stvea_object@codex_clean,
+                                                                stvea_object@cite_latent,
                                                                 num_chunks=num_chunks, seed=seed,
                                                                 num_cores=num_cores, num.cc=num.cc,
                                                                 k.anchor=k.anchor, k.filter=k.filter,
                                                                 k.score=k.score, k.weight=k.weight)
-  return(mapping_object)
+  return(stvea_object)
 }
 
 
-#' Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in MappingDataHolder
+#' Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in STvEA.data
 #'
-#' @param mapping_object MappingDataHolder class with mapping correction run
+#' @param stvea_object STvEA.data class with mapping correction run
 #' @param k.codex number of nearest CITE-seq neighbors to find for each CODEX cell
 #' @param k.cite number of nearest CODEX neighbors to find for each CITE-seq cell
 #' @param c.codex width of Gaussian kernel in CODEX dataset
@@ -44,20 +50,23 @@ CorrectChunksCODEX <- function(mapping_object,
 #'
 #' @export
 #'
-GetMatrixNN <- function(mapping_object,
-                        k.codex = floor(nrow(mapping_object@cite_clean)*0.002),
-                        k.cite = floor(nrow(mapping_object@corrected_codex)*0.002),
+GetMatrixNN <- function(stvea_object,
+                        k.codex = floor(nrow(stvea_object@cite_clean)*0.002),
+                        k.cite = floor(nrow(stvea_object@corrected_codex)*0.002),
                         c.codex = 0.1,
                         c.cite = 0.1) {
-  mapping_object@codex_nn <- GetMatrixNN.internal(mapping_object@corrected_codex,
-                                                  mapping_object@cite_clean,
+  if (is.null(stvea_object@corrected_codex)) {
+    stop("MapCODEXtoCITE must be run on the input object first")
+  }
+  stvea_object@codex_nn <- GetMatrixNN.internal(stvea_object@corrected_codex,
+                                                  stvea_object@cite_norm,
                                                   k=k.codex,
                                                   c=c.codex)
-  mapping_object@cite_nn <- GetMatrixNN.internal(mapping_object@cite_clean,
-                                                 mapping_object@corrected_codex,
+  stvea_object@cite_nn <- GetMatrixNN.internal(stvea_object@cite_norm,
+                                                 stvea_object@corrected_codex,
                                                  k=k.cite,
                                                  c=c.cite)
-  return(mapping_object)
+  return(stvea_object)
 }
 
 
@@ -137,7 +146,9 @@ AnchorCorrection <- function(
 }
 
 
-#' Run all methods for anchor correction
+#' Run all methods for anchor correction to map the CODEX dataset to the CITE-seq dataset
+#' Since the CODEX dataset is usually much bigger, allows to subsample equal-sized
+#' chunks of the CODEX dataset to map individually
 #'
 #' @param cite_protein a (n cell x f feature) protein expression matrix
 #' @param codex_protein a (m cell x f feature) protein expression matrix to be corrected
@@ -155,7 +166,7 @@ AnchorCorrection <- function(
 #'
 #' @export
 #'
-CorrectChunksCODEX.internal <- function(
+MapCODEXtoCITE.internal <- function(
   cite_protein,
   codex_protein,
   cite_latent,
