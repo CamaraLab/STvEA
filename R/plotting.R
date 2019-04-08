@@ -37,11 +37,11 @@ PlotExprCITE <- function(stvea_object, name, type="RNA") {
 #' @export
 #'
 PlotIndexCITE <- function(stvea_object, index) {
-  temp_df <- as.data.frame(rbind(stvea_object@cite_emb[-index,],stvea_object@cite_emb[index]))
+  temp_df <- as.data.frame(rbind(stvea_object@cite_emb[-index,],stvea_object@cite_emb[index,]))
   ggplot(temp_df,
          aes(x=V1,y=V2,color=c(rep("other",nrow(temp_df)-1),"this"))) +
     geom_point(size=0.8) +
-    scale_color_manual(low="gray", high="red", guide=FALSE) +
+    scale_color_manual(values=c("gray","red"), guide=FALSE) +
     theme_void()
 }
 
@@ -57,13 +57,13 @@ PlotIndexCITE <- function(stvea_object, index) {
 PlotExprCODEXumap <- function(stvea_object, name, type="protein") {
   if (type == "RNA") {
     ggplot(stvea_object@codex_emb,
-           aes(x=V1,y=V2,color=stvea_object@cite_mRNA[,name])) +
+           aes(x=V1,y=V2,color=stvea_object@codex_mRNA[,name])) +
       geom_point(size=0.8) +
       scale_color_gradient(low="gray", high="red", guide=FALSE) +
       theme_void()
   } else if (type == "protein") {
     ggplot(stvea_object@codex_emb,
-           aes(x=V1,y=V2,color=stvea_object@cite_protein[,name])) +
+           aes(x=V1,y=V2,color=stvea_object@codex_protein[,name])) +
       geom_point(size=0.8) +
       scale_color_gradient(low="gray", high="purple", guide=FALSE) +
       theme_void()
@@ -73,16 +73,36 @@ PlotExprCODEXumap <- function(stvea_object, name, type="protein") {
 }
 
 
-#' Plot expression of a gene or protein in the CITE-seq spatial coordinates
+#' Plot expression of a gene or protein in the CODEX spatial coordinates
 #'
-#' @param stvea_object STvEA.data class with CITE-seq expression and spatial xy
+#' @param stvea_object STvEA.data class with CODEX expression and spatial xy
 #' @param name gene or protein name to plot
 #' @param type which type of expression data should be plotted? "RNA" or "protein"
 #'
 #' @export
 #'
 PlotExprCODEXspatial <- function(stvea_object, name, type="protein") {
-
+  if (type == "protein") {
+    ggplot(as.data.frame(stvea_object@codex_spatial),
+           aes(x=x,y=y,color=stvea_object@codex_protein[,name])) +
+      geom_point(size=0.5) +
+      scale_color_gradient(low="white", high="blue") +
+      guides(color = FALSE) +
+      ylim(max(y), 0) +
+      ggtitle(title) +
+      theme_minimal()
+  } else if (type == "RNA") {
+    ggplot(as.data.frame(stvea_object@codex_spatial),
+           aes(x=x,y=y,color=stvea_object@codex_mRNA[,name])) +
+      geom_point(size=0.5) +
+      scale_color_gradient(low="white", high="blue") +
+      guides(color = FALSE) +
+      ylim(max(y), 0) +
+      ggtitle(title) +
+      theme_minimal()
+  } else {
+    stop("Invalid type setting")
+  }
 }
 
 
@@ -94,10 +114,24 @@ PlotExprCODEXspatial <- function(stvea_object, name, type="protein") {
 #' @export
 #'
 PlotIndexCODEXumap <- function(stvea_object, index) {
-
+  temp_df <- as.data.frame(rbind(stvea_object@codex_emb[-index,],stvea_object@codex_emb[index,]))
+  ggplot(temp_df,
+         aes(x=V1,y=V2,color=c(rep("other",nrow(temp_df)-1),"this"))) +
+    geom_point(size=0.8) +
+    scale_color_manual(values=c("gray","red"), guide=FALSE) +
+    theme_void()
 }
 
 PlotIndexCODEXspatial <- function(stvea_object, index) {
+  temp_df <- as.data.frame(rbind(stvea_object@codex_spatial[-index,],stvea_object@codex_spatial[index,]))
+  ggplot(temp_df,
+         aes(x=x,y=y,color=c(rep("other",nrow(temp_df)-1),"this"))) +
+    geom_point(size=0.5) +
+    scale_color_gradient(low="gray", high="red") +
+    guides(color = FALSE) +
+    ylim(max(y), 0) +
+    ggtitle(title) +
+    theme_minimal()
 
 }
 
