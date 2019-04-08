@@ -89,8 +89,7 @@ PlotExprCODEXspatial <- function(stvea_object, name, type="protein") {
       scale_color_gradient(low="white", high="blue") +
       guides(color = FALSE) +
       ylim(max(y), 0) +
-      ggtitle(title) +
-      theme_minimal()
+      theme_void()
   } else if (type == "RNA") {
     ggplot(as.data.frame(stvea_object@codex_spatial),
            aes(x=x,y=y,color=stvea_object@codex_mRNA[,name])) +
@@ -98,8 +97,7 @@ PlotExprCODEXspatial <- function(stvea_object, name, type="protein") {
       scale_color_gradient(low="white", high="blue") +
       guides(color = FALSE) +
       ylim(max(y), 0) +
-      ggtitle(title) +
-      theme_minimal()
+      theme_void()
   } else {
     stop("Invalid type setting")
   }
@@ -122,6 +120,14 @@ PlotIndexCODEXumap <- function(stvea_object, index) {
     theme_void()
 }
 
+
+#' Plot location of a CODEX cell in the CODEX spatial coordinates
+#'
+#' @param stvea_object STvEA.data class with CODEX spatial xy
+#' @param index index of CODEX cell to plot
+#'
+#' @export
+#'
 PlotIndexCODEXspatial <- function(stvea_object, index) {
   temp_df <- as.data.frame(rbind(stvea_object@codex_spatial[-index,],stvea_object@codex_spatial[index,]))
   ggplot(temp_df,
@@ -134,6 +140,7 @@ PlotIndexCODEXspatial <- function(stvea_object, index) {
     theme_minimal()
 
 }
+
 
 #' Plot the CODEX neighbors of a set of CITE-seq cells
 #' in the spatial coordinates
