@@ -136,8 +136,7 @@ PlotIndexCODEXspatial <- function(stvea_object, index) {
     scale_color_gradient(low="gray", high="red") +
     guides(color = FALSE) +
     ylim(max(y), 0) +
-    ggtitle(title) +
-    theme_minimal()
+    theme_void()
 
 }
 
