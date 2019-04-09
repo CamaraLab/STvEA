@@ -137,12 +137,13 @@ PlotIndexCODEXspatial <- function(stvea_object, index) {
     guides(color = FALSE) +
     ylim(max(y), 0) +
     theme_void()
-
 }
 
 
 #' Plot the CODEX neighbors of a set of CITE-seq cells
 #' in the spatial coordinates
+#'
+#' @export
 #'
 PlotSpatialNeighbors <- function(cite_cells) {
 }

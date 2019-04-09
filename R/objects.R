@@ -6,6 +6,7 @@ STvEA.data <- setClass(
   Class = 'STvEA.data',
   slots = c(
     cite_mRNA = 'ANY', # cite_cells x genes
+    cite_mRNA_norm = 'ANY', # cite cells x genes log(1+TPM) or seurat
     cite_latent = 'ANY', # cite cells x low
     cite_emb = 'ANY', # cite cells x 2
     cite_clusters = 'vector',
