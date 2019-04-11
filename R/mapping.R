@@ -195,7 +195,8 @@ MapCODEXtoCITE.internal <- function(
                            mc.cores=num_cores)
   corrected_codex <- NULL
   for (i in 1:length(chunk_ids)) {
-    corrected_codex <- rbind(corrected_codex, corrected_data[[i]][(nrow(cite_protein)+1):nrow(corrected_data[[i]]),])
+    corrected_codex <- rbind(corrected_codex,
+                             corrected_data[[i]][(nrow(cite_protein)+1):nrow(corrected_data[[i]]),])
   }
   return(corrected_codex[row.names(codex_protein),])
 }

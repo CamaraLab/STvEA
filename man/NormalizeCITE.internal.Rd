@@ -5,8 +5,8 @@
 \title{Normalize CITE-seq ADT expression by original cell expression totals before cleaning
 Then perform batch correction using the MNN method from Haghverdi et al.}
 \usage{
-NormalizeCITE.internal(cite_protein_clean, cite_protein_raw,
-  batch = rep(1, nrow(cite_protein_raw)), k.batch = 20)
+NormalizeCITE.internal(cite_protein_clean, cite_protein_raw, batch = rep(1,
+  nrow(cite_protein_raw)), k.batch = 20)
 }
 \arguments{
 \item{cite_protein_clean}{Cleaned CITE-seq protein data (cell x protein) output by CleanCITE()}

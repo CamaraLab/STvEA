@@ -2,17 +2,27 @@
 % Please edit documentation in R/plotting.R
 \name{PlotExprCODEXspatial}
 \alias{PlotExprCODEXspatial}
-\title{Plot expression of a gene or protein in the CITE-seq spatial coordinates}
+\title{Plot expression of a gene or protein in the CODEX spatial coordinates}
 \usage{
-PlotExprCODEXspatial(stvea_object, name, type = "protein")
+PlotExprCODEXspatial(stvea_object, name, type = "protein",
+  high_color = "red", high_color2 = "green", low_color = "white",
+  pt_size = 0.8)
 }
 \arguments{
-\item{stvea_object}{STvEA.data class with CITE-seq expression and spatial xy}
+\item{stvea_object}{STvEA.data class with CODEX expression and spatial xy}
 
 \item{name}{gene or protein name to plot}
 
 \item{type}{which type of expression data should be plotted? "RNA" or "protein"}
+
+\item{high_color}{color of high expression on the color ramp}
+
+\item{high_color2}{color of high expression for second protein or gene, if provided}
+
+\item{low_color}{color of low/no expression on the color ramp}
+
+\item{pt_size}{ggplot geom_point size}
 }
 \description{
-Plot expression of a gene or protein in the CITE-seq spatial coordinates
+Plot expression of a gene or protein in the CODEX spatial coordinates
 }

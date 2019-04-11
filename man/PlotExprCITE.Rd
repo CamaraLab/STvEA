@@ -2,17 +2,30 @@
 % Please edit documentation in R/plotting.R
 \name{PlotExprCITE}
 \alias{PlotExprCITE}
-\title{Plot expression of a gene or protein in the CITE-seq UMAP embedding}
+\title{Plot expression of a gene or protein in the CITE-seq UMAP or t-SNE embedding}
 \usage{
-PlotExprCITE(stvea_object, name, type = "RNA")
+PlotExprCITE(stvea_object, name, type = "RNA", high_color = "red",
+  high_color2 = "green", low_color = "gray", pt_size = 0.8)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CITE-seq expression and embedding}
 
-\item{name}{gene or protein name to plot}
+\item{name}{gene or protein to plot - can be a character string, index, or vector with up to two names or indices}
 
 \item{type}{which type of expression data should be plotted? "RNA" or "protein"}
+
+\item{high_color}{color of high expression on the color ramp}
+
+\item{high_color2}{color of high expression for second gene or protein, if provided}
+
+\item{low_color}{color of low/no expression on the color ramp}
+
+\item{pt_size}{ggplot geom_point size}
+
+\item{importFrom}{scales alpha}
+
+\item{importFrom}{grDevices colorRampPalette}
 }
 \description{
-Plot expression of a gene or protein in the CITE-seq UMAP embedding
+Plot expression of a gene or protein in the CITE-seq UMAP or t-SNE embedding
 }

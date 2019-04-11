@@ -16,7 +16,8 @@ FilterCODEX <- function(stvea_object,
                                 size_lim = NULL,
                                 blank_upper = NULL,
                                 blank_lower = NULL) {
-  if (is.null(stvea_object@codex_protein) || is.null(stvea_object@codex_size) || is.null(stvea_object@codex_blanks)) {
+  if (is.null(stvea_object@codex_protein) || is.null(stvea_object@codex_size) ||
+      is.null(stvea_object@codex_blanks)) {
     stop("Input object must contain size of each CODEX cell and expression for CODEX protein and blank channels")
   }
   if (is.null(row.names(stvea_object@codex_protein))) {
@@ -111,10 +112,12 @@ NormalizeCITE <- function(stvea_object) {
 #' as determined by the gating strategy on the blank channels
 #' from the CODEX paper
 #'
-#' @param codex_raw CODEX expression matrix after spillover correction, not including blank channels (cells x proteins)
+#' @param codex_raw CODEX expression matrix after spillover correction,
+#' not including blank channels (cells x proteins)
 #' @param size vector of cell sizes from CODEX segmentation
 #' @param blanks expression matrix for blank channels after spillover correction (cells x channels)
-#' @param size_lim lower and upper limits on size of each cell. If blank, set to 0.025 and 0.99 quantiles
+#' @param size_lim lower and upper limits on size of each cell.
+#' If blank, set to 0.025 and 0.99 quantiles
 #' @param blank_upper a vector with an upper bound expression cutoff for each blank channel.
 #' If NULL, blank upper bounds are set as the 0.995 quantile for each blank
 #' @param blank_lower a vector with a lower bound expression cutoff for each blank channel.
@@ -187,7 +190,8 @@ CleanCODEX.internal <- function(codex_filtered) {
   for (i in 1:ncol(codex_filtered)) {
     fit = Mclust(codex_filtered[,i], G=2, model="V", verbose=FALSE)
     signal <- as.numeric(which.max(fit$parameters$mean))
-    expr_clean <- pnorm(codex_filtered[,i], mean = fit$parameters$mean[signal], sd = sqrt(fit$parameters$variance$sigmasq[signal]))
+    expr_clean <- pnorm(codex_filtered[,i], mean = fit$parameters$mean[signal],
+                        sd = sqrt(fit$parameters$variance$sigmasq[signal]))
     codex_clean[,i] <- expr_clean
   }
   return(codex_clean)
@@ -281,7 +285,8 @@ FitNB <- function(protein_expr,
   }
 
   # distribution with higher median is signal
-  signal <- as.numeric(which.max(c(qnbinom(0.5,mu=fit[1],size=1/fit[3]), qnbinom(0.5,mu=fit[2],size=1/fit[3]))))
+  signal <- as.numeric(which.max(c(qnbinom(0.5,mu=fit[1],size=1/fit[3]),
+                                   qnbinom(0.5,mu=fit[2],size=1/fit[3]))))
 
   expr_clean <- pnbinom(protein_expr, mu=fit[signal],size=1/fit[signal+2])
   return(expr_clean)

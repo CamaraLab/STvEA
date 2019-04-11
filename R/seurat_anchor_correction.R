@@ -112,7 +112,8 @@ FindNN <- function(
     k = k,
     eps = eps
   )
-  return(list('nn.rr' = nn.rr, 'nn.rq' = nn.rq, 'nn.qr' = nn.qr, 'nn.qq' = nn.qq, 'cellsr' = row.names(ref_emb), 'cellsq' = row.names(query_emb)))
+  return(list('nn.rr' = nn.rr, 'nn.rq' = nn.rq, 'nn.qr' = nn.qr, 'nn.qq' = nn.qq,
+              'cellsr' = row.names(ref_emb), 'cellsq' = row.names(query_emb)))
 }
 
 
@@ -181,7 +182,8 @@ FindNNrna <- function(
     k = k,
     eps = eps
   )
-  return(list('nn.rr' = nn.rr, 'nn.rq' = nn.rq, 'nn.qr' = nn.qr, 'nn.qq' = nn.qq, 'cellsr' = row.names(ref_emb), 'cellsq' = row.names(query_emb)))
+  return(list('nn.rr' = nn.rr, 'nn.rq' = nn.rq, 'nn.qr' = nn.qr, 'nn.qq' = nn.qq,
+              'cellsr' = row.names(ref_emb), 'cellsq' = row.names(query_emb)))
 }
 
 
@@ -318,16 +320,21 @@ ScoreAnchors <- function(
   if (verbose) {
     message("Scoring anchors")
   }
-  max.nn <- c(ncol(x = neighbors$nn.rr$nn.idx), ncol(x = neighbors$nn.rq$nn.idx), ncol(x = neighbors$nn.qr$nn.idx), ncol(x = neighbors$nn.qq$nn.idx))
+  max.nn <- c(ncol(x = neighbors$nn.rr$nn.idx), ncol(x = neighbors$nn.rq$nn.idx),
+              ncol(x = neighbors$nn.qr$nn.idx), ncol(x = neighbors$nn.qq$nn.idx))
   if (any(k.score > max.nn)) {
     warning('Requested k.score = ', k.score, ', only ', min(max.nn), ' in dataset')
     k.score <- min(max.nn)
   }
   total.cells <- num_cells_ref + num_cells_query
-  nn.m1 <- ConstructNNMat(nn.idx = neighbors$nn.rr$nn.idx[,1:k.score], offset1 = 0, offset2 = 0, dims = c(total.cells, total.cells))
-  nn.m2 <- ConstructNNMat(nn.idx = neighbors$nn.rq$nn.idx[,1:k.score], offset1 = 0, offset2 = num_cells_ref, dims = c(total.cells, total.cells))
-  nn.m3 <- ConstructNNMat(nn.idx = neighbors$nn.qr$nn.idx[,1:k.score], offset1 = num_cells_ref, offset2 = 0, dims = c(total.cells, total.cells))
-  nn.m4 <- ConstructNNMat(nn.idx = neighbors$nn.qq$nn.idx[,1:k.score], offset1 = num_cells_ref, offset2 = num_cells_ref, dims = c(total.cells, total.cells))
+  nn.m1 <- ConstructNNMat(nn.idx = neighbors$nn.rr$nn.idx[,1:k.score],
+                          offset1 = 0, offset2 = 0, dims = c(total.cells, total.cells))
+  nn.m2 <- ConstructNNMat(nn.idx = neighbors$nn.rq$nn.idx[,1:k.score],
+                          offset1 = 0, offset2 = num_cells_ref, dims = c(total.cells, total.cells))
+  nn.m3 <- ConstructNNMat(nn.idx = neighbors$nn.qr$nn.idx[,1:k.score],
+                          offset1 = num_cells_ref, offset2 = 0, dims = c(total.cells, total.cells))
+  nn.m4 <- ConstructNNMat(nn.idx = neighbors$nn.qq$nn.idx[,1:k.score],
+                          offset1 = num_cells_ref, offset2 = num_cells_ref, dims = c(total.cells, total.cells))
   k.matrix <- nn.m1 + nn.m2 + nn.m3 + nn.m4
   anchor.only <- sparseMatrix(i = anchor.df[, 1], j = anchor.df[, 2], x = 1, dims = c(total.cells, total.cells))
 

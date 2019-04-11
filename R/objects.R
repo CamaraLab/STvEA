@@ -6,7 +6,7 @@ STvEA.data <- setClass(
   Class = 'STvEA.data',
   slots = c(
     cite_mRNA = 'ANY', # cite_cells x genes
-    cite_mRNA_norm = 'ANY', # cite cells x genes log(1+TPM) or seurat
+    cite_mRNA_norm = 'ANY', # cite cells x genes - log(1+TPM) or seurat
     cite_latent = 'ANY', # cite cells x low
     cite_emb = 'ANY', # cite cells x 2
     cite_clusters = 'vector',
@@ -30,39 +30,121 @@ STvEA.data <- setClass(
 )
 
 
-#' Check input data and create STvEA.data object
+#' Set CODEX data in STvEA.data object
 #'
-#' @param cite_protein Raw expression data for CITE-seq proteins (cell x protein)
-#' @param cite_latent Low dimensional latent space for CITE-seq mRNA (cell x dim)
 #' @param codex_protein Segmented and spillover corrected CODEX protein expression (cell x protein)
-#' @param codex_size Size of each CODEX cell (vector)
 #' @param codex_blanks Segmented and spillover corrected CODEX blank channel expression (cell x blank channel)
+#' @param codex_size Size of each CODEX cell (vector)
+#' @param codex_spatial xyz coordinates of each CODEX cell (cell x 3 coordinates)
+#' @param stvea_object (optional) Pre-existing STvEA.data object to load data into.
+#' If not provided, a new object is created.
 #'
 #' @export
 #'
-SetData <- function(cite_protein, cite_latent, codex_protein, codex_size, codex_blanks) {
-  if (any(colnames(cite_protein) != colnames(codex_protein))) {
-    stop("CITE-seq and CODEX datasets must have the same proteins in the same order")
+SetDataCODEX <- function(codex_protein,
+                         codex_blanks,
+                         codex_size,
+                         codex_spatial,
+                         stvea_object = NULL) {
+  if (is.null(stvea_object)) {
+    stvea_object <- new(
+      Class = "STvEA.data",
+      codex_protein = codex_protein,
+      codex_blanks = codex_blanks,
+      codex_size = codex_size,
+      codex_spatial = codex_spatial
+    )
+  } else {
+    stvea_object@codex_protein <- codex_protein
+    stvea_object@codex_blanks <- codex_blanks
+    stvea_object@codex_size <- codex_size
+    stvea_object@codex_spatial <- codex_spatial
   }
-  if (nrow(cite_protein) != nrow(cite_latent)) {
-    stop("CITE-seq protein and latent space must have same number of cells")
-  }
-  if (nrow(codex_protein) != length(codex_size) || nrow(codex_blanks) != length(codex_size)) {
-    stop("CODEX protein, size, and blanks must have same number of cells")
-  }
-  stvea_object <- new(
-    Class = "STvEA.data",
-    cite_protein = cite_protein,
-    cite_latent = cite_latent,
-    codex_protein = codex_protein,
-    codex_size = codex_size,
-    codex_blanks = codex_blanks
-  )
   return(stvea_object)
 }
 
 
-# other matrices: cite_gene, codex_spatial, codex_gene,
-# cite_cluster_labels, codex_cluster_labels, cite_umap_embedding
+#' Set CITE-seq data in STvEA.data object
+#'
+#' @param cite_mRNA Raw count data for CITE-seq mRNA (cell x gene)
+#' @param cite_protein Raw expression data for CITE-seq proteins (cell x protein)
+#' @param cite_mRNA_norm (optional) Normalized and scaled CITE-seq mRNA count data. (cell x gene)
+#' If not provided, raw count data is divided by total per cell, then log transformed.
+#' @param cite_latent (optional) Low dimensional latent space for CITE-seq mRNA (cell x dim)
+#' @param stvea_object (optional) Pre-existing STvEA.data object to load data into.
+#' If not provided, a new object is created.
+#'
+#' @export
+#'
+SetDataCITE <- function(cite_mRNA,
+                        cite_protein,
+                        cite_mRNA_norm = NULL,
+                        cite_latent = NULL,
+                        stvea_object = NULL) {
+  if (is.null(cite_mRNA_norm)) {
+    cite_mRNA_norm <- log(1 + 5000*(cite_mRNA/rowSums(cite_mRNA)))
+  }
+  if (is.null(stvea_object)) {
+    stvea_object <- new(
+      Class = "STvEA.data",
+      cite_mRNA = cite_mRNA,
+      cite_mRNA_norm = cite_mRNA_norm,
+      cite_protein = cite_protein
+    )
+  } else {
+    stvea_object@cite_mRNA <- cite_mRNA
+    stvea_object@cite_mRNA_norm <- cite_mRNA_norm
+    stvea_object@cite_protein <- cite_protein
+  }
+  if(!is.null(cite_latent)) {
+    stvea_object@cite_latent <- cite_latent
+  }
+  return(stvea_object)
+}
 
-# maybe have easy method for transfering data between holders?
+
+#' Transfer data from a Seurat object to STvEA.data object
+#'
+#' @param seurat_object Seurat class object
+#' @param embedding_reduction
+#' @param latent_reduction
+#' @param latent_dims
+#'
+#' @return STvEA.data class object
+#'
+#' @import Seurat
+#'
+#' @export
+#'
+TransferDataSeurat2 <- function(seurat_object,
+                                embedding_reduction = NULL,
+                                latent_reduction = NULL,
+                                latent_dims = 20) {
+  stvea_object <- new(
+    Class = "STvEA.data",
+    cite_mRNA = t(seurat_object@raw.data),
+    cite_protein = t(Seurat::GetAssayData(seurat_object, assay.type="CITE", slot="raw.data")),
+    cite_clusters = Seurat::GetClusters(seurat_object)$cluster
+  )
+  if (!is.null(seurat_object@scale.data)) {
+    stvea_object@cite_mRNA_norm <- t(seurat_object@scale.data)
+  }
+  if (!is.null(latent_reduction)) {
+    cite_latent <- GetDimReduction(
+      object = seurat_object,
+      reduction.type = latent_reduction,
+      slot = 'cell.embeddings'
+    )
+    stvea_object@cite_latent <- cite_latent[,1:min(latent_dims,ncol(cite_latent))]
+  }
+  if (!is.null(embedding_reduction)) {
+    stvea_object@cite_emb <- as.data.frame(GetDimReduction(
+      object = seurat_object,
+      reduction.type = embedding_reduction,
+      slot = 'cell.embeddings'
+    ))
+  }
+  return(stvea_object)
+}
+
+

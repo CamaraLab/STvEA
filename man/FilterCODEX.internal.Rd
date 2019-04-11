@@ -10,13 +10,15 @@ FilterCODEX.internal(codex_raw, size, blanks, size_lim = NULL,
   blank_upper = NULL, blank_lower = NULL)
 }
 \arguments{
-\item{codex_raw}{CODEX expression matrix after spillover correction, not including blank channels (cells x proteins)}
+\item{codex_raw}{CODEX expression matrix after spillover correction,
+not including blank channels (cells x proteins)}
 
 \item{size}{vector of cell sizes from CODEX segmentation}
 
 \item{blanks}{expression matrix for blank channels after spillover correction (cells x channels)}
 
-\item{size_lim}{lower and upper limits on size of each cell. If blank, set to 0.025 and 0.99 quantiles}
+\item{size_lim}{lower and upper limits on size of each cell.
+If blank, set to 0.025 and 0.99 quantiles}
 
 \item{blank_upper}{a vector with an upper bound expression cutoff for each blank channel.
 If NULL, blank upper bounds are set as the 0.995 quantile for each blank}

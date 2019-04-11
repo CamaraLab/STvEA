@@ -5,8 +5,8 @@
 \title{Get knn in to_dataset for each cell in from_dataset
 based on the corrected data matrix from AnchorCorrection}
 \usage{
-GetMatrixNN.internal(from_dataset, to_dataset, k = floor(nrow(to_dataset)
-  * 0.002), c = 0.1)
+GetMatrixNN.internal(from_dataset, to_dataset, k = floor(nrow(to_dataset) *
+  0.002), c = 0.1)
 }
 \arguments{
 \item{from_dataset}{a (cell x feature) matrix or dataframe}

@@ -4,8 +4,8 @@
 \alias{FindWeights}
 \title{Calculates weights of the k nearest anchors for each cell in the query dataset}
 \usage{
-FindWeights(neighbors, anchors, query_mat, integration.matrix,
-  k.weight = 300, sd.weight = 1, eps = 0, verbose = TRUE)
+FindWeights(neighbors, anchors, query_mat, integration.matrix, k.weight = 300,
+  sd.weight = 1, eps = 0, verbose = TRUE)
 }
 \arguments{
 \item{neighbors}{list of neighbors in CCA space as output by FindNN}
