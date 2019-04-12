@@ -2,7 +2,10 @@
 % Please edit documentation in R/data_processing.R
 \name{CleanCITE}
 \alias{CleanCITE}
-\title{Wraps CleanCITE.internal using STvEA.data class}
+\title{Removes noise from CITE-seq protein data by fitting
+a Negative Binomial mixture and computing each expression
+measurement as the cumulative distribution of the
+Negative Binomial with the higher median.}
 \usage{
 CleanCITE(stvea_object, maxit = 500, factr = 1e-09, optim_inits = NULL,
   num_cores = 1)
@@ -21,5 +24,8 @@ starts at two default parameter sets and picks the better one}
 \item{num_cores}{number of cores to use for parallelized fits}
 }
 \description{
-Wraps CleanCITE.internal using STvEA.data class
+Removes noise from CITE-seq protein data by fitting
+a Negative Binomial mixture and computing each expression
+measurement as the cumulative distribution of the
+Negative Binomial with the higher median.
 }

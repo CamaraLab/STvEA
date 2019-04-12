@@ -5,7 +5,8 @@
 \title{Removes noise from CODEX data by fitting a Gaussian
 mixture and computing each expression measurement
 as the cumulative distribution of the Gaussian with
-the higher mean.}
+the higher mean.
+Takes matrices and data frames instead of STvEA.data class}
 \usage{
 CleanCODEX.internal(codex_filtered)
 }
@@ -20,4 +21,5 @@ Removes noise from CODEX data by fitting a Gaussian
 mixture and computing each expression measurement
 as the cumulative distribution of the Gaussian with
 the higher mean.
+Takes matrices and data frames instead of STvEA.data class
 }

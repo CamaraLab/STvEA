@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_processing.R
 \name{NormalizeCITE}
 \alias{NormalizeCITE}
-\title{Wraps NormalizeCITE.internal using STvEA.data class}
+\title{Normalize CITE-seq ADT expression by original cell expression totals}
 \usage{
 NormalizeCITE(stvea_object)
 }
@@ -10,5 +10,5 @@ NormalizeCITE(stvea_object)
 \item{stvea_object}{STvEA.data class with CITE-seq protein data after CleanCITE}
 }
 \description{
-Wraps NormalizeCITE.internal using STvEA.data class
+Normalize CITE-seq ADT expression by original cell expression totals
 }

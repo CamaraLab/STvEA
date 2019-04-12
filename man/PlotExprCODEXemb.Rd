@@ -5,7 +5,7 @@
 \title{Plot expression of a gene or protein in the CODEX UMAP or t-SNE embedding}
 \usage{
 PlotExprCODEXemb(stvea_object, name, type = "protein", high_color = "red",
-  high_color2 = "green", low_color = "gray", pt_size = 0.8)
+  high_color2 = "green", low_color = "light gray", pt_size = 0.8)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CODEX expression and embedding}

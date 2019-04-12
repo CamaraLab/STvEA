@@ -1,7 +1,9 @@
 
-# Function wrappers using STvEA data class
+# Function wrappers using STvEA.data class
 
-#' Wraps FilterCODEX.internal using STvEA.data class
+#' Removes points from CODEX matrix that are not cells
+#' as determined by the gating strategy on the blank channels
+#' from the CODEX paper
 #'
 #' @param stvea_object STvEA.data class with CODEX data
 #' @param size_lim lower and upper limits on size of each cell. If blank, set to 0.025 and 0.99 quantiles
@@ -47,7 +49,10 @@ FilterCODEX <- function(stvea_object,
 }
 
 
-#' Wraps CleanCODEX.internal using STvEA.data class
+#' Removes noise from CODEX data by fitting a Gaussian
+#' mixture and computing each expression measurement
+#' as the cumulative distribution of the Gaussian with
+#' the higher mean.
 #'
 #' @param stvea_object STvEA.data class with CODEX data after FilterCODEX
 #'
@@ -62,7 +67,10 @@ CleanCODEX <- function(stvea_object) {
 }
 
 
-#' Wraps CleanCITE.internal using STvEA.data class
+#' Removes noise from CITE-seq protein data by fitting
+#' a Negative Binomial mixture and computing each expression
+#' measurement as the cumulative distribution of the
+#' Negative Binomial with the higher median.
 #'
 #' @param stvea_object STvEA.data class with CITE-seq protein data
 #' @param maxit maximum number of iterations for optim function
@@ -89,7 +97,8 @@ CleanCITE <- function(stvea_object,
   return(stvea_object)
 }
 
-#' Wraps NormalizeCITE.internal using STvEA.data class
+
+#' Normalize CITE-seq ADT expression by original cell expression totals
 #'
 #' @param stvea_object STvEA.data class with CITE-seq protein data after CleanCITE
 #'
@@ -105,12 +114,31 @@ NormalizeCITE <- function(stvea_object) {
 }
 
 
+#' Filter CITE-seq mRNA data based on number of transcripts per cell
+#' and the number of cells each gene is expressed in
+#'
+#' @param stvea_object STvEA.data class with CITE-seq mRNA data
+#' @param min_transcripts minimum number of transcripts to keep cell
+#' @param min_cells_per_gene minimum number of cells a gene must be
+#'
+#' @export
+#'
+FilterCITEmRNA <- function(stvea_object, min_transcripts=1200, min_cells_per_gene=30) {
+  if (is.null(stvea_object@cite_mRNA)) {
+    stop("stvea_object must contain CITE-seq mRNA data")
+  }
+  stvea_object@cite_mRNA <- FilterCITEmRNA.internal(stvea_object@cite_mRNA,
+                                                    min_transcripts = min_transcripts,
+                                                    min_cells_per_gene = min_cells_per_gene)
+}
 
-# Functions with matrix parameters, not using DataHolder object
+
+# Functions with matrix parameters, not using STvEA.data class
 
 #' Removes points from CODEX matrix that are not cells
 #' as determined by the gating strategy on the blank channels
 #' from the CODEX paper
+#' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param codex_raw CODEX expression matrix after spillover correction,
 #' not including blank channels (cells x proteins)
@@ -172,6 +200,7 @@ FilterCODEX.internal <- function(codex_raw, size, blanks,
 #' mixture and computing each expression measurement
 #' as the cumulative distribution of the Gaussian with
 #' the higher mean.
+#' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param codex_filtered CODEX expression matrix after filtering (cell x proteins)
 #'
@@ -202,6 +231,7 @@ CleanCODEX.internal <- function(codex_filtered) {
 #' a Negative Binomial mixture and computing each expression
 #' measurement as the cumulative distribution of the
 #' Negative Binomial with the higher median.
+#' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param cite_protein Raw CITE-seq protein data (cell x protein)
 #' @param maxit maximum number of iterations for optim function
@@ -246,8 +276,8 @@ CleanCITE.internal <- function(cite_protein,
 }
 
 
-#' Fits the expression values of one protein with a
-#' Negative Binomial mixture
+#' Fits the expression values of one protein with a Negative Binomial mixture
+#' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param protein_expr Raw CITE-seq protein data for one protein
 #' @param maxit maximum number of iterations for optim function
@@ -307,8 +337,8 @@ SSE <- function(args, p_obs) {
 }
 
 
-#' Normalize CITE-seq ADT expression by original cell expression totals before cleaning
-#' Then perform batch correction using the MNN method from Haghverdi et al.
+#' Normalize CITE-seq ADT expression by original cell expression totals
+#' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param cite_protein_clean Cleaned CITE-seq protein data (cell x protein) output by CleanCITE()
 #' @param cite_protein_raw Raw CITE-seq protein data (cell x protein)
@@ -353,13 +383,23 @@ NormalizeCITE.internal <- function(cite_protein_clean,
 }
 
 
-#' Perform HDBSCAN consensus clustering on CITE-seq latent space
+#' Filter CITE-seq mRNA data based on number of transcripts per cell
+#' and the number of cells each gene is expressed in
+#' Takes matrices and data frames instead of STvEA.data class
 #'
-cite_clustering <- function(cite_latent) {
+#' @param cite_mRNA a (cell x gene) matrix of CITE-seq mRNA data
+#' @param min_transcripts minimum number of transcripts to keep cell
+#' @param min_cells_per_gene minimum number of cells a gene must be
+#' expressed in to be kept
+#'
+FilterCITEmRNA.internal <- function(cite_mRNA,
+                                    min_transcripts = 1200,
+                                    min_cells_per_gene = 30) {
+  transcripts <- rowSums(cite_mRNA)
+  cite_mRNA <- cite_mRNA[transcripts >= min_transcripts,]
+  cells_per_gene <- colSums(f != 0)
+  cite_mRNA <- cite_mRNA[cells_per_gene >= min_cells_per_gene,]
+  return(cite_mRNA)
 }
 
 
-#' Assign user input labels to CITE-seq clusters for future plotting
-#'
-clustering_names <- function(labels) {
-}

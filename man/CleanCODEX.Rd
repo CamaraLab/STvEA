@@ -2,7 +2,10 @@
 % Please edit documentation in R/data_processing.R
 \name{CleanCODEX}
 \alias{CleanCODEX}
-\title{Wraps CleanCODEX.internal using STvEA.data class}
+\title{Removes noise from CODEX data by fitting a Gaussian
+mixture and computing each expression measurement
+as the cumulative distribution of the Gaussian with
+the higher mean.}
 \usage{
 CleanCODEX(stvea_object)
 }
@@ -10,5 +13,8 @@ CleanCODEX(stvea_object)
 \item{stvea_object}{STvEA.data class with CODEX data after FilterCODEX}
 }
 \description{
-Wraps CleanCODEX.internal using STvEA.data class
+Removes noise from CODEX data by fitting a Gaussian
+mixture and computing each expression measurement
+as the cumulative distribution of the Gaussian with
+the higher mean.
 }

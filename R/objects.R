@@ -106,9 +106,12 @@ SetDataCITE <- function(cite_mRNA,
 #' Transfer data from a Seurat object to STvEA.data object
 #'
 #' @param seurat_object Seurat class object
-#' @param embedding_reduction
-#' @param latent_reduction
-#' @param latent_dims
+#' @param embedding_reduction (optional) name of the slot holding the dimension reduction
+#' embedding used for visualization. Examples: "umap", "tsne"
+#' @param latent_reduction (optional) name of the lot holding the dimension reduction to
+#' be used for the CITE-seq mRNA latent space. Examples: "pca"
+#' @param latent_dims number of dimensions to use for the latent space,
+#' not used if latent_reduction is not defined
 #'
 #' @return STvEA.data class object
 #'

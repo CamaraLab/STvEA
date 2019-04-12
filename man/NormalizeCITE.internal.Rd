@@ -2,8 +2,8 @@
 % Please edit documentation in R/data_processing.R
 \name{NormalizeCITE.internal}
 \alias{NormalizeCITE.internal}
-\title{Normalize CITE-seq ADT expression by original cell expression totals before cleaning
-Then perform batch correction using the MNN method from Haghverdi et al.}
+\title{Normalize CITE-seq ADT expression by original cell expression totals
+Takes matrices and data frames instead of STvEA.data class}
 \usage{
 NormalizeCITE.internal(cite_protein_clean, cite_protein_raw, batch = rep(1,
   nrow(cite_protein_raw)), k.batch = 20)
@@ -21,6 +21,6 @@ NormalizeCITE.internal(cite_protein_clean, cite_protein_raw, batch = rep(1,
 Normalized and batch corrected CITE-seq protein data matrix (cell x protein)
 }
 \description{
-Normalize CITE-seq ADT expression by original cell expression totals before cleaning
-Then perform batch correction using the MNN method from Haghverdi et al.
+Normalize CITE-seq ADT expression by original cell expression totals
+Takes matrices and data frames instead of STvEA.data class
 }

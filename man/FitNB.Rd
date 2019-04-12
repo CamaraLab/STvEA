@@ -2,8 +2,8 @@
 % Please edit documentation in R/data_processing.R
 \name{FitNB}
 \alias{FitNB}
-\title{Fits the expression values of one protein with a
-Negative Binomial mixture}
+\title{Fits the expression values of one protein with a Negative Binomial mixture
+Takes matrices and data frames instead of STvEA.data class}
 \usage{
 FitNB(protein_expr, maxit = 500, factr = 1e-09, optim_init = NULL)
 }
@@ -18,6 +18,6 @@ FitNB(protein_expr, maxit = 500, factr = 1e-09, optim_init = NULL)
 if NULL, starts at two default parameter sets and picks the better one}
 }
 \description{
-Fits the expression values of one protein with a
-Negative Binomial mixture
+Fits the expression values of one protein with a Negative Binomial mixture
+Takes matrices and data frames instead of STvEA.data class
 }

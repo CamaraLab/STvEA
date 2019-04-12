@@ -2,7 +2,9 @@
 % Please edit documentation in R/data_processing.R
 \name{FilterCODEX}
 \alias{FilterCODEX}
-\title{Wraps FilterCODEX.internal using STvEA.data class}
+\title{Removes points from CODEX matrix that are not cells
+as determined by the gating strategy on the blank channels
+from the CODEX paper}
 \usage{
 FilterCODEX(stvea_object, size_lim = NULL, blank_upper = NULL,
   blank_lower = NULL)
@@ -19,5 +21,7 @@ If NULL, blank upper bounds are set as the 0.995 quantile for each blank}
 If NULL, blank lower bounds are set as the 0.002 quantile for each blank}
 }
 \description{
-Wraps FilterCODEX.internal using STvEA.data class
+Removes points from CODEX matrix that are not cells
+as determined by the gating strategy on the blank channels
+from the CODEX paper
 }

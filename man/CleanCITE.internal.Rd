@@ -5,7 +5,8 @@
 \title{Removes noise from CITE-seq protein data by fitting
 a Negative Binomial mixture and computing each expression
 measurement as the cumulative distribution of the
-Negative Binomial with the higher median.}
+Negative Binomial with the higher median.
+Takes matrices and data frames instead of STvEA.data class}
 \usage{
 CleanCITE.internal(cite_protein, maxit = 500, factr = 1e-09,
   optim_inits = NULL, num_cores = 1)
@@ -31,4 +32,5 @@ Removes noise from CITE-seq protein data by fitting
 a Negative Binomial mixture and computing each expression
 measurement as the cumulative distribution of the
 Negative Binomial with the higher median.
+Takes matrices and data frames instead of STvEA.data class
 }

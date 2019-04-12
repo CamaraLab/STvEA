@@ -10,7 +10,14 @@ TransferDataSeurat2(seurat_object, embedding_reduction = NULL,
 \arguments{
 \item{seurat_object}{Seurat class object}
 
-\item{latent_dims}{}
+\item{embedding_reduction}{(optional) name of the slot holding the dimension reduction
+embedding used for visualization. Examples: "umap", "tsne"}
+
+\item{latent_reduction}{(optional) name of the lot holding the dimension reduction to
+be used for the CITE-seq mRNA latent space. Examples: "pca"}
+
+\item{latent_dims}{number of dimensions to use for the latent space,
+not used if latent_reduction is not defined}
 }
 \value{
 STvEA.data class object
