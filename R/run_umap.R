@@ -9,7 +9,7 @@
 #'
 #' @importFrom umap umap
 #'
-GetUMAP <- function(stvea_object, ...) {
+GetVisUMAP <- function(stvea_object, ...) {
   if (!is.null(stvea_object@cite_latent)) {
     res <- umap(stvea_object@cite_latent, ...)
     stvea_object@cite_emb <- as.data.frame(res$layout)
@@ -25,4 +25,3 @@ GetUMAP <- function(stvea_object, ...) {
   }
   return(stvea_object)
 }
-
