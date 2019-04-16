@@ -98,13 +98,13 @@ ClusterCITE.internal <- function(cite_latent) {
 #'
 #' @export
 #'
-RunHDBSCAN <- function(cite_latent, umap_latent, min_cluster_size_range, min_sample_range, cache_dir=NULL) {
+RunHDBSCAN <- function(cite_latent, umap_latent, min_cluster_size_range, min_sample_range, python_dir, cache_dir=NULL) {
   cite_latent_tmp <- as.matrix(cite_latent)
   colnames(cite_latent_tmp) <- NULL
   #umap_latent <- umap(cite_latent, n_components = ncol(cite_latent), ...)$layout
   umap_latent_tmp <- as.matrix(umap_latent)
   colnames(umap_latent_tmp) <- NULL
-  rPython::python.load('inst/python/consensus_clustering.py')
+  rPython::python.load(python_dir)
   if (is.null(cache_dir)) {
     rPython::python.call("run_hdbscan", cite_latent_tmp, cite_latent_tmp, min_cluster_size_range, min_sample_range)
   } else {
