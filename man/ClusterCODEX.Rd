@@ -2,7 +2,7 @@
 % Please edit documentation in R/clustering.R
 \name{ClusterCODEX}
 \alias{ClusterCODEX}
-\title{Calls ClusterCODEX.internal with STvEA.data object}
+\title{Perform louvain clustering on CODEX data}
 \usage{
 ClusterCODEX(stvea_object, k = NULL)
 }
@@ -13,5 +13,5 @@ ClusterCODEX(stvea_object, k = NULL)
 If NULL, will use all nearest neighbors from the KNN matrix.}
 }
 \description{
-Calls ClusterCODEX.internal with STvEA.data object
+Perform louvain clustering on CODEX data
 }

@@ -3,7 +3,8 @@
 \name{GetMatrixNN.internal}
 \alias{GetMatrixNN.internal}
 \title{Get knn in to_dataset for each cell in from_dataset
-based on the corrected data matrix from AnchorCorrection}
+based on the corrected data matrix from AnchorCorrection
+Takes matrices and data frames instead of STvEA.data class}
 \usage{
 GetMatrixNN.internal(from_dataset, to_dataset, k = floor(nrow(to_dataset) *
   0.002), c = 0.1)
@@ -20,4 +21,5 @@ GetMatrixNN.internal(from_dataset, to_dataset, k = floor(nrow(to_dataset) *
 \description{
 Get knn in to_dataset for each cell in from_dataset
 based on the corrected data matrix from AnchorCorrection
+Takes matrices and data frames instead of STvEA.data class
 }

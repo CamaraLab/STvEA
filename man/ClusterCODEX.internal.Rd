@@ -2,7 +2,8 @@
 % Please edit documentation in R/clustering.R
 \name{ClusterCODEX.internal}
 \alias{ClusterCODEX.internal}
-\title{Perform louvain clustering on CODEX data}
+\title{Perform louvain clustering on CODEX data
+Takes matrices and data frames instead of STvEA.data class}
 \usage{
 ClusterCODEX.internal(codex_knn, k = ncol(codex_knn))
 }
@@ -14,4 +15,5 @@ in the CODEX protein space}
 }
 \description{
 Perform louvain clustering on CODEX data
+Takes matrices and data frames instead of STvEA.data class
 }

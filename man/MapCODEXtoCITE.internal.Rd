@@ -4,7 +4,8 @@
 \alias{MapCODEXtoCITE.internal}
 \title{Run all methods for anchor correction to map the CODEX dataset to the CITE-seq dataset
 Since the CODEX dataset is usually much bigger, allows to subsample equal-sized
-chunks of the CODEX dataset to map individually}
+chunks of the CODEX dataset to map individually
+Takes matrices and data frames instead of STvEA.data class}
 \usage{
 MapCODEXtoCITE.internal(cite_protein, codex_protein, cite_latent, num_chunks,
   seed = NULL, num_cores = 1, num.cc = 29, k.anchor = 20,
@@ -40,4 +41,5 @@ a (m cell x f feature) expression matrix of the CODEX data corrected into the CI
 Run all methods for anchor correction to map the CODEX dataset to the CITE-seq dataset
 Since the CODEX dataset is usually much bigger, allows to subsample equal-sized
 chunks of the CODEX dataset to map individually
+Takes matrices and data frames instead of STvEA.data class
 }

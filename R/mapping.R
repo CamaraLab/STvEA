@@ -149,6 +149,7 @@ AnchorCorrection <- function(
 #' Run all methods for anchor correction to map the CODEX dataset to the CITE-seq dataset
 #' Since the CODEX dataset is usually much bigger, allows to subsample equal-sized
 #' chunks of the CODEX dataset to map individually
+#' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param cite_protein a (n cell x f feature) protein expression matrix
 #' @param codex_protein a (m cell x f feature) protein expression matrix to be corrected
@@ -204,6 +205,7 @@ MapCODEXtoCITE.internal <- function(
 
 #' Get knn in to_dataset for each cell in from_dataset
 #' based on the corrected data matrix from AnchorCorrection
+#' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param from_dataset a (cell x feature) matrix or dataframe
 #' @param to_dataset a (cell x feature) matrix or dataframe

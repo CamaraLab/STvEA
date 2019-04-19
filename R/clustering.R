@@ -1,17 +1,3 @@
-
-# Function wrappers using STvEA.data class
-
-#' Perform HDBSCAN consensus clustering on CITE-seq latent space
-#'
-#' @export
-#'
-ClusterCITE <- function(stvea_object) {
-  if (is.null(stvea_object@cite_latent)) {
-    stop("stvea_object must contain CITE-seq latent space")
-  }
-}
-
-
 #' Get k nearest neighbors for CODEX protein space. If CleanCODEX
 #' has been run, uses cleaned CODEX protein data, otherwise uses
 #' original CODEX protein data.
@@ -33,7 +19,7 @@ KnnCODEX <- function(stvea_object, k=5) {
 }
 
 
-#' Calls ClusterCODEX.internal with STvEA.data object
+#' Perform louvain clustering on CODEX data
 #'
 #' @param stvea_object STvEA.data class object with KNN matrix for CODEX protein space
 #' @param k number of nearest neighbors to use in graph-based clustering
@@ -54,9 +40,51 @@ ClusterCODEX <- function(stvea_object, k=NULL) {
 }
 
 
+#' Run HDBSCAN over parameter ranges
+#' Must use Python HDBSCAN because it has 2 important parameters
+#' (min_cluster_size and min_samples) but R HDBSCAN only has one (minPts)
+#'
+#' @export
+#'
+ParameterScan <- function(stvea_object, min_cluster_size_range, min_sample_range,
+                          ...,
+                          python_dir="/usr/local/lib/R/site-library/STvEA/python",
+                          cache_dir=NULL) {
+  if (is.null(stvea_object@cite_latent)) {
+    stop("stvea_object must contain CITE-seq latent space")
+  }
+  stvea_object@hdbscan_param_scan <- ParameterScan.internal(stvea_object@cite_latent,
+                         min_cluster_size_range, min_sample_range,
+                         ...,
+                         python_dir="/usr/local/lib/R/site-library/STvEA/python",
+                         cache_dir=NULL)
+  return(stvea_object)
+}
+
+
+#' Keep only HDBSCAN results that pass a certain silhouette score cutoff
+#' and create a dissimilarity matrix between cells from the clusterings
+#' Perform agglomerative hierarchical clustering on the
+#' consensus dissimilarity matrix
+#'
+#' @export
+#'
+ConsensusCluster <- function(stvea_object, silhouette_cutoff, num_cluster) {
+  if (is.null(stvea_object@hdbscan_param_scan)) {
+    stop("Please run ParameterScan first")
+  }
+  stvea_object@cite_clusters <- ConsensusCluster.internal(stvea_object@hdbscan_param_scan,
+                                                         stvea_object@cite_latent,
+                                                         silhouette_cutoff,
+                                                         num_cluster)
+  return(stvea_object)
+}
+
+
 # Functions with matrix parameters, not using STvEA.data class
 
 #' Perform louvain clustering on CODEX data
+#' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param codex_knn matrix of (codex cells x k) nearest neighbor indices
 #' in the CODEX protein space
@@ -82,74 +110,81 @@ ClusterCODEX.internal <- function(codex_knn, k = ncol(codex_knn)) {
 }
 
 
-#' Perform HDBSCAN consensus clustering on CITE-seq latent space
-#'
-ClusterCITE.internal <- function(cite_latent) {
-  umap_out <- umap(cite_latent, n_components = ncol(cite_latent), ...)$layout
-
-}
-
-
 #' Run HDBSCAN over parameter ranges
 #' Must use Python HDBSCAN because it has 2 important parameters
 #' (min_cluster_size and min_samples) but R HDBSCAN only has one (minPts)
+#' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @import rPython
+#' @importFrom umap umap
 #'
 #' @export
 #'
-RunHDBSCAN <- function(cite_latent, umap_latent, min_cluster_size_range, min_sample_range, python_dir, cache_dir=NULL) {
+ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_sample_range,
+                       ...,
+                       python_dir="/usr/local/lib/R/site-library/STvEA/python",
+                       cache_dir=NULL) {
   cite_latent_tmp <- as.matrix(cite_latent)
   colnames(cite_latent_tmp) <- NULL
-  #umap_latent <- umap(cite_latent, n_components = ncol(cite_latent), ...)$layout
+  cat("Running UMAP on the CITE-seq latent space\n")
+  umap_latent <- umap(cite_latent, n_components = ncol(cite_latent), ...)$layout
   umap_latent_tmp <- as.matrix(umap_latent)
   colnames(umap_latent_tmp) <- NULL
-  rPython::python.load(python_dir)
+  rPython::python.load(paste(python_dir,"/consensus_clustering.py", sep=""))
+  cat("Running HDBSCAN on the UMAP space\n")
   if (is.null(cache_dir)) {
-    rPython::python.call("run_hdbscan", cite_latent_tmp, cite_latent_tmp, min_cluster_size_range, min_sample_range)
+    hdbscan_labels <- rPython::python.call("run_hdbscan", cite_latent_tmp, umap_latent_tmp, min_cluster_size_range, min_sample_range)
   } else {
-    rPython::python.call("run_hdbscan", cite_latent_tmp, cite_latent_tmp, min_cluster_size_range, min_sample_range, cache_dir)
+    hdbscan_labels <- rPython::python.call("run_hdbscan", cite_latent_tmp, umap_latent_tmp, min_cluster_size_range, min_sample_range, cache_dir)
   }
+  all_scores <- NULL
+  hdbscan_results <- list()
+  for (i in 1:length(hdbscan_labels)) {
+    score <- mean(silhouette(x=hdbscan_labels[[i]], dist = dist(cite_latent))[,3])
+    all_scores <- c(all_scores, score)
+    hdbscan_results[[i]] <- list("cluster_labels" = hdbscan_labels[[i]], "silhouette_score" = score)
+  }
+  hist(all_scores, breaks=100, main="Histogram of silhouette scores", xlab = "Silhouette score", ylab = "Number of calls to HDBSCAN")
+  return(hdbscan_results)
 }
 
 
 #' Keep only HDBSCAN results that pass a certain silhouette score cutoff
 #' and create a dissimilarity matrix between cells from the clusterings
+#' Perform agglomerative hierarchical clustering on the
+#' consensus dissimilarity matrix
+#' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @export
 #'
-GetConsensusMatrix <- function(hdbscan_results, silhouette_cutoff) {
-  num_cells <- hdbscan_results[[1]]$num_cells
-  dissim_matrix <- Matrix(0, nrow = num_cells, ncol = num_cells, sparse = TRUE)
-  all_scores <- NULL
+ConsensusCluster.internal <- function(hdbscan_results, cite_latent, silhouette_cutoff, num_cluster) {
+  num_cells <- length(hdbscan_results[[1]]$cluster_labels)
+  consensus_matrix <- matrix(0, nrow=num_cells, ncol=num_cells)
   total_runs <- 0
+
   for (result in hdbscan_results) {
-    if (result$score >= silhouette_cutoff) {
-      result_matrix <- sparseMatrix(i = result$rows+1, j = result$cols+1,
-                                   x = result$data, dims = c(num_cells, num_cells))
-      dissim_matrix <- dissim_matrix + result_matrix
-      all_scores <- c(all_scores, result$score)
+    if (result$silhouette_score >= silhouette_cutoff) {
+      sim_matrix <- matrix(0, nrow=num_cells, ncol=num_cells)
+      for (cell1 in 1:num_cells) {
+        if (result$cluster_labels[cell1] != -1) {
+          sim_matrix[,cell1] <- 1*(result$cluster_labels == result$cluster_labels[cell1])
+        }
+      }
+      diag(sim_matrix) <- rep(1,num_cells)
+      consensus_matrix <- consensus_matrix - sim_matrix
       total_runs <- total_runs + 1
     }
   }
-  dissim_matrix <- as.matrix(dissim_matrix)
-  dissim_matrix <- dissim_matrix + total_runs
+
+  consensus_matrix <- consensus_matrix + total_runs
   if (total_runs > 0) {
-    dissim_matrix <- dissim_matrix / total_runs
+    consensus_matrix <- consensus_matrix / total_runs
   }
-  return(list("dissim_matrix" = dissim_matrix, "all_scores" = all_scores))
-}
 
-
-#' Perform agglomerative hierarchical clustering on the
-#' dissimilarity matrix output by GetConsensusMatrix
-#'
-#' @export
-#'
-ConsensusCluster <- function(dissim_matrix, num_cluster) {
-  hier_tree <- hclust(dissim_matrix, method="average")
-  clust_labels <- cutree(hier_tree, k=num_cluster)
-  return(clust_labels)
+  hier_tree <- hclust(as.dist(consensus_matrix), method="average")
+  plot(hier_tree)
+  consensus_labels <- cutree(hier_tree, k=num_cluster)
+  return(consensus_labels)
 }
 
 
