@@ -44,6 +44,14 @@ ClusterCODEX <- function(stvea_object, k=NULL) {
 #' Must use Python HDBSCAN because it has 2 important parameters
 #' (min_cluster_size and min_samples) but R HDBSCAN only has one (minPts)
 #'
+#' @param stvea_object STvEA.data class object containing CITE-seq latent space
+#' @param min_cluster_size_range vector of min_cluster_size arguments to scan over
+#' @param min_sample_range vector of min_sample arguments to scan over
+#' @param ... extra parameters to be passed into UMAP
+#' @param python_dir path to folder containing consensus_clustering.py
+#' @param cache_dir path to temp folder to house cached information from HDBSCAN.
+#' If null, no temp folder is created
+#'
 #' @export
 #'
 ParameterScan <- function(stvea_object, min_cluster_size_range, min_sample_range,
@@ -66,6 +74,10 @@ ParameterScan <- function(stvea_object, min_cluster_size_range, min_sample_range
 #' and create a dissimilarity matrix between cells from the clusterings
 #' Perform agglomerative hierarchical clustering on the
 #' consensus dissimilarity matrix
+#'
+#' @param stvea_object STvEA.data class object after ParameterScan has been run
+#' @param silhouette_cutoff minimum silhouette score to keep clustering
+#' @param num_cluster number of clusters to return from hierarchical clustering
 #'
 #' @export
 #'
@@ -115,6 +127,14 @@ ClusterCODEX.internal <- function(codex_knn, k = ncol(codex_knn)) {
 #' (min_cluster_size and min_samples) but R HDBSCAN only has one (minPts)
 #' Takes matrices and data frames instead of STvEA.data class
 #'
+#' @param cite_latent CITE-seq latent space (cells x dimensions)
+#' @param min_cluster_size_range vector of min_cluster_size arguments to scan over
+#' @param min_sample_range vector of min_sample arguments to scan over
+#' @param ... extra parameters to be passed into UMAP
+#' @param python_dir path to folder containing consensus_clustering.py
+#' @param cache_dir path to temp folder to house cached information from HDBSCAN.
+#' If null, no temp folder is created
+#'
 #' @import rPython
 #' @importFrom umap umap
 #'
@@ -154,6 +174,11 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
 #' Perform agglomerative hierarchical clustering on the
 #' consensus dissimilarity matrix
 #' Takes matrices and data frames instead of STvEA.data class
+#'
+#' @param hdbscan_results output of ParameterScan.internal
+#' @param cite_latent CITE-seq latent space (cells x dimensions)
+#' @param silhouette_cutoff minimum silhouette score to keep clustering
+#' @param num_cluster number of clusters to return from hierarchical clustering
 #'
 #' @export
 #'
