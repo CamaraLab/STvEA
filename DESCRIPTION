@@ -14,7 +14,10 @@ Imports:
     mclust,
     RANN,
     tidyr,
-    ggplot2
+    ggplot2,
+    igraph,
+    cluster,
+    colorspace
 Suggests:
     umap,
     rPython
