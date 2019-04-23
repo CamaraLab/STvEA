@@ -116,14 +116,16 @@ SetDataCITE <- function(cite_mRNA,
 #'
 #' @return STvEA.data class object
 #'
-#' @import Seurat
-#'
 #' @export
 #'
 TransferDataSeurat2 <- function(seurat_object,
                                 embedding_reduction = NULL,
                                 latent_reduction = NULL,
                                 latent_dims = 20) {
+  if (!requireNamespace("Seurat", quietly = TRUE)) {
+    stop("Package \"Seurat\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
   stvea_object <- new(
     Class = "STvEA.data",
     cite_mRNA = t(seurat_object@raw.data),
@@ -134,7 +136,7 @@ TransferDataSeurat2 <- function(seurat_object,
     stvea_object@cite_mRNA_norm <- t(seurat_object@scale.data)
   }
   if (!is.null(latent_reduction)) {
-    cite_latent <- GetDimReduction(
+    cite_latent <- Seurat::GetDimReduction(
       object = seurat_object,
       reduction.type = latent_reduction,
       slot = 'cell.embeddings'
@@ -142,7 +144,7 @@ TransferDataSeurat2 <- function(seurat_object,
     stvea_object@cite_latent <- cite_latent[,1:min(latent_dims,ncol(cite_latent))]
   }
   if (!is.null(embedding_reduction)) {
-    stvea_object@cite_emb <- as.data.frame(GetDimReduction(
+    stvea_object@cite_emb <- as.data.frame(Seurat::GetDimReduction(
       object = seurat_object,
       reduction.type = embedding_reduction,
       slot = 'cell.embeddings'
