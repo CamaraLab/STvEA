@@ -139,7 +139,6 @@ ClusterCODEX.internal <- function(codex_knn, k = ncol(codex_knn)) {
 #' @param cache_dir path to temp folder to house cached information from HDBSCAN.
 #' If null, no temp folder is created
 #'
-#' @importFrom umap umap
 #' @importFrom cluster silhouette
 #'
 #' @export
@@ -148,6 +147,10 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
                        ...,
                        python_dir="/usr/local/lib/R/site-library/STvEA/python",
                        cache_dir=NULL) {
+  if (!requireNamespace("umap", quietly = TRUE)) {
+    stop("Package \"umap\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
   if (!requireNamespace("rPython", quietly = TRUE)) {
     stop("Package \"rPython\" needed for this function to work. Please install it.",
          call. = FALSE)
@@ -156,7 +159,7 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
   cite_latent_tmp <- as.matrix(cite_latent)
   colnames(cite_latent_tmp) <- NULL
   cat("Running UMAP on the CITE-seq latent space\n")
-  umap_latent <- umap(cite_latent, n_components = ncol(cite_latent), ...)$layout
+  umap_latent <- umap::umap(cite_latent, n_components = ncol(cite_latent), ...)$layout
   umap_latent_tmp <- as.matrix(umap_latent)
   colnames(umap_latent_tmp) <- NULL
 

@@ -14,7 +14,7 @@ Imports:
     mclust,
     RANN,
     tidyr,
-    ggplot2,
-    umap
+    ggplot2
 Suggests:
+    umap,
     rPython
