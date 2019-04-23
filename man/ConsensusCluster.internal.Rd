@@ -9,7 +9,20 @@ consensus dissimilarity matrix
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
 ConsensusCluster.internal(hdbscan_results, cite_latent, silhouette_cutoff,
-  num_cluster)
+  inconsistent_value, min_cluster_size)
+}
+\arguments{
+\item{hdbscan_results}{output of ParameterScan.internal}
+
+\item{cite_latent}{CITE-seq latent space (cells x dimensions)}
+
+\item{silhouette_cutoff}{minimum silhouette score to keep clustering}
+
+\item{inconsistent_value}{input parameter to python fcluster determining
+where clusters are cut in the hierarchical tree}
+
+\item{min_cluster_size}{cells in clusters smaller than this value are
+assigned a cluster ID of -1, indicating no cluster assignment}
 }
 \description{
 Keep only HDBSCAN results that pass a certain silhouette score cutoff

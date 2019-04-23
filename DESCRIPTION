@@ -15,5 +15,6 @@ Imports:
     RANN,
     tidyr,
     ggplot2,
-    umap,
+    umap
+Suggests:
     rPython

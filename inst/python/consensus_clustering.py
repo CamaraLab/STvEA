@@ -1,13 +1,13 @@
 import hdbscan
 import numpy as np
 from sklearn.metrics import silhouette_score
+from scipy.spatial.distance import squareform
+from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 
 def run_hdbscan(latent, umap_latent, min_cluster_size_list, min_sample_list, cache_dir=None):
     latent = np.array(latent)
     num_cells = latent.shape[0]
     umap_latent = np.array(umap_latent)
-    #min_cluster_size_list = list(range(10,40,6))
-    #min_sample_list = list(range(30,80,5))
 
     results = []
     for min_samples in min_sample_list:
@@ -21,3 +21,15 @@ def run_hdbscan(latent, umap_latent, min_cluster_size_list, min_sample_list, cac
             results.append(hdbscan_labels.tolist())
     return results
 
+def consensus_cluster(distance_matrix, inconsistent_value = 0.3, min_cluster_size=10):
+    new_distance = squareform(distance_matrix)
+    hierarchical_tree = linkage(new_distance, "average")
+    hier_consensus_labels = fcluster(hierarchical_tree, t=inconsistent_value)
+    hier_unique_labels = set(hier_consensus_labels)
+    for label in hier_unique_labels:
+        indices = [i for i, x in enumerate(hier_consensus_labels) if x == label]
+        if len(indices) < min_cluster_size:
+            for index in indices:
+                hier_consensus_labels[index] = -1
+    print(type(hier_consensus_labels))
+    return hier_consensus_labels.tolist()

@@ -20,7 +20,7 @@ FilterCODEX <- function(stvea_object,
                                 blank_lower = NULL) {
   if (is.null(stvea_object@codex_protein) || is.null(stvea_object@codex_size) ||
       is.null(stvea_object@codex_blanks)) {
-    stop("Input object must contain size of each CODEX cell and expression for CODEX protein and blank channels")
+    stop("Input object must contain size of each CODEX cell and expression for CODEX protein and blank channels", call. =FALSE)
   }
   if (is.null(row.names(stvea_object@codex_protein))) {
     row.names(stvea_object@codex_protein) <- as.character(1:nrow(stvea_object@codex_protein))
@@ -60,7 +60,7 @@ FilterCODEX <- function(stvea_object,
 #'
 CleanCODEX <- function(stvea_object) {
   if (is.null(stvea_object@codex_filter)) {
-    stop("FilterCODEX must have been run on the input object first")
+    stop("FilterCODEX must have been run on the input object first", call. =FALSE)
   }
   stvea_object@codex_clean <- CleanCODEX.internal(stvea_object@codex_filter)
   return(stvea_object)
@@ -88,7 +88,7 @@ CleanCITE <- function(stvea_object,
                       optim_inits = NULL,
                       num_cores = 1) {
   if (is.null(stvea_object@cite_protein)) {
-    stop("Input object must contain CITE-seq protein expression")
+    stop("Input object must contain CITE-seq protein expression", call. =FALSE)
   }
   stvea_object@cite_clean <- CleanCITE.internal(stvea_object@cite_protein,
                                                   factr=factr,
@@ -106,7 +106,7 @@ CleanCITE <- function(stvea_object,
 #'
 NormalizeCITE <- function(stvea_object) {
   if(is.null(stvea_object@cite_clean)) {
-    stop("CleanCITE must have been run on the input object first")
+    stop("CleanCITE must have been run on the input object first", call. =FALSE)
   }
   stvea_object@cite_norm <- NormalizeCITE.internal(stvea_object@cite_clean,
                                                      stvea_object@cite_protein)
@@ -125,7 +125,7 @@ NormalizeCITE <- function(stvea_object) {
 #'
 FilterCITEmRNA <- function(stvea_object, min_transcripts=1200, min_cells_per_gene=30) {
   if (is.null(stvea_object@cite_mRNA)) {
-    stop("stvea_object must contain CITE-seq mRNA data")
+    stop("stvea_object must contain CITE-seq mRNA data", call. =FALSE)
   }
   stvea_object@cite_mRNA <- FilterCITEmRNA.internal(stvea_object@cite_mRNA,
                                                     min_transcripts = min_transcripts,

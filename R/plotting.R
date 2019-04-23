@@ -28,11 +28,11 @@ PlotExprCITE <- function(stvea_object, name,
   } else if (type == "protein") {
     plotting_data <- stvea_object@cite_protein
   } else {
-    stop("type must be either \"RNA\" or \"protein\"")
+    stop("type must be either \"RNA\" or \"protein\"", call. =FALSE)
   }
 
   if (length(name) > 2) {
-    stop("name must be at most length 2")
+    stop("name must be at most length 2", call. =FALSE)
   }
 
   rbPal1 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color,1)), alpha=TRUE)
@@ -75,6 +75,28 @@ PlotIndexCITE <- function(stvea_object, index,
 }
 
 
+#' Plot clusters of CITE-seq cells in CITE-seq UMAP or t-SNE embedding
+#'
+#' @param stvea_object STvEA.data class with CITE-seq embedding and clustering
+#'
+#' @importFrom colorspace rainbow_hcl
+#'
+#' @export
+#'
+PlotClusterCITE <- function(stvea_object) {
+  if (-1 %in% stvea_object@cite_clusters) {
+    colors <- c("gray", rainbow_hcl(length(unique(stvea_object@cite_clusters))-1, c = 80))
+  } else {
+    colors <- rainbow_hcl(length(unique(stvea_object@cite_clusters)), c = 80)
+  }
+  ggplot(stvea_object@cite_emb, aes(x=V1,y=V2,color=factor(stvea_object@cite_clusters))) +
+    geom_point(size=0.5) +
+    scale_color_manual(values = colors, name="cluster") +
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    theme_void()
+}
+
+
 #' Plot expression of a gene or protein in the CODEX UMAP or t-SNE embedding
 #'
 #' @param stvea_object STvEA.data class with CODEX expression and embedding
@@ -98,11 +120,11 @@ PlotExprCODEXemb <- function(stvea_object, name,
   } else if (type == "RNA") {
     plotting_data <- stvea_object@codex_mRNA
   } else {
-    stop("type must be either \"RNA\" or \"protein\"")
+    stop("type must be either \"RNA\" or \"protein\"", call. =FALSE)
   }
 
   if (length(name) > 2) {
-    stop("name must be at most length 2")
+    stop("name must be at most length 2", call. =FALSE)
   }
 
   rbPal1 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color,1)), alpha=TRUE)
@@ -147,11 +169,11 @@ PlotExprCODEXspatial <- function(stvea_object, name,
   } else if (type == "RNA") {
     plotting_data <- stvea_object@codex_mRNA
   } else {
-    stop("type must be either \"RNA\" or \"protein\"")
+    stop("type must be either \"RNA\" or \"protein\"", call. =FALSE)
   }
 
   if (length(name) > 2) {
-    stop("name must be at most length 2")
+    stop("name must be at most length 2", call. =FALSE)
   }
 
   rbPal1 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color,1)), alpha=TRUE)

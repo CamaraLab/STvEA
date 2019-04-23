@@ -24,10 +24,10 @@ MapCODEXtoCITE <- function(stvea_object,
                                k.score=80,
                                k.weight=100) {
   if (is.null(stvea_object@cite_norm) || is.null(stvea_object@codex_clean)) {
-    stop("NormalizeCITE and CleanCODEX must have been run on input object first")
+    stop("NormalizeCITE and CleanCODEX must have been run on input object first", call. =FALSE)
   }
   if (is.null(stvea_object@cite_latent)) {
-    stop("Input object must contain lower dimensional latent space of the CITE-seq mRNA data")
+    stop("Input object must contain lower dimensional latent space of the CITE-seq mRNA data", call. =FALSE)
   }
   stvea_object@corrected_codex <- MapCODEXtoCITE.internal(stvea_object@cite_norm,
                                                                 stvea_object@codex_clean,
@@ -56,7 +56,7 @@ GetMatrixNN <- function(stvea_object,
                         c.codex = 0.1,
                         c.cite = 0.1) {
   if (is.null(stvea_object@corrected_codex)) {
-    stop("MapCODEXtoCITE must be run on the input object first")
+    stop("MapCODEXtoCITE must be run on the input object first", call. =FALSE)
   }
   stvea_object@codex_nn <- GetMatrixNN.internal(stvea_object@corrected_codex,
                                                   stvea_object@cite_norm,

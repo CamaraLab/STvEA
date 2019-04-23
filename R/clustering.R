@@ -13,7 +13,7 @@ KnnCODEX <- function(stvea_object, k=5) {
   } else if (!is.null(stvea_object$codex_protein)) {
     stvea_object@codex_knn <- CorKNN(stvea_object$codex_protein, k=k)
   } else {
-    stop("stvea_object must contain either cleaned or original CODEX protein data")
+    stop("stvea_object must contain either cleaned or original CODEX protein data", call. =FALSE)
   }
   return(stvea_object)
 }
@@ -29,7 +29,7 @@ KnnCODEX <- function(stvea_object, k=5) {
 #'
 ClusterCODEX <- function(stvea_object, k=NULL) {
   if (is.null(stvea_object@codex_knn)) {
-    stop("stvea_object must have KNN matrix for CODEX. Run KnnCODEX or GetUMAP first.")
+    stop("stvea_object must have KNN matrix for CODEX. Run KnnCODEX or GetUMAP first.", call. =FALSE)
   }
   if (is.null(k)) {
     stvea_object$codex_clusters <- ClusterCODEX.internal(stvea_object@codex_knn)
@@ -59,7 +59,7 @@ ParameterScan <- function(stvea_object, min_cluster_size_range, min_sample_range
                           python_dir="/usr/local/lib/R/site-library/STvEA/python",
                           cache_dir=NULL) {
   if (is.null(stvea_object@cite_latent)) {
-    stop("stvea_object must contain CITE-seq latent space")
+    stop("stvea_object must contain CITE-seq latent space", call. =FALSE)
   }
   stvea_object@hdbscan_param_scan <- ParameterScan.internal(stvea_object@cite_latent,
                          min_cluster_size_range, min_sample_range,
@@ -77,18 +77,22 @@ ParameterScan <- function(stvea_object, min_cluster_size_range, min_sample_range
 #'
 #' @param stvea_object STvEA.data class object after ParameterScan has been run
 #' @param silhouette_cutoff minimum silhouette score to keep clustering
-#' @param num_cluster number of clusters to return from hierarchical clustering
+#' @param inconsistent_value input parameter to python fcluster determining
+#' where clusters are cut in the hierarchical tree
+#' @param min_cluster_size cells in clusters smaller than this value are
+#' assigned a cluster ID of -1, indicating no cluster assignment
 #'
 #' @export
 #'
-ConsensusCluster <- function(stvea_object, silhouette_cutoff, num_cluster) {
+ConsensusCluster <- function(stvea_object, silhouette_cutoff, inconsistent_value, min_cluster_size) {
   if (is.null(stvea_object@hdbscan_param_scan)) {
-    stop("Please run ParameterScan first")
+    stop("Please run ParameterScan first", call. =FALSE)
   }
   stvea_object@cite_clusters <- ConsensusCluster.internal(stvea_object@hdbscan_param_scan,
                                                          stvea_object@cite_latent,
                                                          silhouette_cutoff,
-                                                         num_cluster)
+                                                         inconsistent_value,
+                                                         min_cluster_size)
   return(stvea_object)
 }
 
@@ -109,7 +113,7 @@ ConsensusCluster <- function(stvea_object, silhouette_cutoff, num_cluster) {
 #'
 ClusterCODEX.internal <- function(codex_knn, k = ncol(codex_knn)) {
   if (k > ncol(codex_knn)) {
-    stop("k must be less than or equal to number of nearest neighbors in codex_knn")
+    stop("k must be less than or equal to number of nearest neighbors in codex_knn", call. =FALSE)
   }
   t_adj_list <- as.data.frame(t(codex_knn[,1:k]))
   colnames(t_adj_list) <- 1:nrow(codex_knn)
@@ -135,8 +139,8 @@ ClusterCODEX.internal <- function(codex_knn, k = ncol(codex_knn)) {
 #' @param cache_dir path to temp folder to house cached information from HDBSCAN.
 #' If null, no temp folder is created
 #'
-#' @import rPython
 #' @importFrom umap umap
+#' @importFrom cluster silhouette
 #'
 #' @export
 #'
@@ -144,12 +148,18 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
                        ...,
                        python_dir="/usr/local/lib/R/site-library/STvEA/python",
                        cache_dir=NULL) {
+  if (!requireNamespace("rPython", quietly = TRUE)) {
+    stop("Package \"rPython\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
   cite_latent_tmp <- as.matrix(cite_latent)
   colnames(cite_latent_tmp) <- NULL
   cat("Running UMAP on the CITE-seq latent space\n")
   umap_latent <- umap(cite_latent, n_components = ncol(cite_latent), ...)$layout
   umap_latent_tmp <- as.matrix(umap_latent)
   colnames(umap_latent_tmp) <- NULL
+
   rPython::python.load(paste(python_dir,"/consensus_clustering.py", sep=""))
   cat("Running HDBSCAN on the UMAP space\n")
   if (is.null(cache_dir)) {
@@ -157,6 +167,7 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
   } else {
     hdbscan_labels <- rPython::python.call("run_hdbscan", cite_latent_tmp, umap_latent_tmp, min_cluster_size_range, min_sample_range, cache_dir)
   }
+
   all_scores <- NULL
   hdbscan_results <- list()
   for (i in 1:length(hdbscan_labels)) {
@@ -165,6 +176,7 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
     hdbscan_results[[i]] <- list("cluster_labels" = hdbscan_labels[[i]], "silhouette_score" = score)
   }
   hist(all_scores, breaks=100, main="Histogram of silhouette scores", xlab = "Silhouette score", ylab = "Number of calls to HDBSCAN")
+
   return(hdbscan_results)
 }
 
@@ -178,11 +190,19 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
 #' @param hdbscan_results output of ParameterScan.internal
 #' @param cite_latent CITE-seq latent space (cells x dimensions)
 #' @param silhouette_cutoff minimum silhouette score to keep clustering
-#' @param num_cluster number of clusters to return from hierarchical clustering
+#' @param inconsistent_value input parameter to python fcluster determining
+#' where clusters are cut in the hierarchical tree
+#' @param min_cluster_size cells in clusters smaller than this value are
+#' assigned a cluster ID of -1, indicating no cluster assignment
 #'
 #' @export
 #'
-ConsensusCluster.internal <- function(hdbscan_results, cite_latent, silhouette_cutoff, num_cluster) {
+ConsensusCluster.internal <- function(hdbscan_results, cite_latent, silhouette_cutoff, inconsistent_value, min_cluster_size) {
+  if (!requireNamespace("rPython", quietly = TRUE)) {
+    stop("Package \"rPython\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
   num_cells <- length(hdbscan_results[[1]]$cluster_labels)
   consensus_matrix <- matrix(0, nrow=num_cells, ncol=num_cells)
   total_runs <- 0
@@ -205,11 +225,11 @@ ConsensusCluster.internal <- function(hdbscan_results, cite_latent, silhouette_c
   if (total_runs > 0) {
     consensus_matrix <- consensus_matrix / total_runs
   }
+  colnames(consensus_matrix) <- NULL
 
-  hier_tree <- hclust(as.dist(consensus_matrix), method="average")
-  plot(hier_tree)
-  consensus_labels <- cutree(hier_tree, k=num_cluster)
-  return(consensus_labels)
+  rPython::python.load(paste("inst/python","/consensus_clustering.py", sep=""))
+  consensus_clusters <- rPython::python.call("consensus_cluster", consensus_matrix, inconsistent_value, min_cluster_size)
+
 }
 
 

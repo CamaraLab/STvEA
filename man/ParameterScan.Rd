@@ -10,6 +10,20 @@ ParameterScan(stvea_object, min_cluster_size_range, min_sample_range, ...,
   python_dir = "/usr/local/lib/R/site-library/STvEA/python",
   cache_dir = NULL)
 }
+\arguments{
+\item{stvea_object}{STvEA.data class object containing CITE-seq latent space}
+
+\item{min_cluster_size_range}{vector of min_cluster_size arguments to scan over}
+
+\item{min_sample_range}{vector of min_sample arguments to scan over}
+
+\item{...}{extra parameters to be passed into UMAP}
+
+\item{python_dir}{path to folder containing consensus_clustering.py}
+
+\item{cache_dir}{path to temp folder to house cached information from HDBSCAN.
+If null, no temp folder is created}
+}
 \description{
 Run HDBSCAN over parameter ranges
 Must use Python HDBSCAN because it has 2 important parameters
