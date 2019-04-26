@@ -155,6 +155,18 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
     stop("Package \"reticulate\" needed for this function to work. Please install it.",
          call. = FALSE)
   }
+  if(!reticulate::py_module_available("hdbscan")) {
+    reticulate::py_install("hdbscan")
+  }
+  if(!reticulate::py_module_available("scipy")) {
+    reticulate::py_install("scipy")
+  }
+  if(!reticulate::py_module_available("numpy")) {
+    reticulate::py_install("numpy")
+  }
+  if(!reticulate::py_module_available("sklearn")) {
+    reticulate::py_install("sklearn")
+  }
 
   cite_latent_tmp <- as.matrix(cite_latent)
   colnames(cite_latent_tmp) <- NULL
@@ -164,7 +176,6 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
   # colnames(umap_latent_tmp) <- NULL
   umap_latent_tmp <- cite_latent_tmp
 
-  reticulate::py_install("hdbscan")
   reticulate::source_python(paste(python_dir,"/consensus_clustering.py",sep=""))
   cat("Running HDBSCAN on the UMAP space\n")
   if (is.null(cache_dir)) {
