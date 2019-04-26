@@ -17,7 +17,8 @@ Imports:
     ggplot2,
     igraph,
     cluster,
-    colorspace
+    colorspace,
+    AdjacencyScore
 Suggests:
     umap,
     rPython
