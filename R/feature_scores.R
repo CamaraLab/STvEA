@@ -57,7 +57,7 @@ AdjScoreClustersCITE <- function(
 #'
 AdjScoreClustersCODEX <- function(stvea_object, k, num_cores=1) {
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
-  AdjScoreClustersCODEX.internal(stvea_object$codex_clusters,
+  AdjScoreClustersCODEX.internal(stvea_object@codex_clusters,
                                  knn_adj,
                                  num_cores=num_cores)
 }
