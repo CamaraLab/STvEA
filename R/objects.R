@@ -24,8 +24,10 @@ STvEA.data <- setClass(
     codex_clean = 'ANY', # codex cells x proteins
 
     corrected_codex = 'ANY', # codex cells x proteins
-    codex_nn = 'dgCMatrix', # cite cells x codex cells
-    cite_nn = 'dgCMatrix', # codex cells x cite cells
+    codex_transfer = 'dgCMatrix', # cite cells x codex cells
+                                  # k CITE-seq neighbors for each CODEX cell
+    cite_transfer = 'dgCMatrix', # codex cells x cite cells
+                                 # k CODEX neighbors for each CITE-seq cell
     codex_mRNA = 'ANY' # codex cells x genes
   )
 )

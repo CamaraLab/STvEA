@@ -50,7 +50,7 @@ MapCODEXtoCITE <- function(stvea_object,
 #'
 #' @export
 #'
-GetMatrixNN <- function(stvea_object,
+GetTransferMatrix <- function(stvea_object,
                         k.codex = floor(nrow(stvea_object@cite_clean)*0.002),
                         k.cite = floor(nrow(stvea_object@corrected_codex)*0.002),
                         c.codex = 0.1,
@@ -58,11 +58,11 @@ GetMatrixNN <- function(stvea_object,
   if (is.null(stvea_object@corrected_codex)) {
     stop("MapCODEXtoCITE must be run on the input object first", call. =FALSE)
   }
-  stvea_object@codex_nn <- GetMatrixNN.internal(stvea_object@corrected_codex,
+  stvea_object@codex_transfer <- GetTransferMatrix.internal(stvea_object@corrected_codex,
                                                   stvea_object@cite_norm,
                                                   k=k.codex,
                                                   c=c.codex)
-  stvea_object@cite_nn <- GetMatrixNN.internal(stvea_object@cite_norm,
+  stvea_object@cite_transfer <- GetTransferMatrix.internal(stvea_object@cite_norm,
                                                  stvea_object@corrected_codex,
                                                  k=k.cite,
                                                  c=c.cite)
@@ -71,7 +71,7 @@ GetMatrixNN <- function(stvea_object,
 
 
 
-# Functions with matrix parameters, not using DataHolder object
+# Functions with matrix parameters, not using STvEA.data object
 
 #' Find the knn indices in data for all cells in query
 #' using Pearson's correlation dissimilarity
@@ -217,7 +217,7 @@ MapCODEXtoCITE.internal <- function(
 #'
 #' @export
 #'
-GetMatrixNN.internal <- function(from_dataset, to_dataset, k = floor(nrow(to_dataset)*0.002), c = 0.1) {
+GetTransferMatrix.internal <- function(from_dataset, to_dataset, k = floor(nrow(to_dataset)*0.002), c = 0.1) {
   # get corrected data for each dataset (either as input or from name in object)
   # compute query knn from CorNN
   # weight each nn based on gaussian kernel of distance

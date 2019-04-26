@@ -21,3 +21,4 @@ Imports:
 Suggests:
     umap,
     rPython
+Remotes: CamaraLab/AdjacencyScore
