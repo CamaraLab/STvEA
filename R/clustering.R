@@ -156,16 +156,16 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
          call. = FALSE)
   }
   if(!reticulate::py_module_available("hdbscan")) {
-    reticulate::py_install("hdbscan")
+    reticulate:::py_install("hdbscan")
   }
   if(!reticulate::py_module_available("scipy")) {
-    reticulate::py_install("scipy")
+    reticulate:::py_install("scipy")
   }
   if(!reticulate::py_module_available("numpy")) {
-    reticulate::py_install("numpy")
+    reticulate:::py_install("numpy")
   }
   if(!reticulate::py_module_available("sklearn")) {
-    reticulate::py_install("sklearn")
+    reticulate:::py_install("sklearn")
   }
 
   cite_latent_tmp <- as.matrix(cite_latent)
