@@ -151,25 +151,29 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
     stop("Package \"umap\" needed for this function to work. Please install it.",
          call. = FALSE)
   }
-  if (!requireNamespace("rPython", quietly = TRUE)) {
-    stop("Package \"rPython\" needed for this function to work. Please install it.",
+  if (!requireNamespace("reticulate", quietly = TRUE)) {
+    stop("Package \"reticulate\" needed for this function to work. Please install it.",
          call. = FALSE)
   }
 
   cite_latent_tmp <- as.matrix(cite_latent)
   colnames(cite_latent_tmp) <- NULL
   cat("Running UMAP on the CITE-seq latent space\n")
-  umap_latent <- umap::umap(cite_latent, n_components = ncol(cite_latent), ...)$layout
-  umap_latent_tmp <- as.matrix(umap_latent)
-  colnames(umap_latent_tmp) <- NULL
+  # umap_latent <- umap::umap(cite_latent, n_components = ncol(cite_latent), ...)$layout
+  # umap_latent_tmp <- as.matrix(umap_latent)
+  # colnames(umap_latent_tmp) <- NULL
+  umap_latent_tmp <- cite_latent_tmp
 
-  rPython::python.load(paste(python_dir,"/consensus_clustering.py", sep=""))
+  reticulate::py_install("hdbscan")
+  reticulate::source_python(paste(python_dir,"/consensus_clustering.py",sep=""))
   cat("Running HDBSCAN on the UMAP space\n")
   if (is.null(cache_dir)) {
-    hdbscan_labels <- rPython::python.call("run_hdbscan", cite_latent_tmp, umap_latent_tmp, min_cluster_size_range, min_sample_range)
+    hdbscan_labels <- run_hdbscan(cite_latent_tmp, umap_latent_tmp, min_cluster_size_range, min_sample_range)
   } else {
-    hdbscan_labels <- rPython::python.call("run_hdbscan", cite_latent_tmp, umap_latent_tmp, min_cluster_size_range, min_sample_range, cache_dir)
+    hdbscan_labels <- run_hdbscan(cite_latent_tmp, umap_latent_tmp, min_cluster_size_range, min_sample_range, cache_dir)
   }
+  sys <- import('sys')
+  sys$stdout$flush()
 
   all_scores <- NULL
   hdbscan_results <- list()
@@ -201,8 +205,8 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
 #' @export
 #'
 ConsensusCluster.internal <- function(hdbscan_results, cite_latent, silhouette_cutoff, inconsistent_value, min_cluster_size) {
-  if (!requireNamespace("rPython", quietly = TRUE)) {
-    stop("Package \"rPython\" needed for this function to work. Please install it.",
+  if (!requireNamespace("reticulate", quietly = TRUE)) {
+    stop("Package \"reticulate\" needed for this function to work. Please install it.",
          call. = FALSE)
   }
 
@@ -230,8 +234,8 @@ ConsensusCluster.internal <- function(hdbscan_results, cite_latent, silhouette_c
   }
   colnames(consensus_matrix) <- NULL
 
-  rPython::python.load(paste("inst/python","/consensus_clustering.py", sep=""))
-  consensus_clusters <- rPython::python.call("consensus_cluster", consensus_matrix, inconsistent_value, min_cluster_size)
+  reticulate::source_python(paste("inst/python","/consensus_clustering.py", sep=""))
+  consensus_clusters <- consensus_cluster(consensus_matrix, inconsistent_value, min_cluster_size)
 
 }
 
