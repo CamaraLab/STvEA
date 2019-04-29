@@ -8,10 +8,10 @@
 #' @export
 #'
 KnnCODEX <- function(stvea_object, k=5) {
-  if (!is.null(stvea_object$codex_clean)) {
-    stvea_object@codex_knn <- CorKNN(stvea_object$codex_clean, k=k)
-  } else if (!is.null(stvea_object$codex_protein)) {
-    stvea_object@codex_knn <- CorKNN(stvea_object$codex_protein, k=k)
+  if (!is.null(stvea_object@codex_clean)) {
+    stvea_object@codex_knn <- CorNN(stvea_object@codex_clean, k=k)$nn.idx
+  } else if (!is.null(stvea_object@codex_protein)) {
+    stvea_object@codex_knn <- CorNN(stvea_object@codex_protein, k=k)$nn.idx
   } else {
     stop("stvea_object must contain either cleaned or original CODEX protein data", call. =FALSE)
   }
@@ -32,9 +32,9 @@ ClusterCODEX <- function(stvea_object, k=NULL) {
     stop("stvea_object must have KNN matrix for CODEX. Run KnnCODEX or GetUMAP first.", call. =FALSE)
   }
   if (is.null(k)) {
-    stvea_object$codex_clusters <- ClusterCODEX.internal(stvea_object@codex_knn)
+    stvea_object@codex_clusters <- ClusterCODEX.internal(stvea_object@codex_knn)
   } else {
-    stvea_object$codex_clusters <- ClusterCODEX.internal(stvea_object@codex_knn, k)
+    stvea_object@codex_clusters <- ClusterCODEX.internal(stvea_object@codex_knn, k)
   }
   return(stvea_object)
 }

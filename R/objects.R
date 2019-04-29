@@ -19,8 +19,9 @@ STvEA.data <- setClass(
     codex_size = 'numeric',
     codex_blanks = 'ANY', # codex cells x blank channels
     codex_spatial = 'ANY', # codex cells x 3
-    codex_clusters = 'vector',
     codex_emb = 'ANY', # codex cells x 2
+    codex_knn = 'ANY', # codex cells x k
+    codex_clusters = 'vector',
     codex_clean = 'ANY', # codex cells x proteins
 
     corrected_codex = 'ANY', # codex cells x proteins
