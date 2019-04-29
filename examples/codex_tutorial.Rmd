@@ -12,26 +12,24 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Read in CODEX data
 ```{r}
 data("codex_balbc1")
-codex_balbc1 <- read.table("../../PGC001.a10/data/BALBc-1.csv", sep=",", stringsAsFactors = FALSE, header=TRUE)
-row.names(data) <- paste("codex_",row.names(data),sep="")
-expression <- cbind(data[, 1:29], MHCII=data$MHCII)
-expression <- expression[,colnames(protein_expr_full)]
-blanks <- data[,grepl("blank", colnames(data))]
-x <- data$X.X
-x <- floor((data$tile_nr.tile_nr-1)/9) * max(data$X.X) + x
-y <- data$Y.Y
-y <- ((data$tile_nr.tile_nr - 1) %% 9) * max(data$Y.Y) + y
-z <- data$Z.Z
+protein_expr <- cbind(codex_balbc1[, 1:29], MHCII=codex_balbc1$MHCII)
+blanks <- codex_balbc1[,grepl("blank", colnames(codex_balbc1))]
+size <- codex_balbc1$size.size
+x <- codex_balbc1$X.X
+x <- floor((codex_balbc1$tile_nr.tile_nr-1)/9) * max(codex_balbc1$X.X) + x
+y <- codex_balbc1$Y.Y
+y <- ((codex_balbc1$tile_nr.tile_nr - 1) %% 9) * max(codex_balbc1$Y.Y) + y
+z <- codex_balbc1$Z.Z
 spatial <- cbind(x,y,z)
-row.names(spatial) <- row.names(expression)
+row.names(spatial) <- row.names(protein_expr)
 ```
 
 ## Create object to hold data
 ```{r}
-stvea_object <- SetDataCODEX(codex_protein = expression, codex_blanks = blanks, codex_size = data$size.size, codex_spatial = as.data.frame(spatial), stvea_object = stvea_object)
+stvea_object <- SetDataCODEX(codex_protein = protein_expr, codex_blanks = blanks, codex_size = size, codex_spatial = as.data.frame(spatial))
 ```
 
-## Filter and clean protein expression
+## Filter and clean protein protein_expr
 ```{r}
 stvea_object <- FilterCODEX(stvea_object, size_lim = c(1000,25000), blank_lower = c(-1200, -1200, -1200, -1200), blank_upper = c(6000,2500,5000,2500))
 

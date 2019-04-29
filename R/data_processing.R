@@ -59,10 +59,7 @@ FilterCODEX <- function(stvea_object,
 #' @export
 #'
 CleanCODEX <- function(stvea_object) {
-  if (is.null(stvea_object@codex_filter)) {
-    stop("FilterCODEX must have been run on the input object first", call. =FALSE)
-  }
-  stvea_object@codex_clean <- CleanCODEX.internal(stvea_object@codex_filter)
+  stvea_object@codex_clean <- CleanCODEX.internal(stvea_object@codex_protein)
   return(stvea_object)
 }
 
