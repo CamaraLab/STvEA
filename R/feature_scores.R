@@ -3,6 +3,27 @@
 NULL
 
 
+#' Visualize heatmap of Adjacency Score run on
+#' all combinations of feature pairs
+#'
+#' @param adj_score_output output of any of the AdjScore functions
+#' - a matrix where each row contains the features in a pair and their
+#' Adjacency Score and q values
+#'
+#' @export
+#'
+AdjScoreHeatmap <- function(adj_score_output) {
+  heatmap_matrix <- matrix(rep(0,length(unique(adj_score_output$f))*length(unique(adj_score_output$g))), ncol=length(unique(adj_score_output$g)))
+  row.names(heatmap_matrix) <- unique(adj_score_output$f)[order(unique(adj_score_output$f))]
+  colnames(heatmap_matrix) <- unique(adj_score_output$g)[order(unique(adj_score_output$g))]
+  for (i in 1:nrow(adj_score_output)) {
+    heatmap_matrix[adj_score_output[i,"f"],adj_score_output[i,"g"]] <- log10(adj_score_output[i,"q"]+1e-15)
+    heatmap_matrix[adj_score_output[i,"g"],adj_score_output[i,"f"]] <- log10(adj_score_output[i,"q"]+1e-15)
+  }
+  heatmap(heatmap_matrix, margins=c(10,10), symm=T)
+}
+
+
 #' Use the Adjacency Score to evaluate colocaliztion of all pairs
 #' of CITE-seq clusters mapped to the CODEX spatial positions
 #'

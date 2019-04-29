@@ -3,24 +3,19 @@
 NULL
 
 
-#' Runs UMAP on CITE-seq latent space and CODEX protein expression
-#' if they exist in the provided STvEA.data object. If CleanCODEX
-#' has been run, calls UMAP on the cleaned CODEX protein expression.
-#' Otherwise, runs UMAP on the original CODEX protein expression.
+#' Runs UMAP on CODEX protein expression. If CleanCODEX has been run,
+#' calls UMAP on the cleaned CODEX protein expression. Otherwise,
+#' runs UMAP on the original or filtered CODEX protein expression.
 #'
 #' @param stvea_object STvEA.data class object
 #' @param ... parameters to pass into umap
 #'
 #' @export
 #'
-GetVisUMAP <- function(stvea_object, ...) {
+GetUmapCODEX <- function(stvea_object, ...) {
   if (!requireNamespace("umap", quietly = TRUE)) {
     stop("Package \"umap\" needed for this function to work. Please install it.",
          call. = FALSE)
-  }
-  if (!is.null(stvea_object@cite_latent)) {
-    res <- umap::umap(stvea_object@cite_latent, ...)
-    stvea_object@cite_emb <- as.data.frame(res$layout)
   }
   if (!is.null(stvea_object@codex_clean)) {
     res <- umap::umap(stvea_object@codex_clean, ...)
@@ -31,7 +26,34 @@ GetVisUMAP <- function(stvea_object, ...) {
     stvea_object@codex_emb <- as.data.frame(res$layout)
     stvea_object@codex_knn <- res$knn$indexes
   } else {
-    warning("stvea_object does not contain cleaned or raw CODEX protein expression")
+    stop("stvea_object does not contain cleaned or raw CODEX protein expression")
+  }
+  return(stvea_object)
+}
+
+
+#' Runs UMAP on CITE-seq latent space (if provided) or
+#' mRNA expression
+#'
+#' @param stvea_object STvEA.data class object with CITE-seq
+#' latent space or mRNA expression
+#' @param ... parameters to pass into umap
+#'
+#' @export
+#'
+GetUmapCITE <- function(stvea_object, ...) {
+  if (!requireNamespace("umap", quietly = TRUE)) {
+    stop("Package \"umap\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+  if (!is.null(stvea_object@cite_latent)) {
+    res <- umap::umap(stvea_object@cite_latent, ...)
+    stvea_object@cite_emb <- as.data.frame(res$layout)
+  } else if (!is.null(stvea_object@cite_mRNA)) {
+    res <- umap::umap(stvea_object@cite_mRNA, ...)
+    stvea_object@cite_emb <- as.data.frame(res$layout)
+  } else {
+    stop("stvea_object does not contain CITE-seq data")
   }
   return(stvea_object)
 }
