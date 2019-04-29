@@ -264,7 +264,7 @@ PlotExprCODEXspatial <- function(stvea_object, name,
     color <- sapply(1:length(color), function(m) colorRampPalette(c(color[m],color2[m]), alpha=TRUE)(3)[2])
   }
 
-  ggplot(as.data.frame(spatial),
+  ggplot(as.data.frame(stvea_object@codex_spatial),
          aes(x=x,y=y,color=factor(1:length(color)))) +
     geom_point(size=0.5, alpha=0.5) +
     scale_color_manual(values=alpha(color,1)) +
