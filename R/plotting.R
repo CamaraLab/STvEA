@@ -118,14 +118,36 @@ PlotIndexCITE <- function(stvea_object, index,
 #'
 #' @export
 #'
-PlotClusterCITE <- function(stvea_object) {
+PlotClusterCITE <- function(stvea_object, pt_size=0.5) {
   if (-1 %in% stvea_object@cite_clusters) {
     colors <- c("gray", rainbow_hcl(length(unique(stvea_object@cite_clusters))-1, c = 80))
   } else {
     colors <- rainbow_hcl(length(unique(stvea_object@cite_clusters)), c = 80)
   }
   ggplot(stvea_object@cite_emb, aes(x=V1,y=V2,color=factor(stvea_object@cite_clusters))) +
-    geom_point(size=0.5) +
+    geom_point(size=pt_size) +
+    scale_color_manual(values = colors, name="cluster") +
+    guides(colour = guide_legend(override.aes = list(size=5))) +
+    theme_void()
+}
+
+
+#' Plot clusters of CODEX cells in CODEX UMAP embedding
+#'
+#' @param stvea_object STvEA.data class with CODEX embedding and clustering
+#'
+#' @importFrom colorspace rainbow_hcl
+#'
+#' @export
+#'
+PlotClusterCODEXemb <- function(stvea_object, pt_size=0.5) {
+  if (-1 %in% stvea_object@codex_clusters) {
+    colors <- c("gray", rainbow_hcl(length(unique(stvea_object@codex_clusters))-1, c = 80))
+  } else {
+    colors <- rainbow_hcl(length(unique(stvea_object@codex_clusters)), c = 80)
+  }
+  ggplot(stvea_object@codex_emb, aes(x=V1,y=V2,color=factor(stvea_object@codex_clusters))) +
+    geom_point(size=pt_size) +
     scale_color_manual(values = colors, name="cluster") +
     guides(colour = guide_legend(override.aes = list(size=5))) +
     theme_void()

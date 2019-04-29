@@ -134,7 +134,7 @@ FilterCITEmRNA <- function(stvea_object, min_transcripts=1200, min_cells_per_gen
 
 #' Removes points from CODEX matrix that are not cells
 #' as determined by the gating strategy on the blank channels
-#' from the CODEX paper
+#' from the CODEX paper, then normalizes data by total counts per cell
 #' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param codex_raw CODEX expression matrix after spillover correction,

@@ -12,6 +12,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Read in CODEX data
 ```{r}
 data("codex_balbc1")
+
+codex_balbc1 <- codex_balbc1[sample(nrow(codex_balbc1), 10000),]
+```
+
+```{r}
 protein_expr <- cbind(codex_balbc1[, 1:29], MHCII=codex_balbc1$MHCII)
 blanks <- codex_balbc1[,grepl("blank", colnames(codex_balbc1))]
 size <- codex_balbc1$size.size
@@ -38,9 +43,16 @@ stvea_object <- CleanCODEX(stvea_object)
 
 ## Louvain clustering on KNN from UMAP
 ```{r}
+ptm <- proc.time()
 stvea_object <- GetVisUMAP(stvea_object, metric = 'pearson', n_neighbors=50, min_dist=0.1, negative_sample_rate = 100)
 
-stvea_object <- ClusterCodex(stvea_object, k=50)
+stvea_object <- ClusterCODEX(stvea_object, k=50)
+proc.time() - ptm
+```
+
+## Plot 
+```{r}
+PlotExprCODEXemb(stvea_object, "CD4")
 ```
 
 
