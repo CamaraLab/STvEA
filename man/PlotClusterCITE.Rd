@@ -4,7 +4,7 @@
 \alias{PlotClusterCITE}
 \title{Plot clusters of CITE-seq cells in CITE-seq UMAP or t-SNE embedding}
 \usage{
-PlotClusterCITE(stvea_object)
+PlotClusterCITE(stvea_object, pt_size = 0.5)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CITE-seq embedding and clustering}
