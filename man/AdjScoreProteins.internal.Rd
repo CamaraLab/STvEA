@@ -6,14 +6,14 @@
 pairs of proteins in the CODEX spatial dimensions
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-AdjScoreProteins.internal(codex_protein, adj_matrix, protein_pairs = NULL,
+AdjScoreProteins.internal(adj_matrix, codex_protein, protein_pairs = NULL,
   c = 0, num_cores = 1, num_perms = 1000, perm_estimate = T)
 }
 \arguments{
-\item{codex_protein}{a (cells x proteins) matrix of CODEX protein expression}
-
 \item{adj_matrix}{a (preferrably sparse) binary matrix of
 adjacency between the cells in the CODEX spatial coordinates}
+
+\item{codex_protein}{a (cells x proteins) matrix of CODEX protein expression}
 
 \item{protein_pairs}{a 2 column matrix of protein pairs where each row
 specifies the names of the proteins in a pair. If NULL, all pairs

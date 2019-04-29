@@ -8,13 +8,13 @@ Calls Adjacency Score with c=0 to use hypergeometric null distribution
 speed up for mutually exclusive binary features.
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-AdjScoreClustersCODEX.internal(codex_clusters, adj_matrix, num_cores = 1)
+AdjScoreClustersCODEX.internal(adj_matrix, codex_clusters, num_cores = 1)
 }
 \arguments{
-\item{codex_clusters}{a vector of the cluster ID for each CODEX cell}
-
 \item{adj_matrix}{a (preferrably sparse) binary matrix of
 adjacency between the cells in the CODEX spatial coordinates}
+
+\item{codex_clusters}{a vector of the cluster ID for each CODEX cell}
 
 \item{num_cores}{integer specifying the number of cores to be used
 in the computation. By default only one core is used.}

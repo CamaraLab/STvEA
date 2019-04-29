@@ -6,18 +6,18 @@
 of CITE-seq clusters mapped to the CODEX spatial positions
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-AdjScoreClustersCITE.internal(cite_clusters, codex_transfer, adj_matrix,
+AdjScoreClustersCITE.internal(adj_matrix, cite_clusters, codex_transfer,
   c = 0, num_cores = 1, num_perms = 1000, perm_estimate = T)
 }
 \arguments{
+\item{adj_matrix}{a (preferrably sparse) binary matrix of
+adjacency between the cells in the CODEX spatial coordinates}
+
 \item{cite_clusters}{a vector of cluster IDs for the CITE-seq cells}
 
 \item{codex_transfer}{a (cite-seq cells x codex cells) matrix
 of weighted nearest neighbor assignments mapping each CODEX
 cell to k CITE-seq cells}
-
-\item{adj_matrix}{a (preferrably sparse) binary matrix of
-adjacency between the cells in the CODEX spatial coordinates}
 
 \item{c}{constant used to determine width of diffusion, must be 0 <= c}
 

@@ -6,18 +6,18 @@
 pairs of genes mapped to the CODEX spatial positions
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-AdjScoreGenes.internal(codex_mRNA, gene_pairs, adj_matrix, c = 0,
+AdjScoreGenes.internal(adj_matrix, codex_mRNA, gene_pairs, c = 0,
   num_cores = 1, num_perms = 1000, perm_estimate = T)
 }
 \arguments{
+\item{adj_matrix}{a (preferrably sparse) binary matrix of
+adjacency between the cells in the CODEX spatial coordinates}
+
 \item{codex_mRNA}{a (CODEX cells x genes) matrix of the CITE-seq
 mRNA expression mapped to the CODEX cells}
 
 \item{gene_pairs}{a 2 column matrix of gene pairs where each row
 specifies the names of the genes in a pair}
-
-\item{adj_matrix}{a (preferrably sparse) binary matrix of
-adjacency between the cells in the CODEX spatial coordinates}
 
 \item{c}{constant used to determine width of diffusion, must be 0 <= c}
 

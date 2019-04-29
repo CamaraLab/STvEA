@@ -5,7 +5,7 @@
 \title{Use the Adjacency Score to evaluate colocalization of given
 pairs of genes mapped to the CODEX spatial positions}
 \usage{
-AdjScoreGenes(stvea_object, gene_pairs, k, c = 0, num_cores = 1,
+AdjScoreGenes(stvea_object, gene_pairs, k = 5, c = 0, num_cores = 1,
   num_perms = 1000, perm_estimate = T)
 }
 \arguments{

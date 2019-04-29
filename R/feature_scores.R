@@ -31,9 +31,9 @@ AdjScoreClustersCITE <- function(
   perm_estimate=T
 ) {
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
-  AdjScoreClustersCITE.internal(stvea_object@cite_clusters,
+  AdjScoreClustersCITE.internal(knn_adj,
+                                stvea_object@cite_clusters,
                                 stvea_object@codex_transfer,
-                                knn_adj,
                                 c=c,
                                 num_cores=num_cores,
                                 num_perms=num_perms,
@@ -57,9 +57,8 @@ AdjScoreClustersCITE <- function(
 #'
 AdjScoreClustersCODEX <- function(stvea_object, k, num_cores=1) {
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
-  AdjScoreClustersCODEX.internal(stvea_object@codex_clusters,
-                                 knn_adj,
-                                 num_perms=0,
+  AdjScoreClustersCODEX.internal(knn_adj,
+                                 stvea_object@codex_clusters,
                                  num_cores=num_cores)
 }
 
@@ -110,9 +109,9 @@ AdjScoreProteins <- function(
   }
 
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
-  AdjScoreProteins.internal(stvea_object@codex_protein,
+  AdjScoreProteins.internal(knn_adj,
+                            stvea_object@codex_protein,
                             protein_pairs,
-                            knn_adj,
                             c=c,
                             num_cores=num_cores,
                             num_perms=num_perms,
@@ -144,16 +143,16 @@ AdjScoreProteins <- function(
 AdjScoreGenes <- function(
   stvea_object,
   gene_pairs,
-  k,
+  k=5,
   c=0,
   num_cores=1,
   num_perms=1000,
   perm_estimate=T
 ) {
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
-  AdjScoreGenes.interna(stvea_object@cite_mRNA,
+  AdjScoreGenes.interna(knn_adj,
+                        stvea_object@cite_mRNA,
                         gene_pairs,
-                        knn_adj,
                         c=c,
                         num_cores=num_cores,
                         num_perms=num_perms,
@@ -167,12 +166,12 @@ AdjScoreGenes <- function(
 #' of CITE-seq clusters mapped to the CODEX spatial positions
 #' Takes matrices and data frames instead of STvEA.data class
 #'
+#' @param adj_matrix a (preferrably sparse) binary matrix of
+#' adjacency between the cells in the CODEX spatial coordinates
 #' @param cite_clusters a vector of cluster IDs for the CITE-seq cells
 #' @param codex_transfer a (cite-seq cells x codex cells) matrix
 #' of weighted nearest neighbor assignments mapping each CODEX
 #' cell to k CITE-seq cells
-#' @param adj_matrix a (preferrably sparse) binary matrix of
-#' adjacency between the cells in the CODEX spatial coordinates
 #' @param c constant used to determine width of diffusion, must be 0 <= c
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
@@ -185,9 +184,9 @@ AdjScoreGenes <- function(
 #' @export
 #'
 AdjScoreClustersCITE.internal <- function(
+  adj_matrix,
   cite_clusters,
   codex_transfer,
-  adj_matrix,
   c=0,
   num_cores=1,
   num_perms=1000,
@@ -217,17 +216,17 @@ AdjScoreClustersCITE.internal <- function(
 #' speed up for mutually exclusive binary features.
 #' Takes matrices and data frames instead of STvEA.data class
 #'
-#' @param codex_clusters a vector of the cluster ID for each CODEX cell
 #' @param adj_matrix a (preferrably sparse) binary matrix of
 #' adjacency between the cells in the CODEX spatial coordinates
+#' @param codex_clusters a vector of the cluster ID for each CODEX cell
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
 #'
 #' @export
 #'
 AdjScoreClustersCODEX.internal <- function(
-  codex_clusters,
   adj_matrix,
+  codex_clusters,
   num_cores=1
 ) {
   cluster_ids <- unique(codex_clusters)
@@ -241,7 +240,7 @@ AdjScoreClustersCODEX.internal <- function(
   }
 
   # Call adjacency score with c=0 and groupings=TRUE to use hypergeometric null distribution speed up
-  adjacency_score(adj_matrix, cluster_matrix, cluster_pairs, c=0, num_cores=num_cores, groupings=TRUE)
+  adjacency_score(adj_matrix, cluster_matrix, cluster_pairs, c=0, num_perms=0, num_cores=num_cores, groupings=TRUE)
 }
 
 
@@ -249,9 +248,9 @@ AdjScoreClustersCODEX.internal <- function(
 #' pairs of proteins in the CODEX spatial dimensions
 #' Takes matrices and data frames instead of STvEA.data class
 #'
-#' @param codex_protein a (cells x proteins) matrix of CODEX protein expression
 #' @param adj_matrix a (preferrably sparse) binary matrix of
 #' adjacency between the cells in the CODEX spatial coordinates
+#' @param codex_protein a (cells x proteins) matrix of CODEX protein expression
 #' @param protein_pairs a 2 column matrix of protein pairs where each row
 #' specifies the names of the proteins in a pair. If NULL, all pairs
 #' of columns in the codex_protein matrix are used.
@@ -267,8 +266,8 @@ AdjScoreClustersCODEX.internal <- function(
 #' @export
 #'
 AdjScoreProteins.internal <- function(
-  codex_protein,
   adj_matrix,
+  codex_protein,
   protein_pairs=NULL,
   c = 0,
   num_cores = 1,
@@ -285,12 +284,12 @@ AdjScoreProteins.internal <- function(
 #' pairs of genes mapped to the CODEX spatial positions
 #' Takes matrices and data frames instead of STvEA.data class
 #'
+#' @param adj_matrix a (preferrably sparse) binary matrix of
+#' adjacency between the cells in the CODEX spatial coordinates
 #' @param codex_mRNA a (CODEX cells x genes) matrix of the CITE-seq
 #' mRNA expression mapped to the CODEX cells
 #' @param gene_pairs a 2 column matrix of gene pairs where each row
 #' specifies the names of the genes in a pair
-#' @param adj_matrix a (preferrably sparse) binary matrix of
-#' adjacency between the cells in the CODEX spatial coordinates
 #' @param c constant used to determine width of diffusion, must be 0 <= c
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
@@ -303,9 +302,9 @@ AdjScoreProteins.internal <- function(
 #' @export
 #'
 AdjScoreGenes.internal <- function(
+  adj_matrix,
   codex_mRNA,
   gene_pairs,
-  adj_matrix,
   c=0,
   num_cores=1,
   num_perms=1000,
