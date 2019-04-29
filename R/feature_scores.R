@@ -59,6 +59,7 @@ AdjScoreClustersCODEX <- function(stvea_object, k, num_cores=1) {
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
   AdjScoreClustersCODEX.internal(stvea_object@codex_clusters,
                                  knn_adj,
+                                 num_perms=0,
                                  num_cores=num_cores)
 }
 
@@ -69,7 +70,8 @@ AdjScoreClustersCODEX <- function(stvea_object, k, num_cores=1) {
 #' @param stvea_object STvEA.data class object containing CODEX
 #' protein expression and CODEX spatial coordinates
 #' @param protein_pairs a 2 column matrix of protein pairs where each row
-#' specifies the names of the proteins in a pair
+#' specifies the names of the proteins in a pair. If NULL, all pairs
+#' of columns in the codex_protein matrix are used.
 #' @param k number of nearest neighbors to create graph
 #' from CODEX spatial information
 #' @param c constant used to determine width of diffusion, must be 0 <= c
@@ -85,13 +87,28 @@ AdjScoreClustersCODEX <- function(stvea_object, k, num_cores=1) {
 #'
 AdjScoreProteins <- function(
   stvea_object,
-  protein_pairs,
-  k,
+  protein_pairs=NULL,
+  k=5,
   c=0,
   num_cores=1,
   num_perms=1000,
   perm_estimate=TRUE
 ) {
+  if (!is.null(stvea_object@codex_clean)) {
+    protein_expr <- stvea_object@codex_clean
+  } else if (!is.null(stvea_object@codex_protein)) {
+    protein_expr <- stvea_object@codex_protein
+  } else {
+    stop("stvea_object must contain cleaned or raw CODEX protein expression")
+  }
+
+  if (is.null(protein_pairs)) {
+    protein_pairs <- t(combn(colnames(protein_expr),2))
+    for (protein in colnames(protein_expr)) {
+      protein_pairs <- rbind(protein_pairs, c(protein,protein))
+    }
+  }
+
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
   AdjScoreProteins.internal(stvea_object@codex_protein,
                             protein_pairs,
@@ -233,10 +250,11 @@ AdjScoreClustersCODEX.internal <- function(
 #' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param codex_protein a (cells x proteins) matrix of CODEX protein expression
-#' @param protein_pairs a 2 column matrix of protein pairs where each row
-#' specifies the names of the proteins in a pair
 #' @param adj_matrix a (preferrably sparse) binary matrix of
 #' adjacency between the cells in the CODEX spatial coordinates
+#' @param protein_pairs a 2 column matrix of protein pairs where each row
+#' specifies the names of the proteins in a pair. If NULL, all pairs
+#' of columns in the codex_protein matrix are used.
 #' @param c constant used to determine width of diffusion, must be 0 <= c
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
@@ -250,12 +268,12 @@ AdjScoreClustersCODEX.internal <- function(
 #'
 AdjScoreProteins.internal <- function(
   codex_protein,
-  protein_pairs,
   adj_matrix,
-  c,
-  num_cores,
-  num_perms,
-  perm_estimate
+  protein_pairs=NULL,
+  c = 0,
+  num_cores = 1,
+  num_perms = 1000,
+  perm_estimate = T
 ) {
   codex_protein_cut <- t(codex_protein[,colnames(codex_protein) %in% as.vector(protein_pairs)])
   adjacency_score(adj_matrix, codex_protein_cut, protein_pairs, c=c, num_cores=num_cores,

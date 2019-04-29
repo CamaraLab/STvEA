@@ -113,7 +113,8 @@ ConsensusCluster <- function(stvea_object, silhouette_cutoff, inconsistent_value
 #'
 ClusterCODEX.internal <- function(codex_knn, k = ncol(codex_knn)) {
   if (k > ncol(codex_knn)) {
-    stop("k must be less than or equal to number of nearest neighbors in codex_knn", call. =FALSE)
+    warning("k must be less than or equal to number of nearest neighbors in codex_knn", call. =FALSE)
+    k = ncol(codex_nn)
   }
   t_adj_list <- as.data.frame(t(codex_knn[,1:k]))
   colnames(t_adj_list) <- 1:nrow(codex_knn)

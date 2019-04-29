@@ -9,14 +9,13 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+library(STvEA)
+```
+
 ## Read in CODEX data
 ```{r}
 data("codex_balbc1")
-
-codex_balbc1 <- codex_balbc1[sample(nrow(codex_balbc1), 10000),]
-```
-
-```{r}
 protein_expr <- cbind(codex_balbc1[, 1:29], MHCII=codex_balbc1$MHCII)
 blanks <- codex_balbc1[,grepl("blank", colnames(codex_balbc1))]
 size <- codex_balbc1$size.size
@@ -27,6 +26,14 @@ y <- ((codex_balbc1$tile_nr.tile_nr - 1) %% 9) * max(codex_balbc1$Y.Y) + y
 z <- codex_balbc1$Z.Z
 spatial <- cbind(x,y,z)
 row.names(spatial) <- row.names(protein_expr)
+```
+
+```{r}
+codex_subset <- x < 3000 & y < 3000
+protein_expr <- protein_expr[codex_subset,]
+blanks <- blanks[codex_subset,]
+size <- size[codex_subset]
+spatial <- spatial[codex_subset,]
 ```
 
 ## Create object to hold data
@@ -43,20 +50,32 @@ stvea_object <- CleanCODEX(stvea_object)
 
 ## Louvain clustering on KNN from UMAP
 ```{r}
+# Takes ~5 minutes with ~10000 cells
 ptm <- proc.time()
-stvea_object <- GetVisUMAP(stvea_object, metric = 'pearson', n_neighbors=50, min_dist=0.1, negative_sample_rate = 100)
+stvea_object <- GetVisUMAP(stvea_object, metric = 'pearson', n_neighbors=30, min_dist=0.1, negative_sample_rate = 50)
 
-stvea_object <- ClusterCODEX(stvea_object, k=50)
+stvea_object <- ClusterCODEX(stvea_object, k=30)
 proc.time() - ptm
 ```
 
-## Plot 
+## Visualize clustering and protein expression on UMAP 
 ```{r}
-PlotCluster
+PlotClusterCODEXemb(stvea_object)
 ```
 
 ```{r}
 PlotExprCODEXemb(stvea_object, "CD4")
 ```
 
+## Assess colocalization of clusters
+```{r}
+cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
+```
 
+```{r}
+protein_pairs <- t(combn(colnames(protein_expr),2))
+for (protein in colnames(protein_expr)) {
+  protein_pairs <- rbind(protein_pairs, c(protein,protein))
+}
+protein_adj <- AdjScoreProteins(stvea_object, protein_pairs, k=3, num_cores=8)
+```

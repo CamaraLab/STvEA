@@ -5,15 +5,16 @@
 \title{Use the Adjacency Score to evaluate colocalization of given
 pairs of proteins in the CODEX spatial dimensions}
 \usage{
-AdjScoreProteins(stvea_object, protein_pairs, k, c = 0, num_cores = 1,
-  num_perms = 1000, perm_estimate = TRUE)
+AdjScoreProteins(stvea_object, protein_pairs = NULL, k = 5, c = 0,
+  num_cores = 1, num_perms = 1000, perm_estimate = TRUE)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class object containing CODEX
 protein expression and CODEX spatial coordinates}
 
 \item{protein_pairs}{a 2 column matrix of protein pairs where each row
-specifies the names of the proteins in a pair}
+specifies the names of the proteins in a pair. If NULL, all pairs
+of columns in the codex_protein matrix are used.}
 
 \item{k}{number of nearest neighbors to create graph
 from CODEX spatial information}
