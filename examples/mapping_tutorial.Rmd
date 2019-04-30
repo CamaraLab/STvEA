@@ -1,6 +1,8 @@
 ---
 title: "Using STvEA to map CODEX and CITE-seq data"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -28,9 +30,6 @@ codex_spatial <- codex_spatial[codex_subset,]
 ```
 
 ## Read in CITE-seq data
-```{r}
-data("citeseq_balbc")
-```
 
 
 ## Create object to hold data
@@ -69,7 +68,11 @@ stvea_object <- CleanCITE(stvea_object, num_cores=8)
 
 ## Cluster CITE-seq cells based on mRNA expression
 ```{r}
-stvea_object <- ParameterScan(stvea_object, seq(5,20,4), seq(10,40,3), n_neighbors=50, min_dist=0.2, negative_sample_rate=50, python_dir = "inst/python", cache_dir="inst/python/tmp")
+stvea_object <- GetUmapCITE(stvea_object, n_neighbors = 50, min_dist=0.1, negative_sample_rate=50)
+```
+
+```{r}
+stvea_object <- ParameterScan(stvea_object, seq(5,20,4), seq(10,40,3), n_neighbors=50, min_dist=0.1, negative_sample_rate=50)
 ```
 
 ```{r}
