@@ -269,6 +269,10 @@ CleanCITE.internal <- function(cite_protein,
   for (i in 1:ncol(cite_protein)) {
     cite_protein_clean[,i] <- cite_protein_list[[i]]
   }
+
+  cite_protein_clean <- cite_protein_clean / rowSums(cite_protein)
+  cite_protein_clean <- t(cite_protein_clean) - apply(cite_protein_clean,2,min)
+  cite_protein_clean <- t(cite_protein_clean/ apply(cite_protein_clean,1,max))
   return(cite_protein_clean)
 }
 
