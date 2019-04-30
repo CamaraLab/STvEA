@@ -7,8 +7,9 @@ Must use Python HDBSCAN because it has 2 important parameters
 (min_cluster_size and min_samples) but R HDBSCAN only has one (minPts)
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-ParameterScan.internal(cite_latent, min_cluster_size_range, min_sample_range,
-  ..., python_dir = "/usr/local/lib/R/site-library/STvEA/python",
+ParameterScan.internal(cite_latent, min_cluster_size_range,
+  min_sample_range, ...,
+  python_dir = "/usr/local/lib/R/site-library/STvEA/python",
   cache_dir = NULL)
 }
 \arguments{

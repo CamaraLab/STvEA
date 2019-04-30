@@ -4,8 +4,8 @@
 \alias{PlotIndexCITE}
 \title{Plot location of a CITE-seq cell in the CITE-seq UMAP or t-SNE embedding}
 \usage{
-PlotIndexCITE(stvea_object, index, high_color = "red", low_color = "gray",
-  pt_size = 0.8)
+PlotIndexCITE(stvea_object, index, high_color = "red",
+  low_color = "gray", pt_size = 0.8)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CITE-seq embedding}

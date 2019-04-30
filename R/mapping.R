@@ -23,13 +23,13 @@ MapCODEXtoCITE <- function(stvea_object,
                                k.filter=100,
                                k.score=80,
                                k.weight=100) {
-  if (is.null(stvea_object@cite_norm) || is.null(stvea_object@codex_clean)) {
+  if (is.null(stvea_object@cite_clean) || is.null(stvea_object@codex_clean)) {
     stop("NormalizeCITE and CleanCODEX must have been run on input object first", call. =FALSE)
   }
   if (is.null(stvea_object@cite_latent)) {
     stop("Input object must contain lower dimensional latent space of the CITE-seq mRNA data", call. =FALSE)
   }
-  stvea_object@corrected_codex <- MapCODEXtoCITE.internal(stvea_object@cite_norm,
+  stvea_object@corrected_codex <- MapCODEXtoCITE.internal(stvea_object@cite_clean,
                                                                 stvea_object@codex_clean,
                                                                 stvea_object@cite_latent,
                                                                 num_chunks=num_chunks, seed=seed,
@@ -59,10 +59,10 @@ GetTransferMatrix <- function(stvea_object,
     stop("MapCODEXtoCITE must be run on the input object first", call. =FALSE)
   }
   stvea_object@codex_transfer <- GetTransferMatrix.internal(stvea_object@corrected_codex,
-                                                  stvea_object@cite_norm,
+                                                  stvea_object@cite_clean,
                                                   k=k.codex,
                                                   c=c.codex)
-  stvea_object@cite_transfer <- GetTransferMatrix.internal(stvea_object@cite_norm,
+  stvea_object@cite_transfer <- GetTransferMatrix.internal(stvea_object@cite_clean,
                                                  stvea_object@corrected_codex,
                                                  k=k.cite,
                                                  c=c.cite)

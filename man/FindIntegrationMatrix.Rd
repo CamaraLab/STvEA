@@ -5,7 +5,8 @@
 \title{Calculate anchor vectors between reference and query dataset
 This is matrix B from Methods in Stuart et al.}
 \usage{
-FindIntegrationMatrix(ref_mat, query_mat, neighbors, anchors, verbose = FALSE)
+FindIntegrationMatrix(ref_mat, query_mat, neighbors, anchors,
+  verbose = FALSE)
 }
 \arguments{
 \item{ref_mat}{a (cell x feature) protein expression matrix}

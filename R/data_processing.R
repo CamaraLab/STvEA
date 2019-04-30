@@ -95,22 +95,6 @@ CleanCITE <- function(stvea_object,
 }
 
 
-#' Normalize CITE-seq ADT expression by original cell expression totals
-#'
-#' @param stvea_object STvEA.data class with CITE-seq protein data after CleanCITE
-#'
-#' @export
-#'
-NormalizeCITE <- function(stvea_object) {
-  if(is.null(stvea_object@cite_clean)) {
-    stop("CleanCITE must have been run on the input object first", call. =FALSE)
-  }
-  stvea_object@cite_norm <- NormalizeCITE.internal(stvea_object@cite_clean,
-                                                     stvea_object@cite_protein)
-  return(stvea_object)
-}
-
-
 #' Filter CITE-seq mRNA data based on number of transcripts per cell
 #' and the number of cells each gene is expressed in
 #'
@@ -335,52 +319,6 @@ SSE <- function(args, p_obs) {
     (1-args[5])*dnbinom(as.numeric(names(p_obs)), mu=args[2], size=1/args[4])
   sse <- min(sum((p_exp - p_obs)^2), .Machine$integer.max)
   return(sse)
-}
-
-
-#' Normalize CITE-seq ADT expression by original cell expression totals
-#' Takes matrices and data frames instead of STvEA.data class
-#'
-#' @param cite_protein_clean Cleaned CITE-seq protein data (cell x protein) output by CleanCITE()
-#' @param cite_protein_raw Raw CITE-seq protein data (cell x protein)
-#' @param batch Batch indices for running MNN batch correction
-#' @param k.batch k to use for MNN batch correction
-#'
-#' @return Normalized and batch corrected CITE-seq protein data matrix (cell x protein)
-#'
-#' @export
-#'
-NormalizeCITE.internal <- function(cite_protein_clean,
-                           cite_protein_raw,
-                           batch = rep(1, nrow(cite_protein_raw)),
-                           k.batch = 20) {
-  # Normalize data by dividing out cell totals (if param TRUE)
-  # Batch correction (if different batches)
-  # Renormalize between 0 and 1?
-  # Return cleaned data matrix (maybe as part of object?)
-
-  # Normalize by total expression per cell
-  cite_protein_clean <- cite_protein_clean / rowSums(cite_protein_raw)
-
-  # Batch correction
-  # batch_ids <- unique(batch)
-  # if (length(batch_ids) > 1) {
-  #   batch_data <- lapply(batch_ids, function(x) t(cite_protein_clean[batch==x,]))
-  #
-  #   corrected_data <- do.call(mnnCorrect, c(batch_data, k=k.batch))
-  #
-  #   cite_protein_corrected <- cite_protein_clean
-  #   for (n in 1:length(batch_ids)) {
-  #     batch_corrected <- t(corrected_data$corrected[[n]])
-  #     colnames(batch_corrected) <- row.names(batch_data[[n]])
-  #     row.names(batch_corrected) <- colnames(batch_data[[n]])
-  #     cite_protein_corrected[batch == batch_ids[n],] <- batch_corrected
-  #   }
-  #   cite_protein_clean <- cite_protein_corrected
-  # }
-  cite_protein_clean <- t(cite_protein_clean) - apply(cite_protein_clean,2,min)
-  cite_protein_clean <- t(cite_protein_clean/ apply(cite_protein_clean,1,max))
-  return(cite_protein_clean)
 }
 
 

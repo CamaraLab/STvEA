@@ -7,8 +7,8 @@ a Negative Binomial mixture and computing each expression
 measurement as the cumulative distribution of the
 Negative Binomial with the higher median.}
 \usage{
-CleanCITE(stvea_object, maxit = 500, factr = 1e-09, optim_inits = NULL,
-  num_cores = 1)
+CleanCITE(stvea_object, maxit = 500, factr = 1e-09,
+  optim_inits = NULL, num_cores = 1)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CITE-seq protein data}
