@@ -244,7 +244,13 @@ PlotExprCODEXspatial <- function(stvea_object, name,
                                  low_color="white",
                                  pt_size =0.8) {
   if (type == "protein") {
-    plotting_data <- stvea_object@codex_protein
+    if (!is.null(stvea_object@codex_clean)) {
+      plotting_data <- stvea_object@codex_clean
+    } else if (!is.null(stvea_object@codex_protein)) {
+      plotting_data <- stvea_object@codex_protein
+    } else {
+      stop("stvea_object must contain CODEX protein data with type=\"protein\"")
+    }
   } else if (type == "RNA") {
     plotting_data <- stvea_object@codex_mRNA
   } else {
@@ -264,12 +270,17 @@ PlotExprCODEXspatial <- function(stvea_object, name,
     color <- sapply(1:length(color), function(m) colorRampPalette(c(color[m],color2[m]), alpha=TRUE)(3)[2])
   }
 
-  ggplot(as.data.frame(stvea_object@codex_spatial),
+  x_tmp <- stvea_object@codex_spatial[,"x"]
+  x_tmp <- x_tmp - min(x_tmp)
+  y_tmp <- stvea_object@codex_spatial[,"y"]
+  y_tmp <- y_tmp - min(y_tmp)
+  spatial_tmp <- as.data.frame(cbind(x = x_tmp, y = y_tmp))
+  ggplot(spatial_tmp,
          aes(x=x,y=y,color=factor(1:length(color)))) +
     geom_point(size=0.5, alpha=0.5) +
     scale_color_manual(values=alpha(color,1)) +
     guides(color = FALSE) +
-    ylim(max(y), 0) +
+    ylim(max(y_tmp), 0) +
     theme_void() + coord_fixed()
 }
 
