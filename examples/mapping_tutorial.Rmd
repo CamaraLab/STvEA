@@ -1,6 +1,6 @@
 ---
-title: "Using STvEA to analyze CODEX data"
-output: rmarkdown::github_document
+title: "Using STvEA to map CODEX and CITE-seq data"
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -27,6 +27,12 @@ codex_size <- codex_size[codex_subset]
 codex_spatial <- codex_spatial[codex_subset,]
 ```
 
+## Read in CITE-seq data
+```{r}
+data("citeseq_balbc")
+```
+
+
 ## Create object to hold data
 The STvEA.data class conveniently handles the required data frames and matrices between function calls.
 ```{r}
@@ -34,22 +40,40 @@ stvea_object <- SetDataCODEX(codex_protein = codex_protein,
                              codex_blanks = codex_blanks,
                              codex_size = codex_size,
                              codex_spatial = codex_spatial)
+stvea_object <- SetDataCITE(cite_mRNA = cite_mRNA,
+                            cite_protein = cite_protein,
+                            cite_latent = cite_latent,
+                            stvea_object = stvea_object)
 ```
 
-## Filter and clean protein protein_expr
+## Filter and clean CODEX protein expression
 Remove cells that are too small or large, or have too low or too high expression in the blank channels.
 If lower and upper limits aren't specified, quantiles are taken as the limits.
 Then normalize data by the total counts per cell
 ```{r}
-stvea_object <- FilterCODEX(stvea_object, size_lim = c(1000,25000),
+stvea_object <- FilterCODEX(stvea_object, size_lim = c(1000, 25000),
                             blank_lower = c(-1200, -1200, -1200, -1200),
-                            blank_upper = c(6000,2500,5000,2500))
+                            blank_upper = c(6000, 2500, 5000, 2500))
 ```
 
 Fit a Gaussian mixture model to the expression levels of each protein.
 New data will be the cumulative probability according to the Gaussian with the higher mean
 ```{r}
 stvea_object <- CleanCODEX(stvea_object)
+```
+
+## Clean and normalize CITE-seq protein expression
+```{r}
+stvea_object <- CleanCITE(stvea_object, num_cores=8)
+```
+
+## Cluster CITE-seq cells based on mRNA expression
+```{r}
+stvea_object <- ParameterScan(stvea_object, seq(5,20,4), seq(10,40,3), n_neighbors=50, min_dist=0.2, negative_sample_rate=50, python_dir = "inst/python", cache_dir="inst/python/tmp")
+```
+
+```{r}
+stvea_object <- ConsensusCluster(stvea_object, 0.1, 0.3, 10)
 ```
 
 ## Cluster CODEX cells based on protein expression
@@ -66,7 +90,17 @@ Use the KNN indices from UMAP to perform Louvain clustering
 stvea_object <- ClusterCODEX(stvea_object, k=30)
 ```
 
-## Visualize clustering and protein expression 
+## Map CITE-seq and CODEX protein
+```{r}
+stvea_object <- CorrectChunksCODEX(stvea_object, num_chunks=8, seed=30, num_cores=4)
+```
+
+## Create neighbor matrices
+```{r}
+stvea_object <- GetTransferMatrix(stvea_object)
+```
+
+## Visualize clustering, mRNA, and protein expression 
 Color each cell in the CODEX UMAP embedding with its cluster assignment.
 Cells in gray were not assigned to any cluster.
 ```{r}
