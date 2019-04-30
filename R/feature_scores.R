@@ -273,8 +273,7 @@ AdjScoreClustersCODEX.internal <- function(
 #' adjacency between the cells in the CODEX spatial coordinates
 #' @param codex_protein a (cells x proteins) matrix of CODEX protein expression
 #' @param protein_pairs a 2 column matrix of protein pairs where each row
-#' specifies the names of the proteins in a pair. If NULL, all pairs
-#' of columns in the codex_protein matrix are used.
+#' specifies the names of the proteins in a pair.
 #' @param c constant used to determine width of diffusion, must be 0 <= c
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
@@ -289,7 +288,7 @@ AdjScoreClustersCODEX.internal <- function(
 AdjScoreProteins.internal <- function(
   adj_matrix,
   codex_protein,
-  protein_pairs=NULL,
+  protein_pairs,
   c = 0,
   num_cores = 1,
   num_perms = 1000,

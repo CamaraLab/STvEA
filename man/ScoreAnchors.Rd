@@ -4,8 +4,8 @@
 \alias{ScoreAnchors}
 \title{Score anchors between 0 and 1 based on shared nearest neighbors}
 \usage{
-ScoreAnchors(neighbors, anchors, num_cells_ref, num_cells_query, k.score = 30,
-  verbose = FALSE)
+ScoreAnchors(neighbors, anchors, num_cells_ref, num_cells_query,
+  k.score = 30, verbose = FALSE)
 }
 \arguments{
 \item{neighbors}{list of neighbors in CCA space as output by FindNN}
