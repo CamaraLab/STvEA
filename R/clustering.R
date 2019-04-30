@@ -56,7 +56,7 @@ ClusterCODEX <- function(stvea_object, k=NULL) {
 #'
 ParameterScan <- function(stvea_object, min_cluster_size_range, min_sample_range,
                           ...,
-                          python_dir="/usr/local/lib/R/site-library/STvEA/python",
+                          python_dir=paste(installed.packages()["STvEA","LibPath"],"/STvEA/python",sep=""),
                           cache_dir=NULL) {
   if (is.null(stvea_object@cite_latent)) {
     stop("stvea_object must contain CITE-seq latent space", call. =FALSE)
@@ -64,7 +64,7 @@ ParameterScan <- function(stvea_object, min_cluster_size_range, min_sample_range
   stvea_object@hdbscan_param_scan <- ParameterScan.internal(stvea_object@cite_latent,
                          min_cluster_size_range, min_sample_range,
                          ...,
-                         python_dir="/usr/local/lib/R/site-library/STvEA/python",
+                         python_dir=python_dir,
                          cache_dir=NULL)
   return(stvea_object)
 }
@@ -146,7 +146,7 @@ ClusterCODEX.internal <- function(codex_knn, k = ncol(codex_knn)) {
 #'
 ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_sample_range,
                        ...,
-                       python_dir="/usr/local/lib/R/site-library/STvEA/python",
+                       python_dir=paste(installed.packages()["STvEA","LibPath"],"/STvEA/python",sep=""),
                        cache_dir=NULL) {
   if (!requireNamespace("umap", quietly = TRUE)) {
     stop("Package \"umap\" needed for this function to work. Please install it.",
@@ -172,11 +172,12 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
   cite_latent_tmp <- as.matrix(cite_latent)
   colnames(cite_latent_tmp) <- NULL
   cat("Running UMAP on the CITE-seq latent space\n")
-  # umap_latent <- umap::umap(cite_latent, n_components = ncol(cite_latent), ...)$layout
-  # umap_latent_tmp <- as.matrix(umap_latent)
-  # colnames(umap_latent_tmp) <- NULL
+  umap_latent <- umap::umap(cite_latent, n_components = ncol(cite_latent), ...)$layout
+  umap_latent_tmp <- as.matrix(umap_latent)
+  colnames(umap_latent_tmp) <- NULL
   umap_latent_tmp <- cite_latent_tmp
 
+  print(paste(python_dir,"/consensus_clustering.py",sep=""))
   reticulate::source_python(paste(python_dir,"/consensus_clustering.py",sep=""))
   cat("Running HDBSCAN on the UMAP space\n")
   if (is.null(cache_dir)) {
@@ -216,7 +217,14 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
 #'
 #' @export
 #'
-ConsensusCluster.internal <- function(hdbscan_results, cite_latent, silhouette_cutoff, inconsistent_value, min_cluster_size) {
+ConsensusCluster.internal <- function(
+  hdbscan_results,
+  cite_latent,
+  silhouette_cutoff,
+  inconsistent_value,
+  min_cluster_size,
+  python_dir = paste(installed.packages()["STvEA","LibPath"],"python",sep="/")
+) {
   if (!requireNamespace("reticulate", quietly = TRUE)) {
     stop("Package \"reticulate\" needed for this function to work. Please install it.",
          call. = FALSE)
@@ -246,7 +254,7 @@ ConsensusCluster.internal <- function(hdbscan_results, cite_latent, silhouette_c
   }
   colnames(consensus_matrix) <- NULL
 
-  reticulate::source_python(paste("inst/python","/consensus_clustering.py", sep=""))
+  reticulate::source_python(paste(python_dir,"/consensus_clustering.py",sep=""))
   consensus_clusters <- consensus_cluster(consensus_matrix, inconsistent_value, min_cluster_size)
 
 }

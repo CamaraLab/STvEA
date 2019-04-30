@@ -15,18 +15,6 @@ Dataframe converted from FCS files at <http://welikesharingdata.blob.core.window
 
 ``` r
 data("codex_balbc1")
-protein_expr <- cbind(codex_balbc1[, 1:29], MHCII=codex_balbc1$MHCII)
-blanks <- codex_balbc1[,grepl("blank", colnames(codex_balbc1))]
-size <- codex_balbc1$size.size
-
-# xy coordinates are currently relative to tile, we want them absolute
-x <- codex_balbc1$X.X
-x <- floor((codex_balbc1$tile_nr.tile_nr-1)/9) * max(codex_balbc1$X.X) + x
-y <- codex_balbc1$Y.Y
-y <- ((codex_balbc1$tile_nr.tile_nr - 1) %% 9) * max(codex_balbc1$Y.Y) + y
-z <- codex_balbc1$Z.Z
-spatial <- cbind(x,y,z)
-row.names(spatial) <- row.names(protein_expr)
 ```
 
 ### Take corner section of CODEX data
@@ -34,11 +22,11 @@ row.names(spatial) <- row.names(protein_expr)
 The clustering and Adjacency Score functions are fairly slow on large numbers of cells.
 
 ``` r
-codex_subset <- x < 3000 & y < 3000
-protein_expr <- protein_expr[codex_subset,]
-blanks <- blanks[codex_subset,]
-size <- size[codex_subset]
-spatial <- spatial[codex_subset,]
+codex_subset <- codex_spatial$x < 3000 & codex_spatial$y < 3000
+codex_protein <- codex_protein[codex_subset,]
+codex_blanks <- codex_blanks[codex_subset,]
+codex_size <- codex_size[codex_subset]
+codex_spatial <- codex_spatial[codex_subset,]
 ```
 
 Create object to hold data
@@ -47,10 +35,10 @@ Create object to hold data
 The STvEA.data class conveniently handles the required data frames and matrices between function calls.
 
 ``` r
-stvea_object <- SetDataCODEX(codex_protein = protein_expr,
-                             codex_blanks = blanks,
-                             codex_size = size,
-                             codex_spatial = as.data.frame(spatial))
+stvea_object <- SetDataCODEX(codex_protein = codex_protein,
+                             codex_blanks = codex_blanks,
+                             codex_size = codex_size,
+                             codex_spatial = codex_spatial)
 ```
 
 Filter and clean protein protein\_expr
@@ -87,8 +75,8 @@ Use the KNN indices from UMAP to perform Louvain clustering
 stvea_object <- ClusterCODEX(stvea_object, k=30)
 ```
 
-Visualize clustering and protein expression on UMAP
----------------------------------------------------
+Visualize clustering and protein expression
+-------------------------------------------
 
 Color each cell in the CODEX UMAP embedding with its cluster assignment. Cells in gray were not assigned to any cluster.
 
@@ -125,8 +113,8 @@ Assess which pairs of clusters often appear in adjacent cells
 cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
-    ## Creating permutation matrices - 0.035 seconds
-    ## Computing adjacency score for each feature pair - 0.411 seconds
+    ## Creating permutation matrices - 0.032 seconds
+    ## Computing adjacency score for each feature pair - 0.36 seconds
 
 ``` r
 AdjScoreHeatmap(cluster_adj)
@@ -140,8 +128,8 @@ Assess which pairs of proteins are often highly expressed in adjacent cells
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 10.863 seconds
-    ## Computing adjacency score for each feature pair - 36.784 seconds
+    ## Creating permutation matrices - 11.502 seconds
+    ## Computing adjacency score for each feature pair - 37.287 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
