@@ -80,10 +80,12 @@ PlotExprCITE <- function(stvea_object, name,
                          high_color2 = "green",
                          low_color="light gray",
                          pt_size =0.8) {
+  print_type <- type
   if (type == "RNA") {
     plotting_data <- stvea_object@cite_mRNA_norm
   } else if (type == "protein") {
     plotting_data <- stvea_object@cite_protein
+    print_type <- "Protein"
   } else {
     stop("type must be either \"RNA\" or \"protein\"", call. =FALSE)
   }
@@ -94,15 +96,18 @@ PlotExprCITE <- function(stvea_object, name,
 
   rbPal1 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color,1)), alpha=TRUE)
   color <- rbPal1(100)[as.numeric(cut(plotting_data[,name[1]],breaks = 100))]
+  subtitle <- paste("Expression of ", name[1], " (", high_color, ")", sep="")
 
   if (length(name) == 2) {
     rbPal2 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color2,1)), alpha=TRUE)
     color2 <- rbPal2(100)[as.numeric(cut(plotting_data[,name[2]],breaks = 100))]
     color <- sapply(1:length(color), function(m) colorRampPalette(c(color[m],color2[m]), alpha=TRUE)(3)[2])
+    subtitle <- paste(subtitle, " and ", name[2], " (", high_color2, ")", sep="")
   }
   ggplot(stvea_object@cite_emb,
          aes_string(x=colnames(stvea_object@cite_emb)[1],y=colnames(stvea_object@cite_emb)[2],color=factor(1:length(color)))) +
     geom_point(size=pt_size) +
+    labs(title = paste(print_type,"expression"), subtitle = subtitle) +
     scale_color_manual(values = alpha(color,1), guide=FALSE) +
     theme_void()
 }
@@ -194,8 +199,10 @@ PlotExprCODEXemb <- function(stvea_object, name,
                               high_color2="green",
                               low_color="light gray",
                               pt_size =0.8) {
+  print_type <- type
   if (type == "protein") {
     plotting_data <- stvea_object@codex_protein
+    print_type <- "Protein"
   } else if (type == "RNA") {
     plotting_data <- stvea_object@codex_mRNA
   } else {
@@ -208,16 +215,20 @@ PlotExprCODEXemb <- function(stvea_object, name,
 
   rbPal1 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color,1)), alpha=TRUE)
   color <- rbPal1(100)[as.numeric(cut(plotting_data[,name[1]],breaks = 100))]
+  subtitle <- paste("Expression of ", name[1], " (", high_color, ")", sep="")
 
   if (length(name) == 2) {
     rbPal2 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color2,1)), alpha=TRUE)
     color2 <- rbPal2(100)[as.numeric(cut(plotting_data[,name[2]],breaks = 100))]
     color <- sapply(1:length(color), function(m) colorRampPalette(c(color[m],color2[m]), alpha=TRUE)(3)[2])
+    subtitle <- paste(subtitle, " and ", name[2], " (", high_color2, ")", sep="")
   }
+
   ggplot(stvea_object@codex_emb,
          aes_string(x=colnames(stvea_object@codex_emb)[1],y=colnames(stvea_object@codex_emb)[2],
              color=factor(1:length(color)))) +
     geom_point(size=pt_size) +
+    labs(title = paste(print_type,"expression"), subtitle = subtitle) +
     scale_color_manual(values = alpha(color,1), guide=FALSE) +
     theme_void()
 
@@ -263,11 +274,13 @@ PlotExprCODEXspatial <- function(stvea_object, name,
 
   rbPal1 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color,1)), alpha=TRUE)
   color <- rbPal1(100)[as.numeric(cut(plotting_data[,name[1]],breaks = 100))]
+  subtitle <- paste("Expression of ", name[1], " (", high_color, ")", sep="")
 
   if (length(name) == 2) {
     rbPal2 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color2,1)), alpha=TRUE)
     color2 <- rbPal2(100)[as.numeric(cut(plotting_data[,name[2]],breaks = 100))]
     color <- sapply(1:length(color), function(m) colorRampPalette(c(color[m],color2[m]), alpha=TRUE)(3)[2])
+    subtitle <- paste(subtitle, " and ", name[2], " (", high_color2, ")", sep="")
   }
 
   x_tmp <- stvea_object@codex_spatial[,"x"]
@@ -279,8 +292,9 @@ PlotExprCODEXspatial <- function(stvea_object, name,
          aes(x=x,y=y,color=factor(1:length(color)))) +
     geom_point(size=0.5, alpha=0.5) +
     scale_color_manual(values=alpha(color,1)) +
-    guides(color = FALSE) +
+    guides(color=FALSE) +
     ylim(max(y_tmp), 0) +
+    labs(title = paste("Spatial",type,"expression"), subtitle = subtitle) +
     theme_void() + coord_fixed()
 }
 
@@ -328,7 +342,7 @@ PlotIndexCODEXspatial <- function(stvea_object, index,
     geom_point(size=pt_size) +
     scale_color_manual(values=c(low_color,high_color), guide=FALSE) +
     guides(color = FALSE) +
-    ylim(max(y), 0) +
+    ylim(max(temp_df$y), 0) +
     theme_void() + coord_fixed()
 }
 
