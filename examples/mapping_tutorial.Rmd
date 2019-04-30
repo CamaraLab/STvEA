@@ -30,7 +30,9 @@ codex_spatial <- codex_spatial[codex_subset,]
 ```
 
 ## Read in CITE-seq data
-
+```{r}
+# link to CITE-seq data on Dropbox
+```
 
 ## Create object to hold data
 The STvEA.data class conveniently handles the required data frames and matrices between function calls.
@@ -104,24 +106,41 @@ stvea_object <- GetTransferMatrix(stvea_object)
 ```
 
 ## Visualize clustering, mRNA, and protein expression 
+Color each cell in the CITE-seq UMAP embedding with its cluster assignment.
+Cells in gray were not assigned to any cluster.
+```{r}
+PlotClusterCITE(stvea_object)
+```
+
+Color each cell in the CITE-seq UMAP embedding with its expression level of one of two genes. If two gene names are provided, color will be interpolated between red and green color values.
+```{r}
+PlotExprCITE(stvea_object, c("Cd4", "Ighd"), type="RNA")
+```
+
+Color each cell in the CITE-seq UMAP embedding with its expression level of one of two proteins.
+```{r}
+PlotExprCITE(stvea_object, c("CD4","IgD"), type="protein")
+```
+
 Color each cell in the CODEX UMAP embedding with its cluster assignment.
 Cells in gray were not assigned to any cluster.
 ```{r}
 PlotClusterCODEXemb(stvea_object)
 ```
 
-Color each cell in the CODEX UMAP embedding with its expression level of proteins.
-One or two protein names can be input. If two protein names are provided,
-color will be interpolated between red and green color values.
+Color each cell in the CODEX UMAP embedding with its expression level of one or two proteins.
 ```{r}
-PlotExprCODEXemb(stvea_object, c("CD4","B220"))
+PlotExprCODEXemb(stvea_object, c("CD4","IgD"))
 ```
 
-Color the CODEX spatial slide with the expression level of proteins.
-One or two protein names can be input. If two protein names are provided,
-color will be interpolated between red and green color values.
+Color the CODEX spatial slide with the expression level of one or two proteins.
 ```{r}
-PlotExprCODEXspatial(stvea_object, c("CD4","B220"))
+PlotExprCODEXspatial(stvea_object, c("CD4","IgD"))
+```
+
+Color the CODEX spatial slide with the expression level of one or two genes that were mapped from the CITE-seq expression levels. 
+```{r}
+PlotExprCODEXspatial(stvea_object, c("Cd4", "IgD"), type="RNA")
 ```
 
 ## Assess colocalization of clusters

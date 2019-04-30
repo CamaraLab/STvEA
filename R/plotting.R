@@ -151,7 +151,9 @@ PlotClusterCITE <- function(stvea_object, pt_size=0.5) {
   } else {
     colors <- rainbow_hcl(length(unique(stvea_object@cite_clusters)), c = 80)
   }
-  ggplot(stvea_object@cite_emb, aes(x=V1,y=V2,color=factor(stvea_object@cite_clusters))) +
+  ggplot(stvea_object@cite_emb, aes_string(x=colnames(stvea_object@cite_emb)[1],
+                                    y=colnames(stvea_object@cite_emb)[2],
+                                    color=factor(stvea_object@cite_clusters))) +
     geom_point(size=pt_size) +
     scale_color_manual(values = colors, name="cluster") +
     guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -173,7 +175,9 @@ PlotClusterCODEXemb <- function(stvea_object, pt_size=0.5) {
   } else {
     colors <- rainbow_hcl(length(unique(stvea_object@codex_clusters)), c = 80)
   }
-  ggplot(stvea_object@codex_emb, aes(x=V1,y=V2,color=factor(stvea_object@codex_clusters))) +
+  ggplot(stvea_object@codex_emb, aes_string(x=colnames(stvea_object@codex_emb)[1],
+                                     y=colnames(stvea_object@codex_emb)[2],
+                                     color=factor(stvea_object@codex_clusters))) +
     geom_point(size=pt_size) +
     scale_color_manual(values = colors, name="cluster") +
     guides(colour = guide_legend(override.aes = list(size=5))) +
