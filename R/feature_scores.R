@@ -35,6 +35,7 @@ AdjScoreHeatmap <- function(adj_score_output) {
 #' @param c constant used to determine width of diffusion, must be 0 <= c
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
+#' On Windows, this must be set to 1.
 #' @param num_perms number of permutations used to build the null
 #' distribution for each feature. By default is set to 1000.
 #' @param perm_estimate boolean indicating whether Gaussian distribution
@@ -77,6 +78,7 @@ AdjScoreClustersCITE <- function(
 #' from CODEX spatial information
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
+#' On Windows, this must be set to 1.
 #'
 #' @export
 #'
@@ -109,6 +111,7 @@ AdjScoreClustersCODEX <- function(
 #' @param c constant used to determine width of diffusion, must be 0 <= c
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
+#' On Windows, this must be set to 1.
 #' @param num_perms number of permutations used to build the null
 #' distribution for each feature. By default is set to 1000.
 #' @param perm_estimate boolean indicating whether Gaussian distribution
@@ -165,6 +168,7 @@ AdjScoreProteins <- function(
 #' @param c constant used to determine width of diffusion, must be 0 <= c
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
+#' On Windows, this must be set to 1.
 #' @param num_perms number of permutations used to build the null
 #' distribution for each feature. By default is set to 1000.
 #' @param perm_estimate boolean indicating whether Gaussian distribution
@@ -183,8 +187,8 @@ AdjScoreGenes <- function(
   perm_estimate=T
 ) {
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
-  AdjScoreGenes.interna(knn_adj,
-                        stvea_object@cite_mRNA,
+  AdjScoreGenes.internal(knn_adj,
+                        stvea_object@codex_mRNA,
                         gene_pairs,
                         c=c,
                         num_cores=num_cores,
@@ -208,6 +212,7 @@ AdjScoreGenes <- function(
 #' @param c constant used to determine width of diffusion, must be 0 <= c
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
+#' On Windows, this must be set to 1.
 #' @param num_perms number of permutations used to build the null
 #' distribution for each feature. By default is set to 1000.
 #' @param perm_estimate boolean indicating whether Gaussian distribution
@@ -254,6 +259,7 @@ AdjScoreClustersCITE.internal <- function(
 #' @param codex_clusters a vector of the cluster ID for each CODEX cell
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
+#' On Windows, this must be set to 1.
 #'
 #' @export
 #'
@@ -289,6 +295,7 @@ AdjScoreClustersCODEX.internal <- function(
 #' @param c constant used to determine width of diffusion, must be 0 <= c
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
+#' On Windows, this must be set to 1.
 #' @param num_perms number of permutations used to build the null
 #' distribution for each feature. By default is set to 1000.
 #' @param perm_estimate boolean indicating whether Gaussian distribution
@@ -325,6 +332,7 @@ AdjScoreProteins.internal <- function(
 #' @param c constant used to determine width of diffusion, must be 0 <= c
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
+#' On Windows, this must be set to 1.
 #' @param num_perms number of permutations used to build the null
 #' distribution for each feature. By default is set to 1000.
 #' @param perm_estimate boolean indicating whether Gaussian distribution

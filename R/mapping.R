@@ -157,7 +157,8 @@ AnchorCorrection <- function(
 #' @param cite_latent a (cell x feature) embedding of the mRNA expression matrix from CITE-seq
 #' @param num_chunks number of equal sized chunks to split CODEX dataset into for correction
 #' @param seed set.seed before randomly sampling chunks of CODEX dataset
-#' @param num_cores number of cores to use in parallelized correction of CODEX dataset
+#' @param num_cores number of cores to use in parallelized correction of CODEX dataset.
+#' On Windows, this must be set to 1.
 #' @param num.cc number of canonical vectors to calculate
 #' @param k.anchor number of nn used to find anchors via mutual nearest neighbors
 #' @param k.filter number of nn in original feature space to use for filtering
@@ -187,14 +188,24 @@ MapCODEXtoCITE.internal <- function(
 
   random_ids <- sample(nrow(codex_protein), replace=FALSE)
   chunk_ids <- split(random_ids, cut(seq_along(random_ids), num_chunks, labels = FALSE))
-  corrected_data <- mclapply(1:length(chunk_ids),
-                           function(i) AnchorCorrection(ref_mat = cite_protein,
-                                                        query_mat = codex_protein[chunk_ids[[i]],],
-                                                        rna_mat = cite_latent, cite_index = 1,
-                                                        num.cc = num.cc, k.anchor = k.anchor,
-                                                        k.filter = k.filter, k.score = k.score,
-                                                        k.weight = k.weight),
-                           mc.cores=num_cores)
+  if (num_cores > 1) {
+    corrected_data <- mclapply(1:length(chunk_ids),
+                             function(i) AnchorCorrection(ref_mat = cite_protein,
+                                                          query_mat = codex_protein[chunk_ids[[i]],],
+                                                          rna_mat = cite_latent, cite_index = 1,
+                                                          num.cc = num.cc, k.anchor = k.anchor,
+                                                          k.filter = k.filter, k.score = k.score,
+                                                          k.weight = k.weight),
+                             mc.cores=num_cores)
+  } else {
+    corrected_data <- lapply(1:length(chunk_ids),
+                               function(i) AnchorCorrection(ref_mat = cite_protein,
+                                                            query_mat = codex_protein[chunk_ids[[i]],],
+                                                            rna_mat = cite_latent, cite_index = 1,
+                                                            num.cc = num.cc, k.anchor = k.anchor,
+                                                            k.filter = k.filter, k.score = k.score,
+                                                            k.weight = k.weight))
+  }
   corrected_codex <- NULL
   for (i in 1:length(chunk_ids)) {
     corrected_codex <- rbind(corrected_codex,

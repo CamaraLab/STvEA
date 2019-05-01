@@ -38,7 +38,7 @@ stvea_object <- SetDataCODEX(codex_protein = codex_protein,
 
 ## Filter and clean protein protein_expr
 Remove cells that are too small or large, or have too low or too high expression in the blank channels.
-If lower and upper limits aren't specified, quantiles are taken as the limits.
+If lower and upper limits aren't specified, the 0.002 and 0.95 quantiles are taken as the limits for blank expression, and the 0.022 and 0.99 quantiles are taken as the limits for size.
 Then normalize data by the total counts per cell
 ```{r}
 stvea_object <- FilterCODEX(stvea_object, size_lim = c(1000,25000),

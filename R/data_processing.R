@@ -220,7 +220,8 @@ CleanCODEX.internal <- function(codex_filtered) {
 #' @param optim_inits a matrix of (proteins x params) with initialization
 #' parameters for each protein to input to the optim function. If NULL,
 #' starts at two default parameter sets and picks the better one
-#' @param num_cores number of cores to use for parallelized fits
+#' @param num_cores number of cores to use for parallelized fits.
+#' On Windows, this must be set to 1.
 #'
 #' @return Cleaned CITE-seq protein data matrix (cell x protein)
 #'
@@ -237,16 +238,29 @@ CleanCITE.internal <- function(cite_protein,
   # Calculate cleaned data from cumulative of higher median
 
   if (!is.null(optim_inits)) {
-    cite_protein_list <- mclapply(1:ncol(cite_protein),
-                                  function(i) FitNB(cite_protein[,i],
-                                                          maxit=maxit, factr=factr,
-                                                          optim_init = optim_inits[i,]),
-                                  mc.cores=num_cores)
+    if (num_cores > 1) {
+      cite_protein_list <- mclapply(1:ncol(cite_protein),
+                                    function(i) FitNB(cite_protein[,i],
+                                                            maxit=maxit, factr=factr,
+                                                            optim_init = optim_inits[i,]),
+                                    mc.cores=num_cores)
+    } else {
+      cite_protein_list <- lapply(1:ncol(cite_protein),
+                                    function(i) FitNB(cite_protein[,i],
+                                                      maxit=maxit, factr=factr,
+                                                      optim_init = optim_inits[i,]))
+    }
   } else {
-    cite_protein_list <- mclapply(1:ncol(cite_protein),
-                                  function(i) FitNB(cite_protein[,i],
-                                                          maxit=maxit, factr=factr),
-                                  mc.cores=num_cores)
+    if (num_cores > 1) {
+      cite_protein_list <- mclapply(1:ncol(cite_protein),
+                                    function(i) FitNB(cite_protein[,i],
+                                                            maxit=maxit, factr=factr),
+                                    mc.cores=num_cores)
+    } else {
+      cite_protein_list <- lapply(1:ncol(cite_protein),
+                                    function(i) FitNB(cite_protein[,i],
+                                                      maxit=maxit, factr=factr))
+    }
   }
 
   cite_protein_clean <- cite_protein

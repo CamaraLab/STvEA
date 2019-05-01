@@ -1,8 +1,6 @@
 ---
 title: "Using STvEA to map CODEX and CITE-seq data"
-output: html_document
-editor_options: 
-  chunk_output_type: console
+output: rmarkdown::github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -32,13 +30,13 @@ codex_spatial <- codex_spatial[codex_subset,]
 ## Read in CITE-seq data
 ```{r include=FALSE}
 # CITE-seq protein
-cite_protein <- read.table("../../PGC001.a15/data/protein_expr_all.csv", sep=",", row.names=1, header=TRUE, stringsAsFactors = FALSE)
+cite_protein <- read.table("../../../PGC001.a15/data/protein_expr_all.csv", sep=",", row.names=1, header=TRUE, stringsAsFactors = FALSE)
 cite_protein <- as.data.frame(t(cite_protein))
 colnames(cite_protein) <- sapply(colnames(cite_protein), function(x) gsub("ADT_", "", x))
 
 # CITE-seq mRNA
-cite_mRNA <- read.table("../../../Data/CITE-seq/balbc_all/gene_matrix_all_new.csv",row.names=1, header = TRUE, sep=",", stringsAsFactors = FALSE)
-genes <- read.table("../../PGC001.a15/data/genes.tsv", row.names=1, header=FALSE, sep="\t", stringsAsFactors = FALSE)
+cite_mRNA <- read.table("../../../../Data/CITE-seq/balbc_all/gene_matrix_all_new.csv",row.names=1, header = TRUE, sep=",", stringsAsFactors = FALSE)
+genes <- read.table("../../../PGC001.a15/data/genes.tsv", row.names=1, header=FALSE, sep="\t", stringsAsFactors = FALSE)
 cite_mRNA <- as.data.frame(t(cite_mRNA))
 col_names <- genes[colnames(cite_mRNA),1]
 cite_mRNA <- cite_mRNA[,!duplicated(col_names)]
@@ -46,7 +44,7 @@ col_names <- col_names[!duplicated(col_names)]
 colnames(cite_mRNA) <- col_names
 
 # CITE-seq extra
-cite_latent <- read.table("../../PGC001.a15/data/latent_output_v2.txt", sep=",", header=FALSE, row.names=1, stringsAsFactors = F)
+cite_latent <- read.table("../../../PGC001.a15/data/latent_output_v2.txt", sep=",", header=FALSE, row.names=1, stringsAsFactors = F)
 ```
 
 ```{r}
@@ -83,21 +81,26 @@ stvea_object <- CleanCODEX(stvea_object)
 ```
 
 ## Clean and normalize CITE-seq protein expression
+Fit a Negative Binomial mixture model to the expression levels of each protein in the CITE-seq dataset. Cleaned data will be the cumulative probability according to the Negative Binomial with the higher median.
 ```{r}
+# This will take around 10 minutes
 stvea_object <- CleanCITE(stvea_object, num_cores=8)
 ```
 
 ## Cluster CITE-seq cells based on mRNA expression
+Compute the 2 dimensional UMAP embedding of the CITE-seq mRNA latent space for later visualization.
 ```{r}
 stvea_object <- GetUmapCITE(stvea_object, n_neighbors = 50, min_dist=0.1, negative_sample_rate=50)
 ```
 
+Run UMAP on the CITE-seq latent space to the same number of dimensions (running UMAP before density based clustering is suggested in the UMAP documentation https://umap-learn.readthedocs.io/en/latest/clustering.html). Scan over the two parameters of the Python HDBSCAN implementation, min_cluster_size and min_samples (more information on selecting these paramters https://hdbscan.readthedocs.io/en/latest/parameter_selection.html).
 ```{r}
-stvea_object <- ParameterScan(stvea_object, seq(5,20,4), seq(10,40,3), n_neighbors=50, min_dist=0.1, negative_sample_rate=50)
+stvea_object <- ParameterScan(stvea_object, min_cluster_size_range = seq(5,20,4), min_samples_range = seq(10,40,3), n_neighbors=50, min_dist=0.1, negative_sample_rate=50)
 ```
 
+Create a dissimilarity matrix between cells as the number of HDBSCAN clusterings (passing a certain silhouette cutoff) in which they are assigned to the same cluster. Perform agglomerative clustering on this dissimilarity matrix using Python's scipy.cluster.hierarchy, cutting the tree using the inconsistent value. Remove all clusters that have fewer than 10 cells.
 ```{r}
-stvea_object <- ConsensusCluster(stvea_object, 0.1, 0.3, 10)
+stvea_object <- ConsensusCluster(stvea_object, silhouette_cutoff = 0.1, inconsistent_value = 0.3, min_cluster_size = 10)
 ```
 
 ## Cluster CODEX cells based on protein expression
@@ -115,11 +118,13 @@ stvea_object <- ClusterCODEX(stvea_object, k=30)
 ```
 
 ## Map CITE-seq and CODEX protein
+Perform a modified version of Seurat anchor correction from https://www.biorxiv.org/content/10.1101/460147v1 mapping the CODEX protein space into the CITE-seq protein space.
 ```{r}
 stvea_object <- MapCODEXtoCITE(stvea_object, num_chunks=8, seed=30, num_cores=4)
 ```
 
 ## Create neighbor matrices
+Create transfer matrices of k CITE-seq nearest neighbors for each CODEX cell and k CODEX nearest neighbors for each CITE-seq cell after the anchor correction above
 ```{r}
 stvea_object <- GetTransferMatrix(stvea_object)
 ```
@@ -183,14 +188,15 @@ protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 AdjScoreHeatmap(protein_adj)
 ```
 
-Assess which pairs of genes from the given list are often highly expressed in adjacency cells. There are too many genes to compute the Adjacency Score for all combinations, so let's compute it for all pairs of genes corresponding to one of our proteins.
+Assess which pairs of genes from the given list are often highly expressed in adjacency cells. There are too many genes to compute the Adjacency Score for all combinations, so let's compute it for all pairs of genes corresponding to one of the proteins.
 ```{r}
-gene_list <- c("Ptprc", "Ly6c1", "Trdc", "Ly6g", "Cd19", "Vcam1", "Cd3g", "Fcgr3", "Cd8a", "Thy1", "Adgre1", "Itgax", "Car1", "Itgam", "Ighd", "Cd27", "Cd5", "Cd79", "Tfrc", "Pecam1", "Cd4", "Ighm", "Cr2", "Cd44", "Ncr1", "H2-Ab1")
+gene_list <- c("Ptprc", "Ly6c1", "Trdc", "Ly6g", "Cd19", "Vcam1", "Cd3g", "Fcgr3", "Cd8a", "Thy1", "Adgre1", "Itgax", "Car1", "Itgam", "Ighd", "Cd27", "Cd5", "Cd79b", "Tfrc", "Pecam1", "Cd4", "Ighm", "Cr2", "Cd44", "Ncr1", "H2-Ab1")
 gene_pairs <- t(combn(gene_list,2))
 for (gene in gene_list) {
   gene_pairs <- rbind(gene_pairs, c(gene,gene))
 }
 gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
+AdjScoreHeatmap(gene_adj)
 ```
 
 

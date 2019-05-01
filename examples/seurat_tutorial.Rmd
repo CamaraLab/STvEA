@@ -67,7 +67,9 @@ stvea_object <- CleanCODEX(stvea_object)
 ```
 
 ## Clean and normalize CITE-seq protein expression
+Fit a Negative Binomial mixture model to the expression levels of each protein in the CITE-seq dataset. Cleaned data will be the cumulative probability according to the Negative Binomial with the higher median.
 ```{r}
+# This will take around 10 minutes
 stvea_object <- CleanCITE(stvea_object, num_cores=8)
 ```
 
@@ -86,11 +88,13 @@ stvea_object <- ClusterCODEX(stvea_object, k=30)
 ```
 
 ## Map CITE-seq and CODEX protein
+Perform a modified version of Seurat anchor correction from https://www.biorxiv.org/content/10.1101/460147v1 mapping the CODEX protein space into the CITE-seq protein space.
 ```{r}
 stvea_object <- MapCODEXtoCITE(stvea_object, num_chunks=8, seed=30, num_cores=4)
 ```
 
 ## Create neighbor matrices
+Create transfer matrices of k CITE-seq nearest neighbors for each CODEX cell and k CODEX nearest neighbors for each CITE-seq cell after the anchor correction above
 ```{r}
 stvea_object <- GetTransferMatrix(stvea_object)
 ```
@@ -130,7 +134,7 @@ PlotExprCODEXspatial(stvea_object, c("CD4","IgD"))
 
 Color the CODEX spatial slide with the expression level of one or two genes that were mapped from the CITE-seq expression levels. 
 ```{r}
-PlotExprCODEXspatial(stvea_object, c("Cd4", "IgD"), type="RNA")
+PlotExprCODEXspatial(stvea_object, c("Cd4", "Ighd"), type="RNA")
 ```
 
 ## Assess colocalization of clusters
@@ -154,9 +158,9 @@ protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 AdjScoreHeatmap(protein_adj)
 ```
 
-Assess which pairs of genes from the given list are often highly expressed in adjacency cells. There are too many genes to compute the Adjacency Score for all combinations, so let's compute it for all pairs of genes corresponding to one of our proteins.
+Assess which pairs of genes from the given list are often highly expressed in adjacency cells. There are too many genes to compute the Adjacency Score for all combinations, so let's compute it for all pairs of genes corresponding to one of the proteins.
 ```{r}
-gene_list <- c("Ptprc", "Ly6c1", "Trdc", "Ly6g", "Cd19", "Vcam1", "Cd3g", "Fcgr3", "Cd8a", "Thy1", "Adgre1", "Itgax", "Car1", "Itgam", "Ighd", "Cd27", "Cd5", "Cd79", "Tfrc", "Pecam1", "Cd4", "Ighm", "Cr2", "Cd44", "Ncr1", "H2-Ab1")
+gene_list <- c("Ptprc", "Ly6c1", "Trdc", "Ly6g", "Cd19", "Vcam1", "Cd3g", "Fcgr3", "Cd8a", "Thy1", "Adgre1", "Itgax", "Car1", "Itgam", "Ighd", "Cd27", "Cd5", "Cd79b", "Tfrc", "Pecam1", "Cd4", "Ighm", "Cr2", "Cd44", "Ncr1", "H2-Ab1")
 gene_pairs <- t(combn(gene_list,2))
 for (gene in gene_list) {
   gene_pairs <- rbind(gene_pairs, c(gene,gene))
