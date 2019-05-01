@@ -30,5 +30,4 @@ def consensus_cluster(distance_matrix, inconsistent_value = 0.3, min_cluster_siz
         if len(indices) < min_cluster_size:
             for index in indices:
                 hier_consensus_labels[index] = -1
-    print(type(hier_consensus_labels))
     return hier_consensus_labels.tolist()

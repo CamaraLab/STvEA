@@ -95,7 +95,7 @@ stvea_object <- GetUmapCITE(stvea_object, n_neighbors = 50, min_dist=0.1, negati
 
 Run UMAP on the CITE-seq latent space to the same number of dimensions (running UMAP before density based clustering is suggested in the UMAP documentation https://umap-learn.readthedocs.io/en/latest/clustering.html). Scan over the two parameters of the Python HDBSCAN implementation, min_cluster_size and min_samples (more information on selecting these paramters https://hdbscan.readthedocs.io/en/latest/parameter_selection.html).
 ```{r}
-stvea_object <- ParameterScan(stvea_object, min_cluster_size_range = seq(5,20,4), min_samples_range = seq(10,40,3), n_neighbors=50, min_dist=0.1, negative_sample_rate=50)
+stvea_object <- ParameterScan(stvea_object, min_cluster_size_range = seq(5,20,4), min_sample_range = seq(10,40,3), n_neighbors=50, min_dist=0.1, negative_sample_rate=50)
 ```
 
 Create a dissimilarity matrix between cells as the number of HDBSCAN clusterings (passing a certain silhouette cutoff) in which they are assigned to the same cluster. Perform agglomerative clustering on this dissimilarity matrix using Python's scipy.cluster.hierarchy, cutting the tree using the inconsistent value. Remove all clusters that have fewer than 10 cells.
@@ -164,7 +164,7 @@ PlotExprCODEXspatial(stvea_object, c("CD4","IgD"))
 
 Color the CODEX spatial slide with the expression level of one or two genes that were mapped from the CITE-seq expression levels. 
 ```{r}
-PlotExprCODEXspatial(stvea_object, c("Cd4", "IgD"), type="RNA")
+PlotExprCODEXspatial(stvea_object, c("Cd4", "Ighd"), type="RNA")
 ```
 
 ## Assess colocalization of clusters
@@ -190,7 +190,10 @@ AdjScoreHeatmap(protein_adj)
 
 Assess which pairs of genes from the given list are often highly expressed in adjacency cells. There are too many genes to compute the Adjacency Score for all combinations, so let's compute it for all pairs of genes corresponding to one of the proteins.
 ```{r}
-gene_list <- c("Ptprc", "Ly6c1", "Trdc", "Ly6g", "Cd19", "Vcam1", "Cd3g", "Fcgr3", "Cd8a", "Thy1", "Adgre1", "Itgax", "Car1", "Itgam", "Ighd", "Cd27", "Cd5", "Cd79b", "Tfrc", "Pecam1", "Cd4", "Ighm", "Cr2", "Cd44", "Ncr1", "H2-Ab1")
+gene_list <- c("Ptprc", "Ly6c1", "Trdc", "Ly6g", "Cd19", "Vcam1", "Cd3g",
+               "Fcgr3", "Cd8a", "Thy1", "Adgre1", "Itgax", "Car1", "Itgam",
+               "Ighd", "Cd27", "Cd5", "Cd79b", "Tfrc", "Pecam1", "Cd4",
+               "Ighm", "Cr2", "Cd44", "Ncr1", "H2-Ab1")
 gene_pairs <- t(combn(gene_list,2))
 for (gene in gene_list) {
   gene_pairs <- rbind(gene_pairs, c(gene,gene))

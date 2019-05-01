@@ -5,9 +5,6 @@ Using STvEA to analyze CODEX data
 library(STvEA)
 ```
 
-    ## Warning: replacing previous import 'Matrix::expm' by 'expm::expm' when
-    ## loading 'AdjacencyScore'
-
 Read in CODEX data
 ------------------
 
@@ -41,10 +38,10 @@ stvea_object <- SetDataCODEX(codex_protein = codex_protein,
                              codex_spatial = codex_spatial)
 ```
 
-Filter and clean protein protein\_expr
---------------------------------------
+Filter and clean protein expression
+-----------------------------------
 
-Remove cells that are too small or large, or have too low or too high expression in the blank channels. If lower and upper limits aren't specified, quantiles are taken as the limits. Then normalize data by the total counts per cell
+Remove cells that are too small or large, or have too low or too high expression in the blank channels. If lower and upper limits aren't specified, the 0.002 and 0.95 quantiles are taken as the limits for blank expression, and the 0.022 and 0.99 quantiles are taken as the limits for size. Then normalize data by the total counts per cell
 
 ``` r
 stvea_object <- FilterCODEX(stvea_object, size_lim = c(1000,25000),
@@ -113,8 +110,8 @@ Assess which pairs of clusters often appear in adjacent cells
 cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
-    ## Creating permutation matrices - 0.032 seconds
-    ## Computing adjacency score for each feature pair - 0.36 seconds
+    ## Creating permutation matrices - 0.033 seconds
+    ## Computing adjacency score for each feature pair - 0.368 seconds
 
 ``` r
 AdjScoreHeatmap(cluster_adj)
@@ -128,8 +125,8 @@ Assess which pairs of proteins are often highly expressed in adjacent cells
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 11.502 seconds
-    ## Computing adjacency score for each feature pair - 37.287 seconds
+    ## Creating permutation matrices - 11.79 seconds
+    ## Computing adjacency score for each feature pair - 40.132 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
