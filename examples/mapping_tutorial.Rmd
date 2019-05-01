@@ -158,3 +158,10 @@ Assess which pairs of proteins are often highly expressed in adjacent cells
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 AdjScoreHeatmap(protein_adj)
 ```
+
+Assess which pairs of genes from the given list are often highly expressed in adjacency cells. There are too many genes to compute the Adjacency Score for all combinations
+```{r}
+gene_adj <- AdjScoreGenes(stvea_object, k=3, num_cores=8)
+```
+
+

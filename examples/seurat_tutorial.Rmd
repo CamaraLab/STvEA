@@ -1,10 +1,14 @@
 ---
 title: "Using STvEA to analyze CITE-seq data from a Seurat object"
-output: html_document
+output: rmarkdown::github_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(STvEA)
 ```
 
 ## Read in CODEX data
@@ -24,14 +28,18 @@ codex_spatial <- codex_spatial[codex_subset,]
 ```
 
 ## Read in CITE-seq data
+```{r include=FALSE}
+cite_seurat_object <- readRDS("../../data/cite_seurat_object.rds")
+```
+
 ```{r}
-# link to Seurat object on Dropbox
+# Link to CITE-seq Seurat object on Dropbox
 ```
 
 ## Create object to hold data
 The STvEA.data class conveniently handles the required data frames and matrices between function calls.
 ```{r}
-stvea_object <- TransferDataSeurat2(balbc_seurat_object,
+stvea_object <- TransferDataSeurat2(cite_seurat_object,
                                     embedding_reduction="tsne",
                                     latent_reduction="pca",
                                     latent_dims=18)
@@ -101,7 +109,7 @@ PlotExprCITE(stvea_object, c("Cd4", "Ighd"), type="RNA")
 
 Color each cell in the CITE-seq UMAP embedding with its expression level of one of two proteins.
 ```{r}
-PlotExprCITE(stvea_object, c("CITE_CD4","CITE_IgD"), type="protein")
+PlotExprCITE(stvea_object, c("CD4","IgD"), type="protein")
 ```
 
 Color each cell in the CODEX UMAP embedding with its cluster assignment.

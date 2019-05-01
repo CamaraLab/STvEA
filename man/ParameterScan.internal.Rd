@@ -7,10 +7,8 @@ Must use Python HDBSCAN because it has 2 important parameters
 (min_cluster_size and min_samples) but R HDBSCAN only has one (minPts)
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-ParameterScan.internal(cite_latent, min_cluster_size_range,
-  min_sample_range, ...,
-  python_dir = "/usr/local/lib/R/site-library/STvEA/python",
-  cache_dir = NULL)
+ParameterScan.internal(cite_latent, min_cluster_size_range, min_sample_range,
+  ...)
 }
 \arguments{
 \item{cite_latent}{CITE-seq latent space (cells x dimensions)}
@@ -20,11 +18,6 @@ ParameterScan.internal(cite_latent, min_cluster_size_range,
 \item{min_sample_range}{vector of min_sample arguments to scan over}
 
 \item{...}{extra parameters to be passed into UMAP}
-
-\item{python_dir}{path to folder containing consensus_clustering.py}
-
-\item{cache_dir}{path to temp folder to house cached information from HDBSCAN.
-If null, no temp folder is created}
 }
 \description{
 Run HDBSCAN over parameter ranges

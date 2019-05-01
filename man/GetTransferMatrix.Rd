@@ -4,9 +4,8 @@
 \alias{GetTransferMatrix}
 \title{Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in STvEA.data}
 \usage{
-GetTransferMatrix(stvea_object,
-  k.codex = floor(nrow(stvea_object@cite_clean) * 0.002),
-  k.cite = floor(nrow(stvea_object@corrected_codex) * 0.002),
+GetTransferMatrix(stvea_object, k.codex = floor(nrow(stvea_object@cite_clean)
+  * 0.002), k.cite = floor(nrow(stvea_object@corrected_codex) * 0.002),
   c.codex = 0.1, c.cite = 0.1)
 }
 \arguments{
