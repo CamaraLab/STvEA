@@ -30,6 +30,25 @@ codex_spatial <- codex_spatial[codex_subset,]
 ```
 
 ## Read in CITE-seq data
+```{r include=FALSE}
+# CITE-seq protein
+cite_protein <- read.table("../../PGC001.a15/data/protein_expr_all.csv", sep=",", row.names=1, header=TRUE, stringsAsFactors = FALSE)
+cite_protein <- as.data.frame(t(cite_protein))
+colnames(cite_protein) <- sapply(colnames(cite_protein), function(x) gsub("ADT_", "", x))
+
+# CITE-seq mRNA
+cite_mRNA <- read.table("../../../Data/CITE-seq/balbc_all/gene_matrix_all_new.csv",row.names=1, header = TRUE, sep=",", stringsAsFactors = FALSE)
+genes <- read.table("../../PGC001.a15/data/genes.tsv", row.names=1, header=FALSE, sep="\t", stringsAsFactors = FALSE)
+cite_mRNA <- as.data.frame(t(cite_mRNA))
+col_names <- genes[colnames(cite_mRNA),1]
+cite_mRNA <- cite_mRNA[,!duplicated(col_names)]
+col_names <- col_names[!duplicated(col_names)]
+colnames(cite_mRNA) <- col_names
+
+# CITE-seq extra
+cite_latent <- read.table("../../PGC001.a15/data/latent_output_v2.txt", sep=",", header=FALSE, row.names=1, stringsAsFactors = F)
+```
+
 ```{r}
 # link to CITE-seq data on Dropbox
 ```
@@ -97,7 +116,7 @@ stvea_object <- ClusterCODEX(stvea_object, k=30)
 
 ## Map CITE-seq and CODEX protein
 ```{r}
-stvea_object <- CorrectChunksCODEX(stvea_object, num_chunks=8, seed=30, num_cores=4)
+stvea_object <- MapCODEXtoCITE(stvea_object, num_chunks=8, seed=30, num_cores=4)
 ```
 
 ## Create neighbor matrices
@@ -144,13 +163,18 @@ PlotExprCODEXspatial(stvea_object, c("Cd4", "IgD"), type="RNA")
 ```
 
 ## Assess colocalization of clusters
-Run the Adjacency Score (https://github.com/CamaraLab/AdjacencyScore) to evaluate how often
-two features take high values in adjacent nodes in a KNN graph of the CODEX spatial dimensions.
+Run the Adjacency Score (https://github.com/CamaraLab/AdjacencyScore) to evaluate how often two features take high values in adjacent nodes in a KNN graph of the CODEX spatial dimensions.
 
-Assess which pairs of clusters often appear in adjacent cells
+Assess which pairs of CODEX clusters often appear in adjacent cells
 ```{r}
-cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
-AdjScoreHeatmap(cluster_adj)
+codex_cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
+AdjScoreHeatmap(codex_cluster_adj)
+```
+
+Assess which pairs of clusters from the CITE-seq mRNA analysis are often mapped to neighboring CODEX cells
+```{r}
+cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
+AdjScoreHeatmap(cite_cluster_adj)
 ```
 
 Assess which pairs of proteins are often highly expressed in adjacent cells
@@ -159,9 +183,14 @@ protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 AdjScoreHeatmap(protein_adj)
 ```
 
-Assess which pairs of genes from the given list are often highly expressed in adjacency cells. There are too many genes to compute the Adjacency Score for all combinations
+Assess which pairs of genes from the given list are often highly expressed in adjacency cells. There are too many genes to compute the Adjacency Score for all combinations, so let's compute it for all pairs of genes corresponding to one of our proteins.
 ```{r}
-gene_adj <- AdjScoreGenes(stvea_object, k=3, num_cores=8)
+gene_list <- c("Ptprc", "Ly6c1", "Trdc", "Ly6g", "Cd19", "Vcam1", "Cd3g", "Fcgr3", "Cd8a", "Thy1", "Adgre1", "Itgax", "Car1", "Itgam", "Ighd", "Cd27", "Cd5", "Cd79", "Tfrc", "Pecam1", "Cd4", "Ighm", "Cr2", "Cd44", "Ncr1", "H2-Ab1")
+gene_pairs <- t(combn(gene_list,2))
+for (gene in gene_list) {
+  gene_pairs <- rbind(gene_pairs, c(gene,gene))
+}
+gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
 ```
 
 

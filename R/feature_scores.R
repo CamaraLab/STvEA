@@ -46,6 +46,10 @@ AdjScoreHeatmap <- function(adj_score_output) {
 AdjScoreClustersCITE <- function(
   stvea_object,
   k,
+  # box_subset=list(xmin = min(stvea_object@codex_spatial$x),
+  #                 xmax = max(stvea_object@codex_spatial$x),
+  #                 ymin = min(stvea_object@codex_spatial$y),
+  #                 ymax = max(stvea_object@codex_spatial$y))
   c=0,
   num_cores=1,
   num_perms=1000,
@@ -76,7 +80,15 @@ AdjScoreClustersCITE <- function(
 #'
 #' @export
 #'
-AdjScoreClustersCODEX <- function(stvea_object, k, num_cores=1) {
+AdjScoreClustersCODEX <- function(
+  stvea_object,
+  k,
+  # box_subset=list(xmin = min(stvea_object@codex_spatial$x),
+  #                 xmax = max(stvea_object@codex_spatial$x),
+  #                 ymin = min(stvea_object@codex_spatial$y),
+  #                 ymax = max(stvea_object@codex_spatial$y))
+  num_cores=1
+) {
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
   AdjScoreClustersCODEX.internal(knn_adj,
                                  stvea_object@codex_clusters,
