@@ -3,8 +3,9 @@ Type: Package
 Title: Spatially-resolved Transcriptomics via Epitope Anchoring
 Version: 0.1.0
 Authors@R: person("Kiya W.", "Govek", email = "govekk@pennmedicine.upenn.edu", role = c("aut", "cre"))
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: STvEA is an analysis pipeline for cleaning, clustering, and plotting CODEX and CITE-seq
+  protein data, mapping a CODEX dataset to a matching CITE-seq dataset, and assessing colocalization
+  of features using the Adjacency Score.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

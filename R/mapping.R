@@ -66,7 +66,7 @@ GetTransferMatrix <- function(stvea_object,
                                                  stvea_object@corrected_codex,
                                                  k=k.cite,
                                                  c=c.cite)
-  stvea_object@codex_mRNA <-t(stvea_object@cite_mRNA) %*% as.matrix(stvea_object@codex_transfer)
+  stvea_object@codex_mRNA <- t(as.matrix(stvea_object@codex_transfer)) %*% as.matrix(stvea_object@cite_mRNA)
   return(stvea_object)
 }
 
