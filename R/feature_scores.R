@@ -230,7 +230,7 @@ AdjScoreClustersCITE.internal <- function(
   num_perms=1000,
   perm_estimate=T
 ) {
-  cluster_ids <- unique(cite_clusters)
+  cluster_ids <- as.character(unique(cite_clusters))
   cluster_ids <- cluster_ids[order(cluster_ids)]
   cluster_matrix <- t(sapply(cluster_ids, function(x) (cite_clusters==x)*1))
   row.names(cluster_matrix) <- cluster_ids
@@ -268,7 +268,7 @@ AdjScoreClustersCODEX.internal <- function(
   codex_clusters,
   num_cores=1
 ) {
-  cluster_ids <- unique(codex_clusters)
+  cluster_ids <- as.character(unique(codex_clusters))
   cluster_ids <- cluster_ids[order(cluster_ids)]
   cluster_matrix <- t(sapply(cluster_ids, function(x) (codex_clusters==x)*1))
   row.names(cluster_matrix) <- cluster_ids

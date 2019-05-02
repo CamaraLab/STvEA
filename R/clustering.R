@@ -141,17 +141,21 @@ ParameterScan.internal <- function(cite_latent, min_cluster_size_range, min_samp
     stop("Package \"reticulate\" needed for this function to work. Please install it.",
          call. = FALSE)
   }
-  if(!reticulate::py_module_available("hdbscan")) {
-    reticulate::py_install("hdbscan")
+  if(!reticulate::py_module_available("numpy")) {
+    stop("Python must have package \"numpy\" installed for this function to work. Please install it.",
+         call.=FALSE)
   }
   if(!reticulate::py_module_available("scipy")) {
-    reticulate::py_install("scipy")
+    stop("Python must have package \"scipy\" installed for this function to work. Please install it.",
+         call.=FALSE)
   }
-  if(!reticulate::py_module_available("numpy")) {
-    reticulate::py_install("numpy")
+  if(!reticulate::py_module_available("hdbscan")) {
+    stop("Python must have package \"hdbscan\" installed for this function to work. Please install it.",
+         call.=FALSE)
   }
   if(!reticulate::py_module_available("sklearn")) {
-    reticulate::py_install("sklearn")
+    stop("Python must have package \"sklearn\" installed for this function to work. Please install it.",
+         call.=FALSE)
   }
 
   cite_latent_tmp <- as.matrix(cite_latent)
@@ -230,6 +234,11 @@ ConsensusCluster.internal <- function(hdbscan_results, cite_latent, silhouette_c
   reticulate::source_python(paste(installed.packages()["STvEA","LibPath"],"/STvEA/python/consensus_clustering.py",sep=""))
   consensus_clusters <- consensus_cluster(consensus_matrix, inconsistent_value, min_cluster_size)
 
+  # relabel clusters so they are sequential, except -1 (no cluster)
+  clustered_pts <- consensus_clusters != -1
+  new_labels <- as.numeric(factor(consensus_clusters[clustered_pts]))
+  consensus_clusters[clustered_pts] <- new_labels
+  return(consensus_clusters)
 }
 
 

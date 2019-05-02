@@ -22,5 +22,5 @@ Imports:
     AdjacencyScore
 Suggests:
     umap,
-    reticulate (>= 1.7)
+    reticulate
 Remotes: CamaraLab/AdjacencyScore
