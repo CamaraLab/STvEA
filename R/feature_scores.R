@@ -59,7 +59,7 @@ AdjScoreClustersCITE <- function(
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
   AdjScoreClustersCITE.internal(knn_adj,
                                 stvea_object@cite_clusters,
-                                stvea_object@codex_transfer,
+                                stvea_object@transfer_matrix,
                                 c=c,
                                 num_cores=num_cores,
                                 num_perms=num_perms,
@@ -206,9 +206,9 @@ AdjScoreGenes <- function(
 #' @param adj_matrix a (preferrably sparse) binary matrix of
 #' adjacency between the cells in the CODEX spatial coordinates
 #' @param cite_clusters a vector of cluster IDs for the CITE-seq cells
-#' @param codex_transfer a (cite-seq cells x codex cells) matrix
-#' of weighted nearest neighbor assignments mapping each CODEX
-#' cell to k CITE-seq cells
+#' @param transfer_matrix a (codex cells x cite-seq cells) matrix
+#' of weighted nearest neighbor assignments mapping each CITE-seq cell
+#' to k CODEX cells
 #' @param c constant used to determine width of diffusion, must be 0 <= c
 #' @param num_cores integer specifying the number of cores to be used
 #' in the computation. By default only one core is used.
@@ -224,7 +224,7 @@ AdjScoreGenes <- function(
 AdjScoreClustersCITE.internal <- function(
   adj_matrix,
   cite_clusters,
-  codex_transfer,
+  transfer_matrix,
   c=0,
   num_cores=1,
   num_perms=1000,
@@ -240,7 +240,7 @@ AdjScoreClustersCITE.internal <- function(
     cluster_pairs <- rbind(cluster_pairs, c(id,id))
   }
 
-  codex_cluster_matrix <- cluster_matrix %*% codex_transfer
+  codex_cluster_matrix <- cluster_matrix %*% t(transfer_matrix)
 
   adjacency_score(adj_matrix, codex_cluster_matrix, cluster_pairs,
                   c=c, num_cores=num_cores, num_perms=num_perms,
@@ -351,6 +351,7 @@ AdjScoreGenes.internal <- function(
   perm_estimate=T
 ) {
   codex_mRNA_cut <- t(codex_mRNA[,colnames(codex_mRNA) %in% as.vector(gene_pairs)])
+  codex_mRNA_cut <- log(1+1000*codex_mRNA_cut)
   adjacency_score(adj_matrix, codex_mRNA_cut, gene_pairs, c=c, num_cores=num_cores,
                   num_perms=num_perms, perm_estimate = perm_estimate)
 }

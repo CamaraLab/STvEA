@@ -58,15 +58,12 @@ GetTransferMatrix <- function(stvea_object,
   if (is.null(stvea_object@corrected_codex)) {
     stop("MapCODEXtoCITE must be run on the input object first", call. =FALSE)
   }
-  stvea_object@codex_transfer <- GetTransferMatrix.internal(stvea_object@corrected_codex,
-                                                  stvea_object@cite_clean,
-                                                  k=k.codex,
-                                                  c=c.codex)
-  stvea_object@cite_transfer <- GetTransferMatrix.internal(stvea_object@cite_clean,
+  stvea_object@transfer_matrix <- GetTransferMatrix.internal(stvea_object@cite_clean,
                                                  stvea_object@corrected_codex,
                                                  k=k.cite,
                                                  c=c.cite)
-  stvea_object@codex_mRNA <- t(as.matrix(stvea_object@codex_transfer)) %*% as.matrix(stvea_object@cite_mRNA)
+  stvea_object@codex_mRNA <- as.matrix(stvea_object@transfer_matrix) %*%
+    as.matrix(stvea_object@cite_mRNA/rowSums(stvea_object@cite_mRNA))
   return(stvea_object)
 }
 

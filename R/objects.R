@@ -25,9 +25,7 @@ STvEA.data <- setClass(
     codex_clean = 'ANY', # codex cells x proteins
 
     corrected_codex = 'ANY', # codex cells x proteins
-    codex_transfer = 'dgCMatrix', # cite cells x codex cells
-                                  # k CITE-seq neighbors for each CODEX cell
-    cite_transfer = 'dgCMatrix', # codex cells x cite cells
+    transfer_matrix = 'dgCMatrix', # codex cells x cite cells
                                  # k CODEX neighbors for each CITE-seq cell
     codex_mRNA = 'ANY' # codex cells x genes
   )
@@ -86,7 +84,7 @@ SetDataCITE <- function(cite_mRNA,
                         cite_latent = NULL,
                         stvea_object = NULL) {
   if (is.null(cite_mRNA_norm)) {
-    cite_mRNA_norm <- log(1 + 5000*(cite_mRNA/rowSums(cite_mRNA)))
+    cite_mRNA_norm <- log(1 + 1000*(cite_mRNA/rowSums(cite_mRNA)))
   }
   if (is.null(stvea_object)) {
     stvea_object <- new(
