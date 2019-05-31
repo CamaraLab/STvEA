@@ -105,7 +105,9 @@ stvea_object <- GetUmapCITE(stvea_object, n_neighbors = 50, min_dist=0.1, negati
 We cluster the CITE-seq cells based on their mRNA expression using a consensus of HDBSCAN clusterings. First, we run UMAP on the CITE-seq latent space to the same number of dimensions (running UMAP before density based clustering is suggested in the UMAP documentation <https://umap-learn.readthedocs.io/en/latest/clustering.html>). We perform a scan over the two parameters of the Python HDBSCAN implementation, min\_cluster\_size and min\_samples (more information on selecting these paramters <https://hdbscan.readthedocs.io/en/latest/parameter_selection.html>).
 
 ``` r
-stvea_object <- ParameterScan(stvea_object, min_cluster_size_range = seq(5,20,4), min_sample_range = seq(10,40,3), n_neighbors=50, min_dist=0.1, negative_sample_rate=50)
+stvea_object <- ParameterScan(stvea_object, min_cluster_size_range = seq(5,20,4),
+                              min_sample_range = seq(10,40,3), n_neighbors=50,
+                              min_dist=0.1, negative_sample_rate=50)
 ```
 
     ## Running UMAP on the CITE-seq latent space
@@ -116,7 +118,8 @@ stvea_object <- ParameterScan(stvea_object, min_cluster_size_range = seq(5,20,4)
 We create a dissimilarity matrix between cells as the number of HDBSCAN clusterings (passing a certain silhouette cutoff) in which they are assigned to the same cluster. The final consensus clusters are an agglomerative clustering on this dissimilarity matrix using Python's scipy.cluster.hierarchy, cutting the tree using the inconsistent value. We remove all clusters that have fewer than 10 cells, caused by the cells that HDBSCAN did not assign to any cluster.
 
 ``` r
-stvea_object <- ConsensusCluster(stvea_object, silhouette_cutoff = 0.1, inconsistent_value = 0.3, min_cluster_size = 10)
+stvea_object <- ConsensusCluster(stvea_object, silhouette_cutoff = 0.1,
+                                 inconsistent_value = 0.3, min_cluster_size = 10)
 ```
 
 Cluster CODEX cells based on protein expression
@@ -157,7 +160,9 @@ stvea_object <- GetTransferMatrix(stvea_object)
 Visualize clustering, mRNA, and protein expression
 --------------------------------------------------
 
-Color each cell in the CITE-seq UMAP embedding with its cluster assignment. Cells in gray were not assigned to any cluster.
+### Color each cell in the CITE-seq UMAP embedding with its cluster assignment.
+
+Cells in gray were not assigned to any cluster.
 
 ``` r
 PlotClusterCITE(stvea_object)
@@ -165,53 +170,61 @@ PlotClusterCITE(stvea_object)
 
 ![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-18-1.png)
 
-Color each cell in the CITE-seq UMAP embedding with its expression level of one of two genes. If two gene names are provided, color will be interpolated between red and green color values.
+### Color each cell in the CITE-seq UMAP embedding with its expression level of one or two genes.
+
+``` r
+PlotExprCITE(stvea_object, "Cd4", type="RNA")
+```
+
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-19-1.png) If two gene names are provided, color will be interpolated between red and green color values.
 
 ``` r
 PlotExprCITE(stvea_object, c("Cd4", "Ighd"), type="RNA")
 ```
 
-![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-19-1.png)
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-20-1.png)
 
-Color each cell in the CITE-seq UMAP embedding with its expression level of one of two proteins.
+### Color each cell in the CITE-seq UMAP embedding with its expression level of one or two proteins.
 
 ``` r
 PlotExprCITE(stvea_object, c("CD4","IgD"), type="protein")
 ```
 
-![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-20-1.png)
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-21-1.png)
 
-Color each cell in the CODEX UMAP embedding with its cluster assignment. Cells in gray were not assigned to any cluster.
+### Color each cell in the CODEX UMAP embedding with its cluster assignment.
+
+Cells in gray were not assigned to any cluster.
 
 ``` r
 PlotClusterCODEXemb(stvea_object)
 ```
 
-![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-21-1.png)
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-22-1.png)
 
-Color each cell in the CODEX UMAP embedding with its expression level of one or two proteins.
+### Color each cell in the CODEX UMAP embedding with its expression level of one or two proteins.
 
 ``` r
 PlotExprCODEXemb(stvea_object, c("CD4","IgD"))
 ```
 
-![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-22-1.png)
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-23-1.png)
 
-Color the CODEX spatial slide with the expression level of one or two proteins.
+### Color the CODEX spatial slide with the expression level of one or two proteins.
 
 ``` r
 PlotExprCODEXspatial(stvea_object, c("CD4","IgD"))
 ```
 
-![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-23-1.png)
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-24-1.png)
 
-Color the CODEX spatial slide with the expression level of one or two genes that were mapped from the CITE-seq expression levels.
+### Color the CODEX spatial slide with the expression level of one or two genes that were mapped from the CITE-seq expression levels.
 
 ``` r
 PlotExprCODEXspatial(stvea_object, c("Cd4", "Ighd"), type="RNA")
 ```
 
-![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-24-1.png)
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-25-1.png)
 
 Assess colocalization of features
 ---------------------------------
@@ -226,14 +239,14 @@ Since we are computing the Adjacency Score of every combination of features (clu
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 8.977 seconds
-    ## Computing adjacency score for each feature pair - 37.656 seconds
+    ## Creating permutation matrices - 8.979 seconds
+    ## Computing adjacency score for each feature pair - 38.665 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
 ```
 
-![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-25-1.png)
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-26-1.png)
 
 ### Which pairs of genes often have high expression mapped to adjacent CODEX cells?
 
@@ -251,14 +264,14 @@ for (gene in gene_list) {
 gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 8.917 seconds
-    ## Computing adjacency score for each feature pair - 39.792 seconds
+    ## Creating permutation matrices - 9.207 seconds
+    ## Computing adjacency score for each feature pair - 37.332 seconds
 
 ``` r
 AdjScoreHeatmap(gene_adj)
 ```
 
-![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-26-1.png)
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-27-1.png)
 
 ### Which pairs of CODEX clusters often appear in adjacent cells?
 
@@ -268,14 +281,14 @@ Since the assignment of a cell to a cluster is a binary feature which is mutuall
 codex_cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
-    ## Creating permutation matrices - 0.009 seconds
-    ## Computing adjacency score for each feature pair - 0.301 seconds
+    ## Creating permutation matrices - 0.016 seconds
+    ## Computing adjacency score for each feature pair - 0.368 seconds
 
 ``` r
 AdjScoreHeatmap(codex_cluster_adj)
 ```
 
-![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-27-1.png)
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-28-1.png)
 
 ### Which pairs of clusters from the CITE-seq mRNA analysis are often mapped to adjacent CODEX cells?
 
@@ -285,11 +298,11 @@ These mapped cluster assignments are not mutually exclusive like the ones above,
 cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 7.982 seconds
-    ## Computing adjacency score for each feature pair - 25.527 seconds
+    ## Creating permutation matrices - 6.663 seconds
+    ## Computing adjacency score for each feature pair - 17.38 seconds
 
 ``` r
 AdjScoreHeatmap(cite_cluster_adj)
 ```
 
-![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-28-1.png)
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-29-1.png)
