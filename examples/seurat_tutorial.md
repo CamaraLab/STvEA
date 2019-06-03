@@ -130,7 +130,9 @@ stvea_object <- GetTransferMatrix(stvea_object)
 Visualize clustering, mRNA, and protein expression
 --------------------------------------------------
 
-Color each cell in the CITE-seq UMAP embedding with its cluster assignment. Cells in gray were not assigned to any cluster.
+### Color each cell in the CITE-seq UMAP embedding with its cluster assignment.
+
+Cells in gray were not assigned to any cluster.
 
 ``` r
 PlotClusterCITE(stvea_object)
@@ -138,53 +140,63 @@ PlotClusterCITE(stvea_object)
 
 ![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-15-1.png)
 
-Color each cell in the CITE-seq UMAP embedding with its expression level of one of two genes. If two gene names are provided, color will be interpolated between red and green color values.
+### Color each cell in the CITE-seq UMAP embedding with its expression level of one or two genes.
+
+``` r
+PlotExprCITE(stvea_object, "Cd4", type="RNA")
+```
+
+![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-16-1.png)
+
+If two gene names are provided, color will be interpolated between red and green color values.
 
 ``` r
 PlotExprCITE(stvea_object, c("Cd4", "Ighd"), type="RNA")
 ```
 
-![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-16-1.png)
+![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
-Color each cell in the CITE-seq UMAP embedding with its expression level of one of two proteins.
+### Color each cell in the CITE-seq UMAP embedding with its expression level of one or two proteins.
 
 ``` r
 PlotExprCITE(stvea_object, c("CD4","IgD"), type="protein")
 ```
 
-![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-17-1.png)
+![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-18-1.png)
 
-Color each cell in the CODEX UMAP embedding with its cluster assignment. Cells in gray were not assigned to any cluster.
+### Color each cell in the CODEX UMAP embedding with its cluster assignment.
+
+Cells in gray were not assigned to any cluster.
 
 ``` r
 PlotClusterCODEXemb(stvea_object)
 ```
 
-![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-18-1.png)
+![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-19-1.png)
 
-Color each cell in the CODEX UMAP embedding with its expression level of one or two proteins.
+### Color each cell in the CODEX UMAP embedding with its expression level of one or two proteins.
 
 ``` r
 PlotExprCODEXemb(stvea_object, c("CD4","IgD"))
 ```
 
-![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-19-1.png)
+![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-20-1.png)
 
-Color the CODEX spatial slide with the expression level of one or two proteins.
+### Color the CODEX spatial slide with the expression level of one or two proteins.
 
 ``` r
 PlotExprCODEXspatial(stvea_object, c("CD4","IgD"))
 ```
 
-![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-20-1.png)
+![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-21-1.png)
 
-Color the CODEX spatial slide with the expression level of one or two genes that were mapped from the CITE-seq expression levels.
+### Color the CODEX spatial slide with the expression level of one or two genes that were mapped from the CITE-seq expression levels.
 
 ``` r
 PlotExprCODEXspatial(stvea_object, c("Cd4", "Ighd"), type="RNA")
 ```
 
-![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-21-1.png)
+![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-22-1.png)
 
 Assess colocalization of features
 ---------------------------------
@@ -199,14 +211,14 @@ Since we are computing the Adjacency Score of every combination of features (clu
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 9.279 seconds
-    ## Computing adjacency score for each feature pair - 39.717 seconds
+    ## Creating permutation matrices - 9.597 seconds
+    ## Computing adjacency score for each feature pair - 39.892 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
 ```
 
-![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-22-1.png)
+![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-23-1.png)
 
 ### Which pairs of genes often have high expression mapped to adjacent CODEX cells?
 
@@ -224,14 +236,14 @@ for (gene in gene_list) {
 gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 9.209 seconds
-    ## Computing adjacency score for each feature pair - 41.701 seconds
+    ## Creating permutation matrices - 9.316 seconds
+    ## Computing adjacency score for each feature pair - 41.459 seconds
 
 ``` r
 AdjScoreHeatmap(gene_adj)
 ```
 
-![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-23-1.png)
+![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-24-1.png)
 
 ### Which pairs of CODEX clusters often appear in adjacent cells?
 
@@ -241,14 +253,14 @@ Since the assignment of a cell to a cluster is a binary feature which is mutuall
 codex_cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
-    ## Creating permutation matrices - 0.008 seconds
-    ## Computing adjacency score for each feature pair - 0.36 seconds
+    ## Creating permutation matrices - 0.01 seconds
+    ## Computing adjacency score for each feature pair - 0.412 seconds
 
 ``` r
 AdjScoreHeatmap(codex_cluster_adj)
 ```
 
-![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-24-1.png)
+![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-25-1.png)
 
 ### Which pairs of clusters from the CITE-seq mRNA analysis are often mapped to adjacent CODEX cells?
 
@@ -258,11 +270,11 @@ These mapped cluster assignments are not mutually exclusive like the ones above,
 cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 6.431 seconds
-    ## Computing adjacency score for each feature pair - 18.379 seconds
+    ## Creating permutation matrices - 6.835 seconds
+    ## Computing adjacency score for each feature pair - 18.19 seconds
 
 ``` r
 AdjScoreHeatmap(cite_cluster_adj)
 ```
 
-![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-25-1.png)
+![](seurat_tutorial_files/figure-markdown_github/unnamed-chunk-26-1.png)
