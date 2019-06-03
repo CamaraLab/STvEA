@@ -176,7 +176,9 @@ PlotClusterCITE(stvea_object)
 PlotExprCITE(stvea_object, "Cd4", type="RNA")
 ```
 
-![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-19-1.png) If two gene names are provided, color will be interpolated between red and green color values.
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-19-1.png)
+
+If two gene names are provided, color will be interpolated between red and green color values.
 
 ``` r
 PlotExprCITE(stvea_object, c("Cd4", "Ighd"), type="RNA")
@@ -239,8 +241,8 @@ Since we are computing the Adjacency Score of every combination of features (clu
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 8.979 seconds
-    ## Computing adjacency score for each feature pair - 38.665 seconds
+    ## Creating permutation matrices - 9.463 seconds
+    ## Computing adjacency score for each feature pair - 38.462 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
@@ -264,8 +266,8 @@ for (gene in gene_list) {
 gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 9.207 seconds
-    ## Computing adjacency score for each feature pair - 37.332 seconds
+    ## Creating permutation matrices - 9.605 seconds
+    ## Computing adjacency score for each feature pair - 40.118 seconds
 
 ``` r
 AdjScoreHeatmap(gene_adj)
@@ -281,8 +283,8 @@ Since the assignment of a cell to a cluster is a binary feature which is mutuall
 codex_cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
-    ## Creating permutation matrices - 0.016 seconds
-    ## Computing adjacency score for each feature pair - 0.368 seconds
+    ## Creating permutation matrices - 0.015 seconds
+    ## Computing adjacency score for each feature pair - 0.422 seconds
 
 ``` r
 AdjScoreHeatmap(codex_cluster_adj)
@@ -298,8 +300,8 @@ These mapped cluster assignments are not mutually exclusive like the ones above,
 cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 6.663 seconds
-    ## Computing adjacency score for each feature pair - 17.38 seconds
+    ## Creating permutation matrices - 9.583 seconds
+    ## Computing adjacency score for each feature pair - 37.788 seconds
 
 ``` r
 AdjScoreHeatmap(cite_cluster_adj)

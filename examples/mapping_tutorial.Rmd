@@ -155,6 +155,7 @@ PlotClusterCITE(stvea_object)
 ```{r}
 PlotExprCITE(stvea_object, "Cd4", type="RNA")
 ```
+
 If two gene names are provided, color will be interpolated between red and green color values.
 ```{r}
 PlotExprCITE(stvea_object, c("Cd4", "Ighd"), type="RNA")
