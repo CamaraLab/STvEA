@@ -212,6 +212,8 @@ CleanCODEX.internal <- function(codex_filtered) {
 #' a Negative Binomial mixture and computing each expression
 #' measurement as the cumulative distribution of the
 #' Negative Binomial with the higher median.
+#' Normalizes CITE-seq protein data by the original
+#' total counts per cell.
 #' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param cite_protein Raw CITE-seq protein data (cell x protein)
@@ -268,6 +270,7 @@ CleanCITE.internal <- function(cite_protein,
     cite_protein_clean[,i] <- cite_protein_list[[i]]
   }
 
+  # normalize by original total counts per cell
   cite_protein_clean <- cite_protein_clean / rowSums(cite_protein)
   cite_protein_clean <- t(cite_protein_clean) - apply(cite_protein_clean,2,min)
   cite_protein_clean <- t(cite_protein_clean/ apply(cite_protein_clean,1,max))
