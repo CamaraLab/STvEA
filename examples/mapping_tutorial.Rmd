@@ -37,27 +37,29 @@ codex_spatial_nm <- codex_spatial_nm[codex_subset,]
 ```
 
 ## Read in CITE-seq data
-We used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al. We have not yet published this data, so please email pcamara\@pennmedicine.upenn.edu if you would like access.
-```{r include=FALSE}
+We used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al.
+```{r}
 # CITE-seq protein
-cite_protein <- read.table("/home/rstudio/Dropbox/Projects/PGC001_Heterotypic_signaling/Analyses/PGC001.a15/data/protein_expr_all.csv", sep=",", row.names=1, header=TRUE, stringsAsFactors = FALSE)
+cite_protein <- read.table("https://www.dropbox.com/s/xzobh2p13cqt4y5/protein_expr_all.csv?dl=1",
+                           sep=",", row.names=1, header=TRUE, stringsAsFactors = FALSE)
 cite_protein <- as.data.frame(t(cite_protein))
 colnames(cite_protein) <- sapply(colnames(cite_protein), function(x) gsub("ADT_", "", x))
 
 # CITE-seq mRNA
-cite_mRNA <- read.table("/home/rstudio/Dropbox/Projects/PGC001_Heterotypic_signaling/Data/CITE-seq/balbc_all/gene_matrix_all_new.csv",row.names=1, header = TRUE, sep=",", stringsAsFactors = FALSE)
-genes <- read.table("/home/rstudio/Dropbox/Projects/PGC001_Heterotypic_signaling/Analyses/PGC001.a15/data/genes.tsv", row.names=1, header=FALSE, sep="\t", stringsAsFactors = FALSE)
+cite_mRNA <- read.table("https://www.dropbox.com/s/910hhahxsbd9ofs/gene_matrix_all_new.csv?dl=1",
+                        row.names=1, header=TRUE, sep=",", stringsAsFactors = FALSE)
+genes <- read.table("https://www.dropbox.com/s/11dmp8ki6tui2zu/genes.tsv?dl=1",
+                    row.names=1, header=FALSE, sep="\t", stringsAsFactors = FALSE)
+# Convert Ensembl to gene name
 cite_mRNA <- as.data.frame(t(cite_mRNA))
 col_names <- genes[colnames(cite_mRNA),1]
 cite_mRNA <- cite_mRNA[,!duplicated(col_names)]
 col_names <- col_names[!duplicated(col_names)]
 colnames(cite_mRNA) <- col_names
 
-# CITE-seq extra
-cite_latent <- read.table("/home/rstudio/Dropbox/Projects/PGC001_Heterotypic_signaling/Analyses/PGC001.a15/data/latent_output_v2.txt", sep=",", header=FALSE, row.names=1, stringsAsFactors = F)
-```
-```{r}
-# link to CITE-seq data on Dropbox
+# CITE-seq mRNA latent space, such as output by scVI
+cite_latent <- read.table("https://www.dropbox.com/s/00ezacd6niunoem/latent_output_v2.txt?dl=1",
+                          sep=",", header=FALSE, row.names=1, stringsAsFactors = F)
 ```
 
 ## Create object to hold data
