@@ -7,12 +7,22 @@ output: rmarkdown::github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Goltsev et al. used CODEX to image the protein expression of tissue sections from 3 normal BALBc mice ( https://www.cell.com/cell/fulltext/S0092-8674(18)30904-8 ). In our recent preprint, Govek & Troisi et al. (https://www.biorxiv.org/content/10.1101/672501v1), we used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al.
+
+The raw filtered count matrices for both protein and mRNA expression from CITE-seq are available on Dropbox:
+
+CITE-seq mRNA expression matrix for both mice:
+https://www.dropbox.com/s/910hhahxsbd9ofs/gene_matrix_all_new.csv?dl=1
+
+CITE-seq protein expression matrix for both mice:
+https://www.dropbox.com/s/xzobh2p13cqt4y5/protein_expr_all.csv?dl=1
+
 ```{r}
 library(STvEA)
 ```
 
 ## Read in CODEX data
-Goltsev et al. used CODEX to image the protein expression of tissue sections from 3 normal BALBc mice ( https://www.cell.com/cell/fulltext/S0092-8674(18)30904-8 ). We downloaded their segmented and spillover corrected data as FCS files from http://welikesharingdata.blob.core.windows.net/forshare/index.html. Here we load the expression of the protein and blank channels, cell size, and spatial coordinates from that file.
+We downloaded the segmented and spillover corrected data from Goltsev et al. as FCS files from http://welikesharingdata.blob.core.windows.net/forshare/index.html. Here we load the expression of the protein and blank channels, cell size, and spatial coordinates from that file.
 ```{r}
 data("codex_balbc1")
 ```
@@ -37,7 +47,7 @@ codex_spatial_nm <- codex_spatial_nm[codex_subset,]
 ```
 
 ## Read in CITE-seq data
-We used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al.
+We read the protein and mRNA count matrices and mRNA latent space directly from Dropbox. The count matrices contain the raw expression counts of cells from both mice and have undergone preprocessing filtering (see "Single-cell CITE-seq processing" from Methods of Govek & Troisi et al. https://www.biorxiv.org/content/10.1101/672501v1).
 ```{r}
 # CITE-seq protein
 cite_protein <- read.table("https://www.dropbox.com/s/xzobh2p13cqt4y5/protein_expr_all.csv?dl=1",

@@ -7,6 +7,16 @@ output: rmarkdown::github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Goltsev et al. used CODEX to image the protein expression of tissue sections from 3 normal BALBc mice ( https://www.cell.com/cell/fulltext/S0092-8674(18)30904-8 ). In our recent preprint, Govek & Troisi et al. (https://www.biorxiv.org/content/10.1101/672501v1), we used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al.
+
+The raw filtered count matrices for both protein and mRNA expression from CITE-seq are available on Dropbox:
+
+CITE-seq mRNA expression matrix for both mice:
+https://www.dropbox.com/s/910hhahxsbd9ofs/gene_matrix_all_new.csv?dl=1
+
+CITE-seq protein expression matrix for both mice:
+https://www.dropbox.com/s/xzobh2p13cqt4y5/protein_expr_all.csv?dl=1
+
 ```{r}
 library(STvEA)
 ```
@@ -37,12 +47,9 @@ codex_spatial_nm <- codex_spatial_nm[codex_subset,]
 ```
 
 ## Read in CITE-seq data
-We used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al. We then used Seurat to normalize and cluster this data with TSNE and PCA. We have not yet published this data, so please email pcamara\@pennmedicine.upenn.edu if you would like access. 
-```{r include=FALSE}
-cite_seurat_object <- readRDS("/home/rstudio/Dropbox/Projects/PGC001_Heterotypic_signaling/Analyses/PGC001.a18/data/cite_seurat_object.rds")
-```
+We used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al. We then used Seurat to normalize and cluster this data with TSNE and PCA.
 ```{r}
-# Link to CITE-seq Seurat object on Dropbox
+cite_seurat_object <- readRDS(url("https://www.dropbox.com/s/6vh70fid4yqxop4/cite_seurat_object.rds?dl=1"))
 ```
 
 ## Create object to hold data

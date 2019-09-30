@@ -1,6 +1,14 @@
 Using STvEA to map CODEX and CITE-seq data
 ================
 
+Goltsev et al. used CODEX to image the protein expression of tissue sections from 3 normal BALBc mice ( <https://www.cell.com/cell/fulltext/S0092-8674(18)30904-8> ). In our recent preprint, Govek & Troisi et al. (<https://www.biorxiv.org/content/10.1101/672501v1>), we used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al.
+
+The raw filtered count matrices for both protein and mRNA expression from CITE-seq are available on Dropbox:
+
+CITE-seq mRNA expression matrix for both mice: <https://www.dropbox.com/s/910hhahxsbd9ofs/gene_matrix_all_new.csv?dl=1>
+
+CITE-seq protein expression matrix for both mice: <https://www.dropbox.com/s/xzobh2p13cqt4y5/protein_expr_all.csv?dl=1>
+
 ``` r
 library(STvEA)
 ```
@@ -8,7 +16,7 @@ library(STvEA)
 Read in CODEX data
 ------------------
 
-Goltsev et al. used CODEX to image the protein expression of tissue sections from 3 normal BALBc mice ( <https://www.cell.com/cell/fulltext/S0092-8674(18)30904-8> ). We downloaded their segmented and spillover corrected data as FCS files from <http://welikesharingdata.blob.core.windows.net/forshare/index.html>. Here we load the expression of the protein and blank channels, cell size, and spatial coordinates from that file.
+We downloaded the segmented and spillover corrected data from Goltsev et al. as FCS files from <http://welikesharingdata.blob.core.windows.net/forshare/index.html>. Here we load the expression of the protein and blank channels, cell size, and spatial coordinates from that file.
 
 ``` r
 data("codex_balbc1")
@@ -40,7 +48,7 @@ codex_spatial_nm <- codex_spatial_nm[codex_subset,]
 Read in CITE-seq data
 ---------------------
 
-We used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al.
+We read the protein and mRNA count matrices and mRNA latent space directly from Dropbox. The count matrices contain the raw expression counts of cells from both mice and have undergone preprocessing filtering (see "Single-cell CITE-seq processing" from Methods of Govek & Troisi et al. <https://www.biorxiv.org/content/10.1101/672501v1>).
 
 ``` r
 # CITE-seq protein
@@ -261,8 +269,8 @@ Since we are computing the Adjacency Score of every combination of features (clu
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 8.895 seconds
-    ## Computing adjacency score for each feature pair - 37.461 seconds
+    ## Creating permutation matrices - 9.021 seconds
+    ## Computing adjacency score for each feature pair - 38.695 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
@@ -286,8 +294,8 @@ for (gene in gene_list) {
 gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 8.319 seconds
-    ## Computing adjacency score for each feature pair - 44.82 seconds
+    ## Creating permutation matrices - 8.215 seconds
+    ## Computing adjacency score for each feature pair - 44.901 seconds
 
 ``` r
 AdjScoreHeatmap(gene_adj)
@@ -303,8 +311,8 @@ Since the assignment of a cell to a cluster is a binary feature which is mutuall
 codex_cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
-    ## Creating permutation matrices - 0.009 seconds
-    ## Computing adjacency score for each feature pair - 0.446 seconds
+    ## Creating permutation matrices - 0.011 seconds
+    ## Computing adjacency score for each feature pair - 0.505 seconds
 
 ``` r
 AdjScoreHeatmap(codex_cluster_adj)
@@ -320,8 +328,8 @@ These mapped cluster assignments are not mutually exclusive like the ones above,
 cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 7.797 seconds
-    ## Computing adjacency score for each feature pair - 38.12 seconds
+    ## Creating permutation matrices - 8.712 seconds
+    ## Computing adjacency score for each feature pair - 33.949 seconds
 
 ``` r
 AdjScoreHeatmap(cite_cluster_adj)
