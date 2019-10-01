@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Goltsev et al. used CODEX to image the protein expression of tissue sections from 3 normal BALBc mice ( https://www.cell.com/cell/fulltext/S0092-8674(18)30904-8 ). In our recent preprint, Govek & Troisi et al. (https://www.biorxiv.org/content/10.1101/672501v1), we used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al.
 
-The raw filtered count matrices for both protein and mRNA expression from CITE-seq are available on Dropbox:
+The raw filtered count matrices for both protein and mRNA expression from CITE-seq are available from these links:
 
 CITE-seq mRNA expression matrix for both mice:
 https://www.dropbox.com/s/910hhahxsbd9ofs/gene_matrix_all_new.csv?dl=1
@@ -47,7 +47,7 @@ codex_spatial_nm <- codex_spatial_nm[codex_subset,]
 ```
 
 ## Read in CITE-seq data
-We read the protein and mRNA count matrices and mRNA latent space directly from Dropbox. The count matrices contain the raw expression counts of cells from both mice and have undergone preprocessing filtering (see "Single-cell CITE-seq processing" from Methods of Govek & Troisi et al. https://www.biorxiv.org/content/10.1101/672501v1).
+We read in the protein and mRNA count matrices, plus the mRNA latent space computed by scVI. The count matrices contain the raw expression counts of cells from both mice and have undergone preprocessing filtering (see "Single-cell CITE-seq processing" from Methods of Govek & Troisi et al. https://www.biorxiv.org/content/10.1101/672501v1).
 ```{r}
 # CITE-seq protein
 cite_protein <- read.table("https://www.dropbox.com/s/xzobh2p13cqt4y5/protein_expr_all.csv?dl=1",

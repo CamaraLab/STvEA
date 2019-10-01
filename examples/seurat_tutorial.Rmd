@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Goltsev et al. used CODEX to image the protein expression of tissue sections from 3 normal BALBc mice ( https://www.cell.com/cell/fulltext/S0092-8674(18)30904-8 ). In our recent preprint, Govek & Troisi et al. (https://www.biorxiv.org/content/10.1101/672501v1), we used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al.
 
-The raw filtered count matrices for both protein and mRNA expression from CITE-seq are available on Dropbox:
+The raw filtered count matrices for both protein and mRNA expression from CITE-seq are available from these links:
 
 CITE-seq mRNA expression matrix for both mice:
 https://www.dropbox.com/s/910hhahxsbd9ofs/gene_matrix_all_new.csv?dl=1
@@ -47,7 +47,7 @@ codex_spatial_nm <- codex_spatial_nm[codex_subset,]
 ```
 
 ## Read in CITE-seq data
-We used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al. We then used Seurat to normalize and cluster this data with TSNE and PCA.
+We used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al. We then used Seurat v2 to normalize and cluster this data with TSNE and PCA. Detailed instructions on using Seurat to process CITE-seq data can be found in the Seurat online vignettes (https://satijalab.org/seurat/v2.4/multimodal_vignette.html). Currently, STvEA can only load in objects from Seurat v2.
 ```{r}
 cite_seurat_object <- readRDS(url("https://www.dropbox.com/s/6vh70fid4yqxop4/cite_seurat_object.rds?dl=1"))
 ```

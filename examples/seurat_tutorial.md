@@ -3,7 +3,7 @@ Using STvEA to analyze CITE-seq data from a Seurat object
 
 Goltsev et al. used CODEX to image the protein expression of tissue sections from 3 normal BALBc mice ( <https://www.cell.com/cell/fulltext/S0092-8674(18)30904-8> ). In our recent preprint, Govek & Troisi et al. (<https://www.biorxiv.org/content/10.1101/672501v1>), we used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al.
 
-The raw filtered count matrices for both protein and mRNA expression from CITE-seq are available on Dropbox:
+The raw filtered count matrices for both protein and mRNA expression from CITE-seq are available from these links:
 
 CITE-seq mRNA expression matrix for both mice: <https://www.dropbox.com/s/910hhahxsbd9ofs/gene_matrix_all_new.csv?dl=1>
 
@@ -48,7 +48,7 @@ codex_spatial_nm <- codex_spatial_nm[codex_subset,]
 Read in CITE-seq data
 ---------------------
 
-We used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al. We then used Seurat to normalize and cluster this data with TSNE and PCA.
+We used CITE-seq to produce single cell mRNA and protein expression data from mice matching those in the CODEX data from Goltsev et al. We then used Seurat v2 to normalize and cluster this data with TSNE and PCA. Detailed instructions on using Seurat to process CITE-seq data can be found in the Seurat online vignettes (<https://satijalab.org/seurat/v2.4/multimodal_vignette.html>). Currently, STvEA can only load in objects from Seurat v2.
 
 ``` r
 cite_seurat_object <- readRDS(url("https://www.dropbox.com/s/6vh70fid4yqxop4/cite_seurat_object.rds?dl=1"))
@@ -228,8 +228,8 @@ Since we are computing the Adjacency Score of every combination of features (clu
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 10.119 seconds
-    ## Computing adjacency score for each feature pair - 41.05 seconds
+    ## Creating permutation matrices - 9.853 seconds
+    ## Computing adjacency score for each feature pair - 38.717 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
@@ -253,8 +253,8 @@ for (gene in gene_list) {
 gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 10.839 seconds
-    ## Computing adjacency score for each feature pair - 45.596 seconds
+    ## Creating permutation matrices - 9.94 seconds
+    ## Computing adjacency score for each feature pair - 47.949 seconds
 
 ``` r
 AdjScoreHeatmap(gene_adj)
@@ -270,8 +270,8 @@ Since the assignment of a cell to a cluster is a binary feature which is mutuall
 codex_cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
-    ## Creating permutation matrices - 0.008 seconds
-    ## Computing adjacency score for each feature pair - 1.02 seconds
+    ## Creating permutation matrices - 0.009 seconds
+    ## Computing adjacency score for each feature pair - 0.987 seconds
 
 ``` r
 AdjScoreHeatmap(codex_cluster_adj)
@@ -287,8 +287,8 @@ These mapped cluster assignments are not mutually exclusive like the ones above,
 cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 5.402 seconds
-    ## Computing adjacency score for each feature pair - 17.748 seconds
+    ## Creating permutation matrices - 5.321 seconds
+    ## Computing adjacency score for each feature pair - 17.151 seconds
 
 ``` r
 AdjScoreHeatmap(cite_cluster_adj)
