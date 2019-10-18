@@ -6,7 +6,7 @@
 of CITE-seq clusters mapped to the CODEX spatial positions
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-AdjScoreClustersCITE.internal(adj_matrix, cite_clusters, codex_transfer,
+AdjScoreClustersCITE.internal(adj_matrix, cite_clusters, transfer_matrix,
   c = 0, num_cores = 1, num_perms = 1000, perm_estimate = T)
 }
 \arguments{
@@ -15,14 +15,15 @@ adjacency between the cells in the CODEX spatial coordinates}
 
 \item{cite_clusters}{a vector of cluster IDs for the CITE-seq cells}
 
-\item{codex_transfer}{a (cite-seq cells x codex cells) matrix
-of weighted nearest neighbor assignments mapping each CODEX
-cell to k CITE-seq cells}
+\item{transfer_matrix}{a (codex cells x cite-seq cells) matrix
+of weighted nearest neighbor assignments mapping each CITE-seq cell
+to k CODEX cells}
 
 \item{c}{constant used to determine width of diffusion, must be 0 <= c}
 
 \item{num_cores}{integer specifying the number of cores to be used
-in the computation. By default only one core is used.}
+in the computation. By default only one core is used.
+On Windows, this must be set to 1.}
 
 \item{num_perms}{number of permutations used to build the null
 distribution for each feature. By default is set to 1000.}

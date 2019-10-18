@@ -8,7 +8,7 @@ measurement as the cumulative distribution of the
 Negative Binomial with the higher median.}
 \usage{
 CleanCITE(stvea_object, maxit = 500, factr = 1e-09, optim_inits = NULL,
-  num_cores = 1)
+  num_cores = 1, normalize = TRUE)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CITE-seq protein data}
@@ -22,6 +22,8 @@ parameters for each protein to input to the optim function. If NULL,
 starts at two default parameter sets and picks the better one}
 
 \item{num_cores}{number of cores to use for parallelized fits}
+
+\item{normalize}{divide cleaned CITE-seq expression by total ADT counts per cell}
 }
 \description{
 Removes noise from CITE-seq protein data by fitting

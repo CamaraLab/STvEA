@@ -17,7 +17,8 @@ cluster assignments and CODEX spatial coordinates}
 from CODEX spatial information}
 
 \item{num_cores}{integer specifying the number of cores to be used
-in the computation. By default only one core is used.}
+in the computation. By default only one core is used.
+On Windows, this must be set to 1.}
 }
 \description{
 Use the Adjacency Score to evaluate colocaliztion of all pairs
