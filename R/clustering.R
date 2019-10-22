@@ -228,6 +228,8 @@ ConsensusCluster.internal <- function(hdbscan_results, cite_latent, silhouette_c
   consensus_matrix <- consensus_matrix + total_runs
   if (total_runs > 0) {
     consensus_matrix <- consensus_matrix / total_runs
+  } else {
+    warning("No clustering runs passed the silhouette score cutoff")
   }
   colnames(consensus_matrix) <- NULL
 
