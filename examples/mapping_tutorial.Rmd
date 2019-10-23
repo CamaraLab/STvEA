@@ -239,8 +239,8 @@ AdjScoreHeatmap(codex_cluster_adj)
 ### Which pairs of clusters from the CITE-seq mRNA analysis are often mapped to adjacent CODEX cells?
 These mapped cluster assignments are not mutually exclusive like the ones above, since the uncertainty in the mapping and similar cluster expression patterns require that we assign each cell to a proportion of clusters, not just one. Therefor we cannot use the speedup mentioned above.
 ```{r}
-#cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
-#AdjScoreHeatmap(cite_cluster_adj)
+cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
+AdjScoreHeatmap(cite_cluster_adj)
 ```
 
 

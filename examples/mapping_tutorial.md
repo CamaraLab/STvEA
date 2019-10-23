@@ -274,8 +274,8 @@ Since we are computing the Adjacency Score of every combination of features (clu
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 8.31 seconds
-    ## Computing adjacency score for each feature pair - 38.828 seconds
+    ## Creating permutation matrices - 8.561 seconds
+    ## Computing adjacency score for each feature pair - 36.248 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
@@ -299,8 +299,8 @@ for (gene in gene_list) {
 gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 7.69 seconds
-    ## Computing adjacency score for each feature pair - 45.476 seconds
+    ## Creating permutation matrices - 7.784 seconds
+    ## Computing adjacency score for each feature pair - 43.465 seconds
 
 ``` r
 AdjScoreHeatmap(gene_adj)
@@ -316,8 +316,8 @@ Since the assignment of a cell to a cluster is a binary feature which is mutuall
 codex_cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
-    ## Creating permutation matrices - 0.009 seconds
-    ## Computing adjacency score for each feature pair - 0.501 seconds
+    ## Creating permutation matrices - 0.008 seconds
+    ## Computing adjacency score for each feature pair - 0.8 seconds
 
 ``` r
 AdjScoreHeatmap(codex_cluster_adj)
@@ -330,6 +330,14 @@ AdjScoreHeatmap(codex_cluster_adj)
 These mapped cluster assignments are not mutually exclusive like the ones above, since the uncertainty in the mapping and similar cluster expression patterns require that we assign each cell to a proportion of clusters, not just one. Therefor we cannot use the speedup mentioned above.
 
 ``` r
-#cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
-#AdjScoreHeatmap(cite_cluster_adj)
+cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
 ```
+
+    ## Creating permutation matrices - 4.798 seconds
+    ## Computing adjacency score for each feature pair - 13.034 seconds
+
+``` r
+AdjScoreHeatmap(cite_cluster_adj)
+```
+
+![](mapping_tutorial_files/figure-markdown_github/unnamed-chunk-28-1.png)
