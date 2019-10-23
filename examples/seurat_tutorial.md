@@ -104,9 +104,11 @@ Clean and normalize CITE-seq protein expression
 
 We follow a similar approach for removing noise in the CITE-seq protein expression as we used for the CODEX data. We fit a negative binomial mixture model to the expression counts of each protein, then take the signal expression as the cumulative probability according to the Negative Binomial with the higher median.
 
+The resulting probability can then optionally be divided by the total protein expression counts per cell to reduce artifacts caused by differing cell sizes. If the *normalize* parameter is set to FALSE, this step will be skipped.
+
 ``` r
 # This will take around 10 minutes
-stvea_object <- CleanCITE(stvea_object, num_cores=8)
+stvea_object <- CleanCITE(stvea_object, num_cores=8, normalize=TRUE)
 ```
 
 Cluster CODEX cells based on protein expression
@@ -228,8 +230,8 @@ Since we are computing the Adjacency Score of every combination of features (clu
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 9.853 seconds
-    ## Computing adjacency score for each feature pair - 38.717 seconds
+    ## Creating permutation matrices - 8.417 seconds
+    ## Computing adjacency score for each feature pair - 40.876 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
@@ -253,8 +255,8 @@ for (gene in gene_list) {
 gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 9.94 seconds
-    ## Computing adjacency score for each feature pair - 47.949 seconds
+    ## Creating permutation matrices - 7.523 seconds
+    ## Computing adjacency score for each feature pair - 47.82 seconds
 
 ``` r
 AdjScoreHeatmap(gene_adj)
@@ -271,7 +273,7 @@ codex_cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
     ## Creating permutation matrices - 0.009 seconds
-    ## Computing adjacency score for each feature pair - 0.987 seconds
+    ## Computing adjacency score for each feature pair - 0.433 seconds
 
 ``` r
 AdjScoreHeatmap(codex_cluster_adj)
@@ -287,8 +289,8 @@ These mapped cluster assignments are not mutually exclusive like the ones above,
 cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 5.321 seconds
-    ## Computing adjacency score for each feature pair - 17.151 seconds
+    ## Creating permutation matrices - 6.669 seconds
+    ## Computing adjacency score for each feature pair - 17.144 seconds
 
 ``` r
 AdjScoreHeatmap(cite_cluster_adj)
