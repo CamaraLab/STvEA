@@ -17,7 +17,8 @@ adjacency between the cells in the CODEX spatial coordinates}
 \item{codex_clusters}{a vector of the cluster ID for each CODEX cell}
 
 \item{num_cores}{integer specifying the number of cores to be used
-in the computation. By default only one core is used.}
+in the computation. By default only one core is used.
+On Windows, this must be set to 1.}
 }
 \description{
 Use the Adjacency Score to evaluate colocaliztion of all pairs

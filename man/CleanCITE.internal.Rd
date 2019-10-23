@@ -6,10 +6,12 @@
 a Negative Binomial mixture and computing each expression
 measurement as the cumulative distribution of the
 Negative Binomial with the higher median.
+Normalizes CITE-seq protein data by the original
+total counts per cell.
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
 CleanCITE.internal(cite_protein, maxit = 500, factr = 1e-09,
-  optim_inits = NULL, num_cores = 1)
+  optim_inits = NULL, num_cores = 1, normalize = TRUE)
 }
 \arguments{
 \item{cite_protein}{Raw CITE-seq protein data (cell x protein)}
@@ -22,7 +24,10 @@ CleanCITE.internal(cite_protein, maxit = 500, factr = 1e-09,
 parameters for each protein to input to the optim function. If NULL,
 starts at two default parameter sets and picks the better one}
 
-\item{num_cores}{number of cores to use for parallelized fits}
+\item{num_cores}{number of cores to use for parallelized fits.
+On Windows, this must be set to 1.}
+
+\item{normalize}{divide cleaned CITE-seq expression by total ADT counts per cell}
 }
 \value{
 Cleaned CITE-seq protein data matrix (cell x protein)
@@ -32,5 +37,7 @@ Removes noise from CITE-seq protein data by fitting
 a Negative Binomial mixture and computing each expression
 measurement as the cumulative distribution of the
 Negative Binomial with the higher median.
+Normalizes CITE-seq protein data by the original
+total counts per cell.
 Takes matrices and data frames instead of STvEA.data class
 }

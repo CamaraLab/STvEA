@@ -19,7 +19,8 @@ from CODEX spatial information}
 \item{c}{constant used to determine width of diffusion, must be 0 <= c}
 
 \item{num_cores}{integer specifying the number of cores to be used
-in the computation. By default only one core is used.}
+in the computation. By default only one core is used.
+On Windows, this must be set to 1.}
 
 \item{num_perms}{number of permutations used to build the null
 distribution for each feature. By default is set to 1000.}

@@ -76,6 +76,7 @@ CleanCODEX <- function(stvea_object) {
 #' parameters for each protein to input to the optim function. If NULL,
 #' starts at two default parameter sets and picks the better one
 #' @param num_cores number of cores to use for parallelized fits
+#' @param normalize divide cleaned CITE-seq expression by total ADT counts per cell
 #'
 #' @export
 #'
@@ -83,14 +84,16 @@ CleanCITE <- function(stvea_object,
                       maxit = 500,
                       factr = 1e-9,
                       optim_inits = NULL,
-                      num_cores = 1) {
+                      num_cores = 1,
+                      normalize = TRUE) {
   if (is.null(stvea_object@cite_protein)) {
     stop("Input object must contain CITE-seq protein expression", call. =FALSE)
   }
   stvea_object@cite_clean <- CleanCITE.internal(stvea_object@cite_protein,
                                                   factr=factr,
                                                   optim_inits=optim_inits,
-                                                  num_cores=num_cores)
+                                                  num_cores=num_cores,
+                                                  normalize=normalize)
   return(stvea_object)
 }
 
@@ -224,6 +227,7 @@ CleanCODEX.internal <- function(codex_filtered) {
 #' starts at two default parameter sets and picks the better one
 #' @param num_cores number of cores to use for parallelized fits.
 #' On Windows, this must be set to 1.
+#' @param normalize divide cleaned CITE-seq expression by total ADT counts per cell
 #'
 #' @return Cleaned CITE-seq protein data matrix (cell x protein)
 #'
@@ -235,7 +239,8 @@ CleanCITE.internal <- function(cite_protein,
                        maxit = 500,
                        factr = 1e-9,
                        optim_inits = NULL,
-                       num_cores = 1) {
+                       num_cores = 1,
+                       normalize = TRUE) {
   # Fit Negative Binomial mixture to protein data
   # Calculate cleaned data from cumulative of higher median
 
@@ -270,10 +275,12 @@ CleanCITE.internal <- function(cite_protein,
     cite_protein_clean[,i] <- cite_protein_list[[i]]
   }
 
-  # normalize by original total counts per cell
-  cite_protein_clean <- cite_protein_clean / rowSums(cite_protein)
-  cite_protein_clean <- t(cite_protein_clean) - apply(cite_protein_clean,2,min)
-  cite_protein_clean <- t(cite_protein_clean/ apply(cite_protein_clean,1,max))
+  if (normalize) {
+    # normalize by original total counts per cell
+    cite_protein_clean <- cite_protein_clean / rowSums(cite_protein)
+    cite_protein_clean <- t(cite_protein_clean) - apply(cite_protein_clean,2,min)
+    cite_protein_clean <- t(cite_protein_clean/ apply(cite_protein_clean,1,max))
+  }
   return(cite_protein_clean)
 }
 

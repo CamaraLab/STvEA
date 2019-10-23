@@ -22,7 +22,8 @@ MapCODEXtoCITE.internal(cite_protein, codex_protein, cite_latent, num_chunks,
 
 \item{seed}{set.seed before randomly sampling chunks of CODEX dataset}
 
-\item{num_cores}{number of cores to use in parallelized correction of CODEX dataset}
+\item{num_cores}{number of cores to use in parallelized correction of CODEX dataset.
+On Windows, this must be set to 1.}
 
 \item{num.cc}{number of canonical vectors to calculate}
 

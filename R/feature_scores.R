@@ -231,6 +231,9 @@ AdjScoreClustersCITE.internal <- function(
   perm_estimate=T
 ) {
   cluster_ids <- as.character(unique(cite_clusters))
+  if (length(cluster_ids) < 2) {
+    stop("Cannot compute adjacency score of fewer than 2 clusters")
+  }
   cluster_ids <- cluster_ids[order(cluster_ids)]
   cluster_matrix <- t(sapply(cluster_ids, function(x) (cite_clusters==x)*1))
   row.names(cluster_matrix) <- cluster_ids
@@ -269,6 +272,9 @@ AdjScoreClustersCODEX.internal <- function(
   num_cores=1
 ) {
   cluster_ids <- as.character(unique(codex_clusters))
+  if (length(cluster_ids) < 2) {
+    stop("Cannot compute adjacency score of fewer than 2 clusters")
+  }
   cluster_ids <- cluster_ids[order(cluster_ids)]
   cluster_matrix <- t(sapply(cluster_ids, function(x) (codex_clusters==x)*1))
   row.names(cluster_matrix) <- cluster_ids

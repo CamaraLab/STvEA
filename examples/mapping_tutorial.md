@@ -114,9 +114,11 @@ Clean and normalize CITE-seq protein expression
 
 We follow a similar approach for removing noise in the CITE-seq protein expression as we used for the CODEX data. We fit a negative binomial mixture model to the expression counts of each protein, then take the signal expression as the cumulative probability according to the Negative Binomial with the higher median.
 
+The resulting probability can then optionally be divided by the total protein expression counts per cell to reduce artifacts caused by differing cell sizes. If the *normalize* parameter is set to FALSE, this step will be skipped.
+
 ``` r
 # This will take around 10 minutes
-stvea_object <- CleanCITE(stvea_object, num_cores=8)
+stvea_object <- CleanCITE(stvea_object, num_cores=8, normalize=TRUE)
 ```
 
 Fitting a negative binomial model required raw counts for the protein expression data, so batch correction may optionally be performed after the noise cleaning step. To do so, use a separate batch correction algorithm, such as mnnCorrect from Haghverdi et al. (<https://www.nature.com/articles/nbt.4091>) on the stvea\_object@cite\_clean matrix, then set stvea\_object@cite\_clean to be the corrected output of that algorithm. The rest of the STvEA mapping algorithm will work best if the protein expression values after batch correction are rescaled to \[0,1\].
@@ -127,7 +129,9 @@ Cluster CITE-seq cells based on mRNA expression
 We use UMAP to compute a 2 dimensional embedding of the CITE-seq mRNA latent space for later visualization.
 
 ``` r
-stvea_object <- GetUmapCITE(stvea_object, n_neighbors = 50, min_dist=0.1, negative_sample_rate=50)
+stvea_object <- GetUmapCITE(stvea_object, metric = 'pearson',
+                            n_neighbors = 50, min_dist=0.1,
+                            negative_sample_rate=50)
 ```
 
 We cluster the CITE-seq cells based on their mRNA expression using a consensus of HDBSCAN clusterings. First, we run UMAP on the CITE-seq latent space to the same number of dimensions (running UMAP before density based clustering is suggested in the UMAP documentation <https://umap-learn.readthedocs.io/en/latest/clustering.html>). We perform a scan over the two parameters of the Python HDBSCAN implementation, min\_cluster\_size and min\_samples (more information on selecting these paramters <https://hdbscan.readthedocs.io/en/latest/parameter_selection.html>).
@@ -135,7 +139,8 @@ We cluster the CITE-seq cells based on their mRNA expression using a consensus o
 ``` r
 stvea_object <- ParameterScan(stvea_object, min_cluster_size_range = seq(5,20,4),
                               min_sample_range = seq(10,40,3), n_neighbors=50,
-                              min_dist=0.1, negative_sample_rate=50)
+                              min_dist=0.1, negative_sample_rate=50,
+                              metric = 'pearson')
 ```
 
     ## Running UMAP on the CITE-seq latent space
@@ -146,8 +151,8 @@ stvea_object <- ParameterScan(stvea_object, min_cluster_size_range = seq(5,20,4)
 We create a dissimilarity matrix between cells as the number of HDBSCAN clusterings (passing a certain silhouette cutoff) in which they are assigned to the same cluster. The final consensus clusters are an agglomerative clustering on this dissimilarity matrix using Python's scipy.cluster.hierarchy, cutting the tree using the inconsistent value. We remove all clusters that have fewer than 10 cells, caused by the cells that HDBSCAN did not assign to any cluster.
 
 ``` r
-stvea_object <- ConsensusCluster(stvea_object, silhouette_cutoff = 0.1,
-                                 inconsistent_value = 0.3, min_cluster_size = 10)
+stvea_object <- ConsensusCluster(stvea_object, silhouette_cutoff = 0.114,
+                                 inconsistent_value = 0.1, min_cluster_size = 10)
 ```
 
 Cluster CODEX cells based on protein expression
@@ -269,8 +274,8 @@ Since we are computing the Adjacency Score of every combination of features (clu
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 10.027 seconds
-    ## Computing adjacency score for each feature pair - 39.559 seconds
+    ## Creating permutation matrices - 8.561 seconds
+    ## Computing adjacency score for each feature pair - 36.248 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
@@ -294,8 +299,8 @@ for (gene in gene_list) {
 gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 7.954 seconds
-    ## Computing adjacency score for each feature pair - 45.2 seconds
+    ## Creating permutation matrices - 7.784 seconds
+    ## Computing adjacency score for each feature pair - 43.465 seconds
 
 ``` r
 AdjScoreHeatmap(gene_adj)
@@ -311,8 +316,8 @@ Since the assignment of a cell to a cluster is a binary feature which is mutuall
 codex_cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
-    ## Creating permutation matrices - 0.009 seconds
-    ## Computing adjacency score for each feature pair - 0.487 seconds
+    ## Creating permutation matrices - 0.008 seconds
+    ## Computing adjacency score for each feature pair - 0.8 seconds
 
 ``` r
 AdjScoreHeatmap(codex_cluster_adj)
@@ -328,8 +333,8 @@ These mapped cluster assignments are not mutually exclusive like the ones above,
 cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 7.832 seconds
-    ## Computing adjacency score for each feature pair - 27.433 seconds
+    ## Creating permutation matrices - 4.798 seconds
+    ## Computing adjacency score for each feature pair - 13.034 seconds
 
 ``` r
 AdjScoreHeatmap(cite_cluster_adj)
