@@ -116,7 +116,9 @@ Fitting a negative binomial model required raw counts for the protein expression
 ## Cluster CITE-seq cells based on mRNA expression
 We use UMAP to compute a 2 dimensional embedding of the CITE-seq mRNA latent space for later visualization.
 ```{r}
-stvea_object <- GetUmapCITE(stvea_object, metric = 'pearson', n_neighbors = 50, min_dist=0.1, negative_sample_rate=50)
+stvea_object <- GetUmapCITE(stvea_object, metric = 'pearson',
+                            n_neighbors = 50, min_dist=0.1,
+                            negative_sample_rate=50)
 ```
 
 We cluster the CITE-seq cells based on their mRNA expression using a consensus of HDBSCAN clusterings.

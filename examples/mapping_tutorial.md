@@ -129,7 +129,9 @@ Cluster CITE-seq cells based on mRNA expression
 We use UMAP to compute a 2 dimensional embedding of the CITE-seq mRNA latent space for later visualization.
 
 ``` r
-stvea_object <- GetUmapCITE(stvea_object, metric = 'pearson', n_neighbors = 50, min_dist=0.1, negative_sample_rate=50)
+stvea_object <- GetUmapCITE(stvea_object, metric = 'pearson',
+                            n_neighbors = 50, min_dist=0.1,
+                            negative_sample_rate=50)
 ```
 
 We cluster the CITE-seq cells based on their mRNA expression using a consensus of HDBSCAN clusterings. First, we run UMAP on the CITE-seq latent space to the same number of dimensions (running UMAP before density based clustering is suggested in the UMAP documentation <https://umap-learn.readthedocs.io/en/latest/clustering.html>). We perform a scan over the two parameters of the Python HDBSCAN implementation, min\_cluster\_size and min\_samples (more information on selecting these paramters <https://hdbscan.readthedocs.io/en/latest/parameter_selection.html>).
@@ -272,8 +274,8 @@ Since we are computing the Adjacency Score of every combination of features (clu
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 8.402 seconds
-    ## Computing adjacency score for each feature pair - 38.914 seconds
+    ## Creating permutation matrices - 8.31 seconds
+    ## Computing adjacency score for each feature pair - 38.828 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
@@ -297,8 +299,8 @@ for (gene in gene_list) {
 gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 7.411 seconds
-    ## Computing adjacency score for each feature pair - 45.769 seconds
+    ## Creating permutation matrices - 7.69 seconds
+    ## Computing adjacency score for each feature pair - 45.476 seconds
 
 ``` r
 AdjScoreHeatmap(gene_adj)
@@ -315,7 +317,7 @@ codex_cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
     ## Creating permutation matrices - 0.009 seconds
-    ## Computing adjacency score for each feature pair - 0.455 seconds
+    ## Computing adjacency score for each feature pair - 0.501 seconds
 
 ``` r
 AdjScoreHeatmap(codex_cluster_adj)
