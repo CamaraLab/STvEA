@@ -7,23 +7,29 @@ a Negative Binomial mixture and computing each expression
 measurement as the cumulative distribution of the
 Negative Binomial with the higher median.}
 \usage{
-CleanCITE(stvea_object, maxit = 500, factr = 1e-09, optim_inits = NULL,
-  num_cores = 1, normalize = TRUE)
+CleanCITE(stvea_object, model = "nb", num_cores = 1, maxit = 500,
+  factr = 1e-09, optim_inits = NULL, normalize = TRUE)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CITE-seq protein data}
 
-\item{maxit}{maximum number of iterations for optim function}
-
-\item{factr}{accuracty of optim function}
-
-\item{optim_inits}{a matrix of (proteins x params) with initialization
-parameters for each protein to input to the optim function. If NULL,
-starts at two default parameter sets and picks the better one}
+\item{model}{"nb" (Negative Binomial) or "gaussian" model to fit}
 
 \item{num_cores}{number of cores to use for parallelized fits}
 
-\item{normalize}{divide cleaned CITE-seq expression by total ADT counts per cell}
+\item{maxit}{maximum number of iterations for optim function
+- only used if model is "nb"}
+
+\item{factr}{accuracty of optim function
+- only used if model is "nb"}
+
+\item{optim_inits}{a matrix of (proteins x params) with initialization
+parameters for each protein to input to the optim function. If NULL,
+starts at two default parameter sets and picks the better one
+ - only used if model is "nb"}
+
+\item{normalize}{divide cleaned CITE-seq expression by total ADT counts per cell
+- only used if model is "nb"}
 }
 \description{
 Removes noise from CITE-seq protein data by fitting

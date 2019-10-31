@@ -84,7 +84,7 @@ SetDataCITE <- function(cite_mRNA,
                         cite_latent = NULL,
                         stvea_object = NULL) {
   if (is.null(cite_mRNA_norm)) {
-    cite_mRNA_norm <- log(1 + 1000*(cite_mRNA/rowSums(cite_mRNA)))
+    cite_mRNA_norm <- log(1 + 1e4*(cite_mRNA/rowSums(cite_mRNA)))
   }
   if (is.null(stvea_object)) {
     stvea_object <- new(
