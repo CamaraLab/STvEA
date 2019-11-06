@@ -19,6 +19,7 @@ https://www.dropbox.com/s/xzobh2p13cqt4y5/protein_expr_all.csv?dl=1
 
 ```{r}
 library(STvEA)
+set.seed(4068)
 ```
 
 ## Read in CODEX data
@@ -86,9 +87,11 @@ stvea_object <- CleanCODEX(stvea_object)
 We follow a similar approach for removing noise in the CITE-seq protein expression as we used for the CODEX data. We fit a negative binomial mixture model to the expression counts of each protein, then take the signal expression as the cumulative probability according to the Negative Binomial with the higher median.
 
 The resulting probability can then optionally be divided by the total protein expression counts per cell to reduce artifacts caused by differing cell sizes. If the *normalize* parameter is set to FALSE, this step will be skipped.
+
+Alternatively, by setting *model* = "gaussian", a Gaussian mixture model will be fit to the log-normalized protein expression with the zeros removed. The signal expression is then taken as the cumulative probability according to the Gaussian component with the higher median.
 ```{r}
 # This will take around 10 minutes
-stvea_object <- CleanCITE(stvea_object, num_cores=8, normalize=TRUE)
+stvea_object <- CleanCITE(stvea_object, num_cores=1, normalize=TRUE, model="nb")
 ```
 
 ## Cluster CODEX cells based on protein expression

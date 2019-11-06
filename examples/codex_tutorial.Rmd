@@ -9,6 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(STvEA)
+set.seed(4068)
 ```
 
 ## Read in CODEX data

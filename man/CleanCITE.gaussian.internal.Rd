@@ -3,10 +3,10 @@
 \name{CleanCITE.gaussian.internal}
 \alias{CleanCITE.gaussian.internal}
 \title{Removes noise from CITE-seq protein data by fitting
-a two-component Gaussian mixture and computing each
+a two-component Gaussian mixture to the log-normalized
+expression with the zeros removed, and then computing each
 expression measurement as the cumulative distribution
-of the Gaussian with the higher median.
-Takes matrices and data frames instead of STvEA.data class}
+of the Gaussian with the higher median.}
 \usage{
 CleanCITE.gaussian.internal(norm_cite_protein, num_cores = 1)
 }
@@ -20,9 +20,9 @@ On Windows, this must be set to 1.}
 Cleaned CITE-seq protein data matrix (cell x protein)
 }
 \description{
-Removes noise from CITE-seq protein data by fitting
-a two-component Gaussian mixture and computing each
-expression measurement as the cumulative distribution
-of the Gaussian with the higher median.
+This model is similar to the one proposed by Trong et al. in the SISUA preprint
+(https://www.biorxiv.org/content/10.1101/631382v1)
+}
+\details{
 Takes matrices and data frames instead of STvEA.data class
 }

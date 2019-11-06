@@ -3,9 +3,9 @@
 \name{CleanCITE}
 \alias{CleanCITE}
 \title{Removes noise from CITE-seq protein data by fitting
-a Negative Binomial mixture and computing each expression
-measurement as the cumulative distribution of the
-Negative Binomial with the higher median.}
+a two component mixture model and computing each
+expression measurement as the cumulative distribution
+of the component with the higher median.}
 \usage{
 CleanCITE(stvea_object, model = "nb", num_cores = 1, maxit = 500,
   factr = 1e-09, optim_inits = NULL, normalize = TRUE)
@@ -32,8 +32,11 @@ starts at two default parameter sets and picks the better one
 - only used if model is "nb"}
 }
 \description{
-Removes noise from CITE-seq protein data by fitting
-a Negative Binomial mixture and computing each expression
-measurement as the cumulative distribution of the
-Negative Binomial with the higher median.
+This mixture model can either be:
+- a Negative Binomial on the
+expression counts (with optional weighting/normalization by
+the total ADT counts per cell after cleaning)
+- a Gaussian on the log-normalized expression with
+zeros removed, similar to the method proposed by Trong et al. in SISUA
+(https://www.biorxiv.org/content/10.1101/631382v1)
 }

@@ -65,9 +65,17 @@ CleanCODEX <- function(stvea_object) {
 
 
 #' Removes noise from CITE-seq protein data by fitting
-#' a Negative Binomial mixture and computing each expression
-#' measurement as the cumulative distribution of the
-#' Negative Binomial with the higher median.
+#' a two component mixture model and computing each
+#' expression measurement as the cumulative distribution
+#' of the component with the higher median.
+#'
+#' This mixture model can either be:
+#' - a Negative Binomial on the
+#' expression counts (with optional weighting/normalization by
+#' the total ADT counts per cell after cleaning)
+#' - a Gaussian on the log-normalized expression with
+#' zeros removed, similar to the method proposed by Trong et al. in SISUA
+#' (https://www.biorxiv.org/content/10.1101/631382v1)
 #'
 #' @param stvea_object STvEA.data class with CITE-seq protein data
 #' @param model "nb" (Negative Binomial) or "gaussian" model to fit
@@ -290,9 +298,14 @@ CleanCITE.nb.internal <- function(cite_protein,
 
 
 #' Removes noise from CITE-seq protein data by fitting
-#' a two-component Gaussian mixture and computing each
+#' a two-component Gaussian mixture to the log-normalized
+#' expression with the zeros removed, and then computing each
 #' expression measurement as the cumulative distribution
 #' of the Gaussian with the higher median.
+#'
+#' This model is similar to the one proposed by Trong et al. in the SISUA preprint
+#' (https://www.biorxiv.org/content/10.1101/631382v1)
+#'
 #' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param norm_cite_protein Log-normalized CITE-seq protein data (cell x protein)

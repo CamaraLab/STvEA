@@ -11,6 +11,7 @@ CITE-seq protein expression matrix for both mice: <https://www.dropbox.com/s/xzo
 
 ``` r
 library(STvEA)
+set.seed(4068) #3048
 ```
 
 Read in CODEX data
@@ -112,13 +113,15 @@ stvea_object <- CleanCODEX(stvea_object)
 Clean and normalize CITE-seq protein expression
 -----------------------------------------------
 
-We follow a similar approach for removing noise in the CITE-seq protein expression as we used for the CODEX data. We fit a negative binomial mixture model to the expression counts of each protein, then take the signal expression as the cumulative probability according to the Negative Binomial with the higher median.
+We follow a similar approach for removing noise in the CITE-seq protein expression as we used for the CODEX data. We fit a negative binomial mixture model to the expression counts of each protein, then take the signal expression as the cumulative probability according to the Negative Binomial component with the higher median.
 
 The resulting probability can then optionally be divided by the total protein expression counts per cell to reduce artifacts caused by differing cell sizes. If the *normalize* parameter is set to FALSE, this step will be skipped.
 
+Alternatively, by setting *model* = "gaussian", a Gaussian mixture model will be fit to the log-normalized protein expression with the zeros removed. The signal expression is then taken as the cumulative probability according to the Gaussian component with the higher median.
+
 ``` r
 # This will take around 10 minutes
-stvea_object <- CleanCITE(stvea_object, num_cores=8, normalize=TRUE)
+stvea_object <- CleanCITE(stvea_object, num_cores=1, normalize=TRUE, model="nb")
 ```
 
 Fitting a negative binomial model required raw counts for the protein expression data, so batch correction may optionally be performed after the noise cleaning step. To do so, use a separate batch correction algorithm, such as mnnCorrect from Haghverdi et al. (<https://www.nature.com/articles/nbt.4091>) on the stvea\_object@cite\_clean matrix, then set stvea\_object@cite\_clean to be the corrected output of that algorithm. The rest of the STvEA mapping algorithm will work best if the protein expression values after batch correction are rescaled to \[0,1\].
@@ -274,8 +277,8 @@ Since we are computing the Adjacency Score of every combination of features (clu
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 8.561 seconds
-    ## Computing adjacency score for each feature pair - 36.248 seconds
+    ## Creating permutation matrices - 8.485 seconds
+    ## Computing adjacency score for each feature pair - 40.623 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
@@ -299,8 +302,8 @@ for (gene in gene_list) {
 gene_adj <- AdjScoreGenes(stvea_object, gene_pairs,  k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 7.784 seconds
-    ## Computing adjacency score for each feature pair - 43.465 seconds
+    ## Creating permutation matrices - 7.508 seconds
+    ## Computing adjacency score for each feature pair - 42.749 seconds
 
 ``` r
 AdjScoreHeatmap(gene_adj)
@@ -316,8 +319,8 @@ Since the assignment of a cell to a cluster is a binary feature which is mutuall
 codex_cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
-    ## Creating permutation matrices - 0.008 seconds
-    ## Computing adjacency score for each feature pair - 0.8 seconds
+    ## Creating permutation matrices - 0.013 seconds
+    ## Computing adjacency score for each feature pair - 0.886 seconds
 
 ``` r
 AdjScoreHeatmap(codex_cluster_adj)
@@ -333,8 +336,8 @@ These mapped cluster assignments are not mutually exclusive like the ones above,
 cite_cluster_adj <- AdjScoreClustersCITE(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 4.798 seconds
-    ## Computing adjacency score for each feature pair - 13.034 seconds
+    ## Creating permutation matrices - 6.464 seconds
+    ## Computing adjacency score for each feature pair - 20.77 seconds
 
 ``` r
 AdjScoreHeatmap(cite_cluster_adj)
