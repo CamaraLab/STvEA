@@ -65,35 +65,57 @@ CleanCODEX <- function(stvea_object) {
 
 
 #' Removes noise from CITE-seq protein data by fitting
-#' a Negative Binomial mixture and computing each expression
-#' measurement as the cumulative distribution of the
-#' Negative Binomial with the higher median.
+#' a two component mixture model and computing each
+#' expression measurement as the cumulative distribution
+#' of the component with the higher median.
+#'
+#' This mixture model can either be:
+#' - a Negative Binomial on the
+#' expression counts (with optional weighting/normalization by
+#' the total ADT counts per cell after cleaning)
+#' - a Gaussian on the log-normalized expression with
+#' zeros removed, similar to the method proposed by Trong et al. in SISUA
+#' (https://www.biorxiv.org/content/10.1101/631382v1)
 #'
 #' @param stvea_object STvEA.data class with CITE-seq protein data
+#' @param model "nb" (Negative Binomial) or "gaussian" model to fit
+#' @param num_cores number of cores to use for parallelized fits
 #' @param maxit maximum number of iterations for optim function
+#'  - only used if model is "nb"
 #' @param factr accuracty of optim function
+#'  - only used if model is "nb"
 #' @param optim_inits a matrix of (proteins x params) with initialization
 #' parameters for each protein to input to the optim function. If NULL,
 #' starts at two default parameter sets and picks the better one
-#' @param num_cores number of cores to use for parallelized fits
+#'  - only used if model is "nb"
 #' @param normalize divide cleaned CITE-seq expression by total ADT counts per cell
-#'
+#' - only used if model is "nb"
 #' @export
 #'
 CleanCITE <- function(stvea_object,
+                      model = "nb",
+                      num_cores = 1,
                       maxit = 500,
                       factr = 1e-9,
                       optim_inits = NULL,
-                      num_cores = 1,
                       normalize = TRUE) {
   if (is.null(stvea_object@cite_protein)) {
     stop("Input object must contain CITE-seq protein expression", call. =FALSE)
   }
-  stvea_object@cite_clean <- CleanCITE.internal(stvea_object@cite_protein,
+  if (model == "nb") {
+    stvea_object@cite_clean <- CleanCITE.nb.internal(stvea_object@cite_protein,
+                                                  num_cores=num_cores,
                                                   factr=factr,
                                                   optim_inits=optim_inits,
-                                                  num_cores=num_cores,
                                                   normalize=normalize)
+  } else if (model == "gaussian") {
+    norm_protein <- stvea_object@cite_protein/rowSums(stvea_object@cite_protein)
+    log_norm_protein <- log(1 + 1e4*norm_protein)
+    stvea_object@cite_clean <- CleanCITE.gaussian.internal(log_norm_protein,
+                                                           num_cores=num_cores)
+  } else {
+    stop(sprintf("Invalid model parameter %s for CleanCITE",model))
+  }
   return(stvea_object)
 }
 
@@ -143,12 +165,6 @@ FilterCODEX.internal <- function(codex_raw, size, blanks,
                          size_lim = NULL,
                          blank_upper = NULL,
                          blank_lower = NULL) {
-  # filter cells by size
-  # determine cutoffs based on blank expression, but also let user define
-  # plot blank channels to user to verify
-  # normalize by total expression per cell
-  # return filtered matrix (maybe as part of object)
-
   # Create filters
   if (is.null(size_lim)) {
     size_lim <- quantile(size, probs=c(0.025,0.99))
@@ -195,14 +211,13 @@ FilterCODEX.internal <- function(codex_raw, size, blanks,
 #' @export
 #'
 CleanCODEX.internal <- function(codex_filtered) {
-  # compute Gaussian mixture on each protein
-  # compute cleaned data from cumulative of higher mean Gaussian
-  # return cleaned data (maybe as part of object)
-
   codex_clean <- codex_filtered
+  # For each protein
   for (i in 1:ncol(codex_filtered)) {
+    # Compute Gaussian mixture on each protein
     fit = Mclust(codex_filtered[,i], G=2, model="V", verbose=FALSE)
     signal <- as.numeric(which.max(fit$parameters$mean))
+    # Compute cleaned data from cumulative of higher mean Gaussian
     expr_clean <- pnorm(codex_filtered[,i], mean = fit$parameters$mean[signal],
                         sd = sqrt(fit$parameters$variance$sigmasq[signal]))
     codex_clean[,i] <- expr_clean
@@ -212,21 +227,21 @@ CleanCODEX.internal <- function(codex_filtered) {
 
 
 #' Removes noise from CITE-seq protein data by fitting
-#' a Negative Binomial mixture and computing each expression
-#' measurement as the cumulative distribution of the
-#' Negative Binomial with the higher median.
+#' a two-component Negative Binomial mixture and computing
+#' each expression measurement as the cumulative distribution
+#' of the Negative Binomial with the higher median.
 #' Normalizes CITE-seq protein data by the original
 #' total counts per cell.
 #' Takes matrices and data frames instead of STvEA.data class
 #'
 #' @param cite_protein Raw CITE-seq protein data (cell x protein)
+#' @param num_cores number of cores to use for parallelized fits.
+#' On Windows, this must be set to 1.
 #' @param maxit maximum number of iterations for optim function
 #' @param factr accuracty of optim function
 #' @param optim_inits a matrix of (proteins x params) with initialization
 #' parameters for each protein to input to the optim function. If NULL,
 #' starts at two default parameter sets and picks the better one
-#' @param num_cores number of cores to use for parallelized fits.
-#' On Windows, this must be set to 1.
 #' @param normalize divide cleaned CITE-seq expression by total ADT counts per cell
 #'
 #' @return Cleaned CITE-seq protein data matrix (cell x protein)
@@ -235,38 +250,35 @@ CleanCODEX.internal <- function(codex_filtered) {
 #'
 #' @export
 #'
-CleanCITE.internal <- function(cite_protein,
-                       maxit = 500,
-                       factr = 1e-9,
-                       optim_inits = NULL,
-                       num_cores = 1,
-                       normalize = TRUE) {
-  # Fit Negative Binomial mixture to protein data
-  # Calculate cleaned data from cumulative of higher median
-
+CleanCITE.nb.internal <- function(cite_protein,
+                               num_cores = 1,
+                               maxit = 500,
+                               factr = 1e-9,
+                               optim_inits = NULL,
+                               normalize = TRUE) {
   if (!is.null(optim_inits)) {
     if (num_cores > 1) {
       cite_protein_list <- mclapply(1:ncol(cite_protein),
                                     function(i) FitNB(cite_protein[,i],
-                                                            maxit=maxit, factr=factr,
-                                                            optim_init = optim_inits[i,]),
+                                                      maxit=maxit, factr=factr,
+                                                      optim_init = optim_inits[i,]),
                                     mc.cores=num_cores)
     } else {
       cite_protein_list <- lapply(1:ncol(cite_protein),
-                                    function(i) FitNB(cite_protein[,i],
-                                                      maxit=maxit, factr=factr,
-                                                      optim_init = optim_inits[i,]))
+                                  function(i) FitNB(cite_protein[,i],
+                                                    maxit=maxit, factr=factr,
+                                                    optim_init = optim_inits[i,]))
     }
   } else {
     if (num_cores > 1) {
       cite_protein_list <- mclapply(1:ncol(cite_protein),
                                     function(i) FitNB(cite_protein[,i],
-                                                            maxit=maxit, factr=factr),
+                                                      maxit=maxit, factr=factr),
                                     mc.cores=num_cores)
     } else {
       cite_protein_list <- lapply(1:ncol(cite_protein),
-                                    function(i) FitNB(cite_protein[,i],
-                                                      maxit=maxit, factr=factr))
+                                  function(i) FitNB(cite_protein[,i],
+                                                    maxit=maxit, factr=factr))
     }
   }
 
@@ -276,11 +288,51 @@ CleanCITE.internal <- function(cite_protein,
   }
 
   if (normalize) {
-    # normalize by original total counts per cell
+    # Normalize by original total counts per cell
     cite_protein_clean <- cite_protein_clean / rowSums(cite_protein)
     cite_protein_clean <- t(cite_protein_clean) - apply(cite_protein_clean,2,min)
     cite_protein_clean <- t(cite_protein_clean/ apply(cite_protein_clean,1,max))
   }
+  return(cite_protein_clean)
+}
+
+
+#' Removes noise from CITE-seq protein data by fitting
+#' a two-component Gaussian mixture to the log-normalized
+#' expression with the zeros removed, and then computing each
+#' expression measurement as the cumulative distribution
+#' of the Gaussian with the higher median.
+#'
+#' This model is similar to the one proposed by Trong et al. in the SISUA preprint
+#' (https://www.biorxiv.org/content/10.1101/631382v1)
+#'
+#' Takes matrices and data frames instead of STvEA.data class
+#'
+#' @param norm_cite_protein Log-normalized CITE-seq protein data (cell x protein)
+#' @param num_cores number of cores to use for parallelized fits.
+#' On Windows, this must be set to 1.
+#'
+#' @return Cleaned CITE-seq protein data matrix (cell x protein)
+#'
+#' @importFrom parallel mclapply
+#'
+#' @export
+#'
+CleanCITE.gaussian.internal <- function(norm_cite_protein, num_cores = 1) {
+  if (num_cores > 1) {
+    cite_protein_list <- mclapply(1:ncol(norm_cite_protein),
+                                  function(i) FitGaussian(norm_cite_protein[,i]),
+                                  mc.cores=num_cores)
+  } else {
+    cite_protein_list <- lapply(1:ncol(norm_cite_protein),
+                                function(i) FitGaussian(norm_cite_protein[,i]))
+  }
+
+  cite_protein_clean <- norm_cite_protein
+  for (i in 1:ncol(norm_cite_protein)) {
+    cite_protein_clean[,i] <- cite_protein_list[[i]]
+  }
+
   return(cite_protein_clean)
 }
 
@@ -303,12 +355,12 @@ FitNB <- function(protein_expr,
   p_obs <- table(factor(protein_expr, levels=0:max(protein_expr)))/length(protein_expr)
 
   if (is.null(optim_init)) {
-    # sometimes negative binomial doesn't fit well with certain starting parameters, so try 2
+    # Sometimes negative binomial doesn't fit well with certain starting parameters, so try 2
     fit1 <- optim(c(5,50,2,0.5,0.5), SSE, p_obs = p_obs,
-                  method="L-BFGS-B", lower=rep(1e-8,5), upper=c(Inf, Inf,Inf,Inf,1),
+                  method="L-BFGS-B", lower=rep(1e-8,5), upper=c(Inf,Inf,Inf,Inf,1),
                   control=list(maxit=maxit, factr=factr))
     fit2 <- optim(c(5,50,0.5,2,0.5), SSE, p_obs = p_obs,
-                  method="L-BFGS-B", lower=rep(1e-8,5), upper=c(Inf, Inf,Inf,Inf,1),
+                  method="L-BFGS-B", lower=rep(1e-8,5), upper=c(Inf,Inf,Inf,Inf,1),
                   control=list(maxit=maxit, factr=factr))
     score1 <- SSE(fit1$par, p_obs)
     score2 <- SSE(fit2$par, p_obs)
@@ -319,15 +371,15 @@ FitNB <- function(protein_expr,
     }
   } else {
     fit <- optim(optim_init, SSE, p_obs = p_obs,
-                 method="L-BFGS-B", lower=rep(1e-8,5), upper=c(Inf, Inf,Inf,Inf,1),
+                 method="L-BFGS-B", lower=rep(1e-8,5), upper=c(Inf,Inf,Inf,Inf,1),
                  control=list(maxit=maxit, factr=factr))$par
   }
 
-  # distribution with higher median is signal
+  # Distribution with higher median is signal
   signal <- as.numeric(which.max(c(qnbinom(0.5,mu=fit[1],size=1/fit[3]),
                                    qnbinom(0.5,mu=fit[2],size=1/fit[3]))))
 
-  expr_clean <- pnbinom(protein_expr, mu=fit[signal],size=1/fit[signal+2])
+  expr_clean <- pnbinom(protein_expr, mu=fit[signal], size=1/fit[signal+2])
   return(expr_clean)
 }
 
@@ -343,6 +395,24 @@ SSE <- function(args, p_obs) {
     (1-args[5])*dnbinom(as.numeric(names(p_obs)), mu=args[2], size=1/args[4])
   sse <- min(sum((p_exp - p_obs)^2), .Machine$integer.max)
   return(sse)
+}
+
+
+#' Fits the log-normalized expression values of one protein with a Gaussian mixture
+#' Takes matrices and data frames instead of STvEA.data class
+#'
+#' @param norm_protein_expr Log-normalized CITE-seq protein data for one protein
+#'
+#' @importFrom mclust Mclust
+#'
+FitGaussian <- function(norm_protein_expr) {
+  npe <- norm_protein_expr[norm_protein_expr != 0]
+  fit = Mclust(npe, G=2, model="V", verbose=FALSE)
+  signal <- as.numeric(which.max(fit$parameters$mean))
+  expr_clean <- pnorm(norm_protein_expr,
+                 mean = fit$parameters$mean[signal],
+                 sd = sqrt(fit$parameters$variance$sigmasq[signal]))
+  return(expr_clean)
 }
 
 

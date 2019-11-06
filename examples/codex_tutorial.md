@@ -3,6 +3,7 @@ Using STvEA to analyze CODEX data
 
 ``` r
 library(STvEA)
+set.seed(4068)
 ```
 
 Read in CODEX data
@@ -135,8 +136,8 @@ Since we are computing the Adjacency Score of every combination of features (clu
 protein_adj <- AdjScoreProteins(stvea_object, k=3, num_cores=8)
 ```
 
-    ## Creating permutation matrices - 11.291 seconds
-    ## Computing adjacency score for each feature pair - 39.672 seconds
+    ## Creating permutation matrices - 11.271 seconds
+    ## Computing adjacency score for each feature pair - 39.315 seconds
 
 ``` r
 AdjScoreHeatmap(protein_adj)
@@ -152,8 +153,8 @@ Since the assignment of a cell to a cluster is a binary feature which is mutuall
 cluster_adj <- AdjScoreClustersCODEX(stvea_object, k=3)
 ```
 
-    ## Creating permutation matrices - 0.008 seconds
-    ## Computing adjacency score for each feature pair - 0.651 seconds
+    ## Creating permutation matrices - 0.007 seconds
+    ## Computing adjacency score for each feature pair - 0.34 seconds
 
 ``` r
 AdjScoreHeatmap(cluster_adj)
