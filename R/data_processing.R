@@ -377,7 +377,7 @@ FitNB <- function(protein_expr,
 
   # Distribution with higher median is signal
   signal <- as.numeric(which.max(c(qnbinom(0.5,mu=fit[1],size=1/fit[3]),
-                                   qnbinom(0.5,mu=fit[2],size=1/fit[3]))))
+                                   qnbinom(0.5,mu=fit[2],size=1/fit[4]))))
 
   expr_clean <- pnbinom(protein_expr, mu=fit[signal], size=1/fit[signal+2])
   return(expr_clean)
