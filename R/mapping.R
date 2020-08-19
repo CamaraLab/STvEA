@@ -184,12 +184,13 @@ MapCODEXtoCITE.internal <- function(
   }
 
   if (num_chunks == 1) {
-    return(AnchorCorrection(ref_mat = cite_protein,
-                           query_mat = codex_protein,
-                           rna_mat = cite_latent, cite_index = 1,
-                           num.cc = num.cc, k.anchor = k.anchor,
-                           k.filter = k.filter, k.score = k.score,
-                           k.weight = k.weight))
+    corrected_data <- AnchorCorrection(ref_mat = cite_protein,
+                                       query_mat = codex_protein,
+                                       rna_mat = cite_latent, cite_index = 1,
+                                       num.cc = num.cc, k.anchor = k.anchor,
+                                       k.filter = k.filter, k.score = k.score,
+                                       k.weight = k.weight)
+    return(corrected_data[(nrow(cite_protein)+1):nrow(corrected_data),])
   }
 
   random_ids <- sample(nrow(codex_protein), replace=FALSE)
