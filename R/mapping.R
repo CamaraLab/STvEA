@@ -183,9 +183,19 @@ MapCODEXtoCITE.internal <- function(
     set.seed(seed)
   }
 
+  if (num_chunks == 1) {
+    return(AnchorCorrection(ref_mat = cite_protein,
+                           query_mat = codex_protein,
+                           rna_mat = cite_latent, cite_index = 1,
+                           num.cc = num.cc, k.anchor = k.anchor,
+                           k.filter = k.filter, k.score = k.score,
+                           k.weight = k.weight))
+  }
+
   random_ids <- sample(nrow(codex_protein), replace=FALSE)
   chunk_ids <- split(random_ids, cut(seq_along(random_ids), num_chunks, labels = FALSE))
   if (num_cores > 1) {
+    chunk_ids <- split(random_ids, cut(seq_along(random_ids), num_chunks, labels = FALSE))
     corrected_data <- mclapply(1:length(chunk_ids),
                              function(i) AnchorCorrection(ref_mat = cite_protein,
                                                           query_mat = codex_protein[chunk_ids[[i]],],
