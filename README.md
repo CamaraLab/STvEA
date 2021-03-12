@@ -2,7 +2,7 @@
 
 ```STvEA``` is an analysis pipeline for cleaning, clustering, and plotting CODEX and CITE-seq protein data, mapping a CODEX dataset to a matching CITE-seq dataset, and assessing colocalization of features using the Adjacency Score. More information can be found in:
 
-- K. W. Govek*, E. C. Troisi*, Z. Miao, R. G. Aubin, S. Woodhouse, and P. G. Cámara. _Single-Cell Transcriptomic Analysis of mIHC Images via Antigen Mapping_. **Science Advances** 7 (2021) 10. [DOI: 10.1126/sciadv.abc5464] (https://doi.org/10.1126/sciadv.abc5464). *authors contributed equally.
+K. W. Govek*, E. C. Troisi*, Z. Miao, R. G. Aubin, S. Woodhouse, and P. G. Cámara. _Single-Cell Transcriptomic Analysis of mIHC Images via Antigen Mapping_. **Science Advances** 7 (2021) 10. [DOI: 10.1126/sciadv.abc5464](https://doi.org/10.1126/sciadv.abc5464). *authors contributed equally.
 
 ## Installation
 
