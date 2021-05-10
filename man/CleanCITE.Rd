@@ -20,7 +20,7 @@ CleanCITE(stvea_object, model = "nb", num_cores = 1, maxit = 500,
 \item{maxit}{maximum number of iterations for optim function
 - only used if model is "nb"}
 
-\item{factr}{accuracty of optim function
+\item{factr}{accuracy of optim function
 - only used if model is "nb"}
 
 \item{optim_inits}{a matrix of (proteins x params) with initialization

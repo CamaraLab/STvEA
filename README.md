@@ -14,6 +14,10 @@ devtools::install_github("CamaraLab/STvEA")
 
 Example pipeline for only CODEX data. Performs filtering of protein expression data, visualization of clusters, and analysis of the spatial co-localization of both clusters and proteins.
 
+[Analyzing CyTOF data and reading from FCS files](https://github.com/CamaraLab/STvEA/tree/master/examples/cytof_tutorial.md)
+
+Example pipeline for reading CyTOF or CODEX data from FCS files and analyzing mIHC or cytometry data without a spatial component.
+
 [Mapping CODEX data to CITE-seq data](https://github.com/CamaraLab/STvEA/tree/master/examples/mapping_tutorial.md)
 
 Performs separate filtering and clustering for both CODEX and CITE-seq protein expression data. Maps the CODEX protein space to the CITE-seq protein space in order to transfer features such as gene expression and clusters from the CITE-seq cells onto the CODEX cells. Analyzes co-localization of genes, proteins, and clusters using the Adjacency Score.

@@ -205,7 +205,13 @@ PlotExprCODEXemb <- function(stvea_object, name,
                               pt_size =0.8) {
   print_type <- type
   if (type == "protein") {
-    plotting_data <- stvea_object@codex_protein
+    if (!is.null(stvea_object@codex_clean)) {
+      plotting_data <- stvea_object@codex_clean
+    } else if (!is.null(stvea_object@codex_protein)) {
+      plotting_data <- stvea_object@codex_protein
+    } else {
+      stop("stvea_object must contain CODEX protein data with type=\"protein\"")
+    }
     print_type <- "Protein"
   } else if (type == "RNA") {
     plotting_data <- stvea_object@codex_mRNA
@@ -258,6 +264,9 @@ PlotExprCODEXspatial <- function(stvea_object, name,
                                  high_color2="green",
                                  low_color="white",
                                  pt_size =0.8) {
+  if (is.null(stvea_object@codex_spatial)) {
+    stop("stvea_object does not contain CODEX spatial information")
+  }
   if (type == "protein") {
     if (!is.null(stvea_object@codex_clean)) {
       plotting_data <- stvea_object@codex_clean
@@ -340,6 +349,9 @@ PlotIndexCODEXspatial <- function(stvea_object, index,
                                   high_color="red",
                                   low_color="gray",
                                   pt_size =0.8) {
+  if (is.null(stvea_object@codex_spatial)) {
+    stop("stvea_object does not contain CODEX spatial information")
+  }
   temp_df <- as.data.frame(rbind(stvea_object@codex_spatial[-index,],stvea_object@codex_spatial[index,]))
   ggplot(temp_df,
          aes(x=x,y=y,color=c(rep("other",nrow(temp_df)-1),"this"))) +
@@ -348,28 +360,4 @@ PlotIndexCODEXspatial <- function(stvea_object, index,
     guides(color = FALSE) +
     ylim(max(temp_df$y), 0) +
     theme_void() + coord_fixed()
-}
-
-
-#' Plot the CODEX neighbors of a set of CITE-seq cells
-#' in the spatial coordinates
-#'
-PlotSpatialNeighbors <- function(cite_cells) {
-}
-
-#' Plot CITE-seq neighbors of a set of CODEX cells
-#' in the CITE-seq mRNA UMAP
-#'
-PlotUmapNeighbors <- function(codex_cells) {
-}
-
-#' Plot CITE-seq gene expression on
-#' CODEX spatial coordinates
-#'
-PlotSpatialRNA <- function(gene_name) {
-}
-
-#' Plot heatmap of cluster feature scores
-#'
-plot_heatmap <- function(feature_score) {
 }

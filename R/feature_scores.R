@@ -47,15 +47,14 @@ AdjScoreHeatmap <- function(adj_score_output) {
 AdjScoreClustersCITE <- function(
   stvea_object,
   k,
-  # box_subset=list(xmin = min(stvea_object@codex_spatial$x),
-  #                 xmax = max(stvea_object@codex_spatial$x),
-  #                 ymin = min(stvea_object@codex_spatial$y),
-  #                 ymax = max(stvea_object@codex_spatial$y))
   c=0,
   num_cores=1,
   num_perms=1000,
   perm_estimate=T
 ) {
+  if (is.null(stvea_object@codex_spatial)) {
+    stop("stvea_object does not contain CODEX spatial information")
+  }
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
   AdjScoreClustersCITE.internal(knn_adj,
                                 stvea_object@cite_clusters,
@@ -85,12 +84,11 @@ AdjScoreClustersCITE <- function(
 AdjScoreClustersCODEX <- function(
   stvea_object,
   k,
-  # box_subset=list(xmin = min(stvea_object@codex_spatial$x),
-  #                 xmax = max(stvea_object@codex_spatial$x),
-  #                 ymin = min(stvea_object@codex_spatial$y),
-  #                 ymax = max(stvea_object@codex_spatial$y))
   num_cores=1
 ) {
+  if (is.null(stvea_object@codex_spatial)) {
+    stop("stvea_object does not contain CODEX spatial information")
+  }
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
   AdjScoreClustersCODEX.internal(knn_adj,
                                  stvea_object@codex_clusters,
@@ -129,6 +127,10 @@ AdjScoreProteins <- function(
   num_perms=1000,
   perm_estimate=TRUE
 ) {
+  if (is.null(stvea_object@codex_spatial)) {
+    stop("stvea_object does not contain CODEX spatial information")
+  }
+
   if (!is.null(stvea_object@codex_clean)) {
     protein_expr <- stvea_object@codex_clean
   } else if (!is.null(stvea_object@codex_protein)) {
@@ -186,6 +188,9 @@ AdjScoreGenes <- function(
   num_perms=1000,
   perm_estimate=T
 ) {
+  if (is.null(stvea_object@codex_spatial)) {
+    stop("stvea_object does not contain CODEX spatial information")
+  }
   knn_adj <- knn_graph(stvea_object@codex_spatial, k=k)
   AdjScoreGenes.internal(knn_adj,
                         stvea_object@codex_mRNA,

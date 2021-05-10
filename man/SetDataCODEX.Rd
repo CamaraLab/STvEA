@@ -4,7 +4,7 @@
 \alias{SetDataCODEX}
 \title{Set CODEX data in STvEA.data object}
 \usage{
-SetDataCODEX(codex_protein, codex_blanks, codex_size, codex_spatial,
+SetDataCODEX(codex_protein, codex_blanks, codex_size, codex_spatial = NULL,
   stvea_object = NULL)
 }
 \arguments{
@@ -14,7 +14,7 @@ SetDataCODEX(codex_protein, codex_blanks, codex_size, codex_spatial,
 
 \item{codex_size}{Size of each CODEX cell (vector)}
 
-\item{codex_spatial}{xyz coordinates of each CODEX cell (cell x 3 coordinates)}
+\item{codex_spatial}{(optional) xyz coordinates of each CODEX cell (cell x 3 coordinates)}
 
 \item{stvea_object}{(optional) Pre-existing STvEA.data object to load data into.
 If not provided, a new object is created.}

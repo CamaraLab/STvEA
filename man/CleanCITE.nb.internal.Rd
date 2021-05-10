@@ -21,7 +21,7 @@ On Windows, this must be set to 1.}
 
 \item{maxit}{maximum number of iterations for optim function}
 
-\item{factr}{accuracty of optim function}
+\item{factr}{accuracy of optim function}
 
 \item{optim_inits}{a matrix of (proteins x params) with initialization
 parameters for each protein to input to the optim function. If NULL,
