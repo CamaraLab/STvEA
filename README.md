@@ -3,10 +3,24 @@
 ```STvEA``` is an analysis pipeline for cleaning, clustering, and plotting CODEX and CITE-seq protein data, mapping a CODEX dataset to a matching CITE-seq dataset, and assessing colocalization of features using the Adjacency Score.
 
 ## Installation
+Install flowCore
+```
+# Bioconductor 3.6 (R 3.4)
+source("https://bioconductor.org/biocLite.R")
+biocLite("flowCore")
 
+# Bioconductor 3.8+ (R 3.5+)
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("flowCore")
+```
+Install STvEA
 ```
 devtools::install_github("CamaraLab/STvEA")
 ```
+## Docker image
+We provide Docker images to run STvEA in R Studio, based off the rocker/rstudio images:
+https://hub.docker.com/r/camaralab/stvea
 
 ## Tutorials
 
