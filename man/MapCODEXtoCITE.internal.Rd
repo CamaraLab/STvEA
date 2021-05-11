@@ -8,7 +8,7 @@ chunks of the CODEX dataset to map individually
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
 MapCODEXtoCITE.internal(cite_protein, codex_protein, cite_latent, num_chunks,
-  seed = NULL, num_cores = 1, num.cc = 29, k.anchor = 20,
+  seed = NULL, num_cores = 1, num.cc = NULL, k.anchor = 20,
   k.filter = 100, k.score = 80, k.weight = 100)
 }
 \arguments{
@@ -25,7 +25,7 @@ MapCODEXtoCITE.internal(cite_protein, codex_protein, cite_latent, num_chunks,
 \item{num_cores}{number of cores to use in parallelized correction of CODEX dataset.
 On Windows, this must be set to 1.}
 
-\item{num.cc}{number of canonical vectors to calculate}
+\item{num.cc}{number of canonical vectors to calculate. Defaults to number of proteins - 1}
 
 \item{k.anchor}{number of nn used to find anchors via mutual nearest neighbors}
 

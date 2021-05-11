@@ -37,7 +37,7 @@ STvEA.data <- setClass(
 #' @param codex_protein Segmented and spillover corrected CODEX protein expression (cell x protein)
 #' @param codex_blanks Segmented and spillover corrected CODEX blank channel expression (cell x blank channel)
 #' @param codex_size Size of each CODEX cell (vector)
-#' @param codex_spatial xyz coordinates of each CODEX cell (cell x 3 coordinates)
+#' @param codex_spatial (optional) xyz coordinates of each CODEX cell (cell x 3 coordinates)
 #' @param stvea_object (optional) Pre-existing STvEA.data object to load data into.
 #' If not provided, a new object is created.
 #'
@@ -46,7 +46,7 @@ STvEA.data <- setClass(
 SetDataCODEX <- function(codex_protein,
                          codex_blanks,
                          codex_size,
-                         codex_spatial,
+                         codex_spatial = NULL,
                          stvea_object = NULL) {
   if (is.null(stvea_object)) {
     stvea_object <- new(
@@ -155,3 +155,129 @@ TransferDataSeurat2 <- function(seurat_object,
 }
 
 
+#' Read in FCS file
+#'
+#' @param path_to_fcs readable path to FCS file
+#' @param is_protein boolean vector indicating which columns in FCS
+#' should be kept as protein expression for downstream analyses
+#' @param is_blank boolean vector indicating which columns in FCS
+#' are blank for filtering purposes
+#' @param protein_names vector of names for each protein channel column -
+#' if null, will keep column names from FCS
+#' @param tile_relative whether x,y,z coordinates are relative to x_tile,y_tile (TRUE)
+#' or to corner of image (FALSE).
+#'       If TRUE, will compute absolute coordinates
+#'       If FALSE, will just take given x,y,z coordinates
+#' @param num_tile_x number of tiles in the x direction, only used if tile_relative = TRUE
+#' and the tile information in the FCS file is saved as tile_nr instead of x_tile,y_tile
+#' @param x_pix_size x dimension of pixel coordinates in nm. Set to 1 to keep pixel dimensions.
+#' @param y_pix_size y dimension of pixel coordinates in nm. Set to 1 to keep pixel dimensions.
+#' @param z_pix_size z dimension of pixel coordinates in nm. Set to 1 to keep pixel dimensions.
+#' @param stvea_object (optional) Pre-existing STvEA.data object to load data into.
+#' If not provided, a new object is created.
+#'
+#' @return STvEA.data class object
+#'
+#' @importFrom flowCore read.FCS
+#' @importFrom stringr str_match
+#'
+#' @export
+#'
+ReadDataFCS <- function(path_to_fcs,
+                        is_protein,
+                        is_blank,
+                        protein_names = NULL,
+                        tile_relative = FALSE,
+                        num_tile_x = 9,
+                        x_pix_size = 188,
+                        y_pix_size = 188,
+                        z_pix_size = 900,
+                        stvea_object = NULL) {
+  expr_mat <- read.FCS(path_to_fcs,transformation=FALSE, truncate_max_range=FALSE)@exprs
+
+  # Get blank columns
+  if (sum(is_blank) == 0) {
+    warning("No columns are labelled as blank, setting blank channel data to all 0s")
+    codex_blanks <- as.matrix(rep(0,nrow(expr_mat)), ncol=1)
+  } else {
+    codex_blanks <- expr_mat[,is_blank,drop=FALSE]
+  }
+
+  # Get protein matrix
+  if (!is.null(protein_names) && sum(is_protein) != length(protein_names)) {
+    stop("Length of protein_names must be the same as TRUE values in is_protein")
+  }
+  codex_protein <- expr_mat[,is_protein,drop=FALSE]
+  if (!is.null(protein_names)) {
+    colnames(codex_protein) <- protein_names
+  }
+
+  # Match columns of the format "X.X" and convert them to just "x"
+  reg_match <- str_match(colnames(expr_mat), "(.+)\\.\\1")
+  match <- !is.na(reg_match[,1]) # these columns have the form "X.X"
+  colnames(expr_mat)[match] <- reg_match[match,2] # convert to just "X"
+  colnames(expr_mat) <- sapply(colnames(expr_mat), tolower) # lowercase "x"
+
+  # Get spatial information
+  if (!all(c("x","y","z") %in% colnames(expr_mat))) {
+    warning("Cannot find x,y,z coordinates in FCS. Continuing without spatial information")
+    codex_spatial_nm <- NULL
+  } else {
+    if (tile_relative) {
+      if ("tile_nr" %in% colnames(expr_mat)) {
+        x <- floor((expr_mat[,"tile_nr"]-1)/num_tile_x) * max(expr_mat[,"x"]) + expr_mat[,"x"]
+        y <- ((expr_mat[,"tile_nr"] - 1) %% num_tile_x) * max(expr_mat[,"y"]) + expr_mat[,"y"]
+      } else if ("tile_num" %in% colnames(expr_mat)) {
+        x <- floor((expr_mat[,"tile_num"]-1)/num_tile_x) * max(expr_mat[,"x"]) + expr_mat[,"x"]
+        y <- ((expr_mat[,"tile_num"] - 1) %% num_tile_x) * max(expr_mat[,"y"]) + expr_mat[,"y"]
+      } else if ("x_tile" %in% colnames(expr_mat) && "y_tile" %in% colnames(expr_mat)) {
+        x <- (expr_mat[,"x_tile"] - 1) * max(expr_mat[,"x"]) + expr_mat[,"x"]
+        y <- (expr_mat[,"y_tile"] - 1) * max(expr_mat[,"y"]) + expr_mat[,"y"]
+      } else {
+        stop("Cannot find tile information in FCS to compute absolute x,y,z from relative")
+      }
+      z <- expr_mat[,"z"]
+      codex_spatial <- cbind(x,y,z)
+    } else {
+      codex_spatial <- expr_mat[,c("x","y","z")]
+    }
+    codex_spatial_nm <- cbind(x=codex_spatial[,"x"]*x_pix_size,
+                              y=codex_spatial[,"y"]*y_pix_size,
+                              z=codex_spatial[,"z"]*z_pix_size)
+  }
+
+  # Get size information
+  if ("size" %in% colnames(expr_mat)) {
+    codex_size <- expr_mat[,"size"]
+  } else {
+    warning("Cannot find size information in FCS, setting all cell size to 0")
+    codex_size <- rep(0, nrow(expr_mat))
+  }
+
+  stvea_object <- SetDataCODEX(codex_protein = codex_protein,
+                              codex_blanks = codex_blanks,
+                              codex_size = codex_size,
+                              codex_spatial = codex_spatial_nm,
+                              stvea_object = stvea_object)
+
+  return(stvea_object)
+}
+
+#' Reads channel names from FCS two different ways
+#'
+#' @param path_to_fcs readable path to FCS file
+#'
+#' @return list where "columns" are the column names from the FCS data matrix,
+#' and "channels" are the readable names in the description
+#'
+#' @importFrom flowCore read.FCS
+#'
+#' @export
+#'
+ReadNamesFCS <- function(path_to_fcs) {
+  data <- read.FCS(path_to_fcs,transformation=FALSE, truncate_max_range=FALSE)
+  columns <- colnames(data@exprs)
+  names(columns) <- NULL
+  channels <- as.character(data@description[paste("$P",1:ncol(data@exprs),"S",sep="")])
+  return(list(columns = columns, channels=channels))
+}

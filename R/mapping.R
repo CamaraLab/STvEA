@@ -6,7 +6,8 @@
 #' @param num_chunks number of equal sized chunks to split CODEX dataset into for correction
 #' @param seed set.seed before randomly sampling chunks of CODEX dataset
 #' @param num_cores number of cores to use in parallelized correction of CODEX dataset
-#' @param num.cc number of canonical vectors to calculate
+#' @param num.cc number of canonical vectors to calculate. Defaults to number of proteins
+#' in common - 1
 #' @param k.anchor number of nn used to find anchors via mutual nearest neighbors
 #' @param k.filter number of nn in original feature space to use for filtering
 #' @param k.score number of nn to use in shared nearest neighbor scoring
@@ -18,7 +19,7 @@ MapCODEXtoCITE <- function(stvea_object,
                                num_chunks,
                                seed = NULL,
                                num_cores = 1,
-                               num.cc = 29,
+                               num.cc = NULL,
                                k.anchor = 20,
                                k.filter=100,
                                k.score=80,
@@ -29,8 +30,19 @@ MapCODEXtoCITE <- function(stvea_object,
   if (is.null(stvea_object@cite_latent)) {
     stop("Input object must contain lower dimensional latent space of the CITE-seq mRNA data", call. =FALSE)
   }
-  stvea_object@corrected_codex <- MapCODEXtoCITE.internal(stvea_object@cite_clean,
-                                                                stvea_object@codex_clean,
+
+  common_proteins <- colnames(stvea_object@cite_clean)[colnames(stvea_object@cite_clean) %in% colnames(stvea_object@codex_clean)]
+  if (length(common_proteins) < 2) {
+    stop("There are too few proteins (< 2) in common between CITE-seq and CODEX protein matrices. It is advised to have at least 10 proteins in common.")
+  }
+  cite_clean_subset <- stvea_object@cite_clean[,common_proteins]
+  codex_clean_subset <- stvea_object@codex_clean[,common_proteins]
+  if (is.null(num.cc)) {
+    num.cc <- length(common_proteins)-1
+  }
+
+  stvea_object@corrected_codex <- MapCODEXtoCITE.internal(cite_clean_subset,
+                                                                codex_clean_subset,
                                                                 stvea_object@cite_latent,
                                                                 num_chunks=num_chunks, seed=seed,
                                                                 num_cores=num_cores, num.cc=num.cc,
@@ -58,7 +70,7 @@ GetTransferMatrix <- function(stvea_object,
   if (is.null(stvea_object@corrected_codex)) {
     stop("MapCODEXtoCITE must be run on the input object first", call. =FALSE)
   }
-  stvea_object@transfer_matrix <- GetTransferMatrix.internal(stvea_object@cite_clean,
+  stvea_object@transfer_matrix <- GetTransferMatrix.internal(stvea_object@cite_clean[,colnames(stvea_object@corrected_codex)],
                                                  stvea_object@corrected_codex,
                                                  k=k.cite,
                                                  c=c.cite)
@@ -107,7 +119,7 @@ CorNN <- function(
 #' @param query_mat a (cell x feature) protein expression matrix to be corrected
 #' @param rna_mat a (cell x feature) embedding of the mRNA expression matrix from CITE-seq
 #' @param cite_index which matrix (1 or 2) is the CITE-seq protein expression matrix
-#' @param num.cc number of canonical vectors to calculate
+#' @param num.cc number of canonical vectors to calculate. Defaults to number of proteins - 1
 #' @param k.anchor number of nn used to find anchors via mutual nearest neighbors
 #' @param k.filter number of nn in original feature space to use for filtering
 #' @param k.score number of nn to use in shared nearest neighbor scoring
@@ -121,13 +133,16 @@ AnchorCorrection <- function(
   query_mat,
   rna_mat,
   cite_index,
-  num.cc = 29,
+  num.cc = NULL,
   k.anchor = 20,
   k.filter=100,
   k.score=80,
   k.weight=100,
   verbose=FALSE
 ) {
+  if (is.null(num.cc)) {
+    num.cc <- ncol(ref_mat)-1
+  }
   cca_matrix <- RunCCA(t(ref_mat), t(query_mat), standardize=TRUE, num.cc=num.cc)$ccv
   neighbors <- FindNNrna(ref_emb = cca_matrix[1:nrow(ref_mat),],
                          query_emb = cca_matrix[(nrow(ref_mat)+1):nrow(cca_matrix),],
@@ -156,7 +171,7 @@ AnchorCorrection <- function(
 #' @param seed set.seed before randomly sampling chunks of CODEX dataset
 #' @param num_cores number of cores to use in parallelized correction of CODEX dataset.
 #' On Windows, this must be set to 1.
-#' @param num.cc number of canonical vectors to calculate
+#' @param num.cc number of canonical vectors to calculate. Defaults to number of proteins - 1
 #' @param k.anchor number of nn used to find anchors via mutual nearest neighbors
 #' @param k.filter number of nn in original feature space to use for filtering
 #' @param k.score number of nn to use in shared nearest neighbor scoring
@@ -173,7 +188,7 @@ MapCODEXtoCITE.internal <- function(
   num_chunks,
   seed = NULL,
   num_cores = 1,
-  num.cc = 29,
+  num.cc = NULL,
   k.anchor = 20,
   k.filter=100,
   k.score=80,
@@ -182,10 +197,24 @@ MapCODEXtoCITE.internal <- function(
   if (!is.null(seed)) {
     set.seed(seed)
   }
+  if (is.null(num.cc)) {
+    num.cc <- ncol(cite_protein)-1
+  }
+
+  if (num_chunks == 1) {
+    corrected_data <- AnchorCorrection(ref_mat = cite_protein,
+                                       query_mat = codex_protein,
+                                       rna_mat = cite_latent, cite_index = 1,
+                                       num.cc = num.cc, k.anchor = k.anchor,
+                                       k.filter = k.filter, k.score = k.score,
+                                       k.weight = k.weight)
+    return(corrected_data[(nrow(cite_protein)+1):nrow(corrected_data),])
+  }
 
   random_ids <- sample(nrow(codex_protein), replace=FALSE)
   chunk_ids <- split(random_ids, cut(seq_along(random_ids), num_chunks, labels = FALSE))
   if (num_cores > 1) {
+    chunk_ids <- split(random_ids, cut(seq_along(random_ids), num_chunks, labels = FALSE))
     corrected_data <- mclapply(1:length(chunk_ids),
                              function(i) AnchorCorrection(ref_mat = cite_protein,
                                                           query_mat = codex_protein[chunk_ids[[i]],],

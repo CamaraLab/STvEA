@@ -7,10 +7,30 @@ mixture and computing each expression measurement
 as the cumulative distribution of the Gaussian with
 the higher mean.}
 \usage{
-CleanCODEX(stvea_object)
+CleanCODEX(stvea_object, model = "gaussian", num_cores = 1, maxit = 500,
+  factr = 1e-09, optim_inits = NULL, normalize = FALSE)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CODEX data after FilterCODEX}
+
+\item{model}{"nb" (Negative Binomial) or "gaussian" model to fit or
+"arcsinh" for standard arcsinh transform (wrapper of flowCore method)}
+
+\item{num_cores}{number of cores to use for parallelized fits}
+
+\item{maxit}{maximum number of iterations for optim function
+- only used if model is "nb"}
+
+\item{factr}{accuracy of optim function
+- only used if model is "nb"}
+
+\item{optim_inits}{a matrix of (proteins x params) with initialization
+parameters for each protein to input to the optim function. If NULL,
+starts at two default parameter sets and picks the better one
+ - only used if model is "nb"}
+
+\item{normalize}{divide cleaned CODEX expression by total expression per cell
+- only used if model is "nb"}
 }
 \description{
 Removes noise from CODEX data by fitting a Gaussian

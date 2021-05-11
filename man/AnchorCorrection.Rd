@@ -4,7 +4,7 @@
 \alias{AnchorCorrection}
 \title{Run all methods for anchor correction}
 \usage{
-AnchorCorrection(ref_mat, query_mat, rna_mat, cite_index, num.cc = 29,
+AnchorCorrection(ref_mat, query_mat, rna_mat, cite_index, num.cc = NULL,
   k.anchor = 20, k.filter = 100, k.score = 80, k.weight = 100,
   verbose = FALSE)
 }
@@ -17,7 +17,7 @@ AnchorCorrection(ref_mat, query_mat, rna_mat, cite_index, num.cc = 29,
 
 \item{cite_index}{which matrix (1 or 2) is the CITE-seq protein expression matrix}
 
-\item{num.cc}{number of canonical vectors to calculate}
+\item{num.cc}{number of canonical vectors to calculate. Defaults to number of proteins - 1}
 
 \item{k.anchor}{number of nn used to find anchors via mutual nearest neighbors}
 

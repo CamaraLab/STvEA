@@ -5,7 +5,7 @@
 \title{Wraps MapCODEXtoCITE.internal using STvEA.data class}
 \usage{
 MapCODEXtoCITE(stvea_object, num_chunks, seed = NULL, num_cores = 1,
-  num.cc = 29, k.anchor = 20, k.filter = 100, k.score = 80,
+  num.cc = NULL, k.anchor = 20, k.filter = 100, k.score = 80,
   k.weight = 100)
 }
 \arguments{
@@ -17,7 +17,8 @@ MapCODEXtoCITE(stvea_object, num_chunks, seed = NULL, num_cores = 1,
 
 \item{num_cores}{number of cores to use in parallelized correction of CODEX dataset}
 
-\item{num.cc}{number of canonical vectors to calculate}
+\item{num.cc}{number of canonical vectors to calculate. Defaults to number of proteins
+in common - 1}
 
 \item{k.anchor}{number of nn used to find anchors via mutual nearest neighbors}
 
