@@ -9,6 +9,8 @@ Install flowCore
 source("https://bioconductor.org/biocLite.R")
 biocLite("flowCore")
 
+------ or ------
+
 # Bioconductor 3.8+ (R 3.5+)
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
