@@ -3,12 +3,6 @@ Using STvEA to analyze CyTOF data
 
 ``` r
 library(STvEA)
-```
-
-    ## Warning: replacing previous import 'Matrix::expm' by 'expm::expm' when
-    ## loading 'AdjacencyScore'
-
-``` r
 set.seed(4068)
 ```
 
@@ -42,7 +36,8 @@ print(cytof_names)
 ``` r
 is_blank <- rep(FALSE, length(cytof_names)) # there are no blank channels
 is_protein <- !grepl("Time|Event|Center|Offset|Width|Residual|DNA|livedead|bc|^[0-9]|GFP",cytof_names)
-stvea_object <- ReadDataFCS("../data/MGL02_Spleen_Live_cells.fcs", is_protein, is_blank, protein_names = cytof_names[is_protein])
+stvea_object <- ReadDataFCS("../data/MGL02_Spleen_Live_cells.fcs", is_protein, is_blank,
+                            protein_names = cytof_names[is_protein])
 ```
 
     ## Warning in ReadDataFCS("../data/MGL02_Spleen_Live_cells.fcs", is_protein, :
@@ -74,7 +69,7 @@ print(dim(stvea_object@codex_protein)) # The filtering function does not remove 
 Clean CyTOF data
 ================
 
-Multiple articles reference the defualt Fluidigm CyTOF software randomizing counts by adding a value uniformly sampled from \[-1,0\]. Thus we take the ceiling of the CyTOF values and fit a negative binomial distribution. If this doesn't work, we can instead apply a standard arcsinh transformation. References: <https://doi.org/10.1002/cyto.a.23908>, <https://biosurf.org/cytof_data_scientist.html>
+Multiple articles reference the default Fluidigm CyTOF software randomizing counts by adding a value uniformly sampled from \[-1,0\]. Thus we take the ceiling of the CyTOF values and fit a negative binomial distribution. If this doesn't work, we can instead apply a standard arcsinh transformation. References: <https://doi.org/10.1002/cyto.a.23908>, <https://biosurf.org/cytof_data_scientist.html>
 
 ``` r
 # Fit negative binomial
@@ -87,17 +82,12 @@ stvea_object <- CleanCODEX(stvea_object, model="nb", normalize=FALSE, num_cores=
 Cluster CyTOF cells based on protein expression
 -----------------------------------------------
 
-We use UMAP to compute the 2 dimensional embedding of the cleaned CyTOF protein expression for later visualization. The call to UMAP also returns the KNN indices with k = n\_neighbors.
+We use UMAP to compute the 2 dimensional embedding of the cleaned CyTOF protein expression for later visualization. The call to UMAP also returns the KNN indices with k = n\_neighbors. This function call will take over an hour for almost 150,000 cells. Decrease the negative\_sample\_rate to speed it up.
 
 ``` r
-ptm <- proc.time()
 stvea_object <- GetUmapCODEX(stvea_object, metric = 'pearson', n_neighbors=30,
                              min_dist=0.1, negative_sample_rate = 50)
-proc.time() - ptm
 ```
-
-    ##     user   system  elapsed 
-    ## 5810.300   20.450 5829.073
 
 We perform Louvain clustering on a KNN graph of the CyTOF cells, built from the KNN indices returned by UMAP. If k is provided, it must be less than or equal to n\_neighbors from above. If it is not provided, it is set equal to n\_neighbors.
 
@@ -119,7 +109,7 @@ PlotClusterCODEXemb(stvea_object, pt_size=0.1)
 Color each cell in the CyTOF UMAP embedding with its expression level of proteins. One or two protein names can be input. If two protein names are provided, color will be interpolated between red and green color values.
 
 ``` r
-PlotExprCODEXemb(stvea_object, "CD11b", pt_size=0.1) #CD11b
+PlotExprCODEXemb(stvea_object, "CD11b", pt_size=0.1)
 ```
 
 ![](cytof_tutorial_files/figure-markdown_github/unnamed-chunk-8-1.png)
@@ -129,7 +119,3 @@ PlotExprCODEXemb(stvea_object, c("Tbet","TCRb"), pt_size=0.1)
 ```
 
 ![](cytof_tutorial_files/figure-markdown_github/unnamed-chunk-9-1.png)
-
-``` r
-#tbet
-```

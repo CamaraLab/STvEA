@@ -21,7 +21,8 @@ cytof_names <- ReadNamesFCS("../data/MGL02_Spleen_Live_cells.fcs")[["channels"]]
 print(cytof_names)
 is_blank <- rep(FALSE, length(cytof_names)) # there are no blank channels
 is_protein <- !grepl("Time|Event|Center|Offset|Width|Residual|DNA|livedead|bc|^[0-9]|GFP",cytof_names)
-stvea_object <- ReadDataFCS("../data/MGL02_Spleen_Live_cells.fcs", is_protein, is_blank, protein_names = cytof_names[is_protein])
+stvea_object <- ReadDataFCS("../data/MGL02_Spleen_Live_cells.fcs", is_protein, is_blank,
+                            protein_names = cytof_names[is_protein])
 print(dim(stvea_object@codex_protein))
 ```
 
@@ -32,7 +33,7 @@ print(dim(stvea_object@codex_protein)) # The filtering function does not remove 
 ```
 
 # Clean CyTOF data
-Multiple articles reference the defualt Fluidigm CyTOF software randomizing counts by adding a value uniformly sampled from [-1,0]. Thus we take the ceiling of the CyTOF values and fit a negative binomial distribution. If this doesn't work, we can instead apply a standard arcsinh transformation.
+Multiple articles reference the default Fluidigm CyTOF software randomizing counts by adding a value uniformly sampled from [-1,0]. Thus we take the ceiling of the CyTOF values and fit a negative binomial distribution. If this doesn't work, we can instead apply a standard arcsinh transformation.
 References: https://doi.org/10.1002/cyto.a.23908, https://biosurf.org/cytof_data_scientist.html
 ```{r}
 # Fit negative binomial
@@ -43,12 +44,10 @@ stvea_object <- CleanCODEX(stvea_object, model="nb", normalize=FALSE, num_cores=
 ```
 
 ## Cluster CyTOF cells based on protein expression
-We use UMAP to compute the 2 dimensional embedding of the cleaned CyTOF protein expression for later visualization. The call to UMAP also returns the KNN indices with k = n_neighbors.
+We use UMAP to compute the 2 dimensional embedding of the cleaned CyTOF protein expression for later visualization. The call to UMAP also returns the KNN indices with k = n_neighbors. This function call will take over an hour for almost 150,000 cells. Decrease the negative_sample_rate to speed it up.
 ```{r}
-ptm <- proc.time()
 stvea_object <- GetUmapCODEX(stvea_object, metric = 'pearson', n_neighbors=30,
                              min_dist=0.1, negative_sample_rate = 50)
-proc.time() - ptm
 ```
 
 We perform Louvain clustering on a KNN graph of the CyTOF cells, built from the KNN indices returned by UMAP. If k is provided, it must be less than or equal to n_neighbors from above. If it is not provided, it is set equal to n_neighbors.
