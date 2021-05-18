@@ -11,17 +11,21 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Imports:
-    irlba,
-    mclust,
-    RANN,
-    tidyr,
-    ggplot2,
-    igraph,
+    AdjacencyScore,
     cluster,
     colorspace,
-    AdjacencyScore
+    flowCore,
+    ggplot2,
+    igraph,
+    irlba,
+    Matrix,
+    mclust,
+    RANN,
+    stringr,
+    tidyr
 Suggests:
     umap,
     reticulate
-Remotes: CamaraLab/AdjacencyScore
-biocViews: flowCore
+Remotes:
+    CamaraLab/AdjacencyScore
+biocViews:
