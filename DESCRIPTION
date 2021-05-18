@@ -6,6 +6,7 @@ Authors@R: person("Kiya W.", "Govek", email = "govekk@pennmedicine.upenn.edu", r
 Description: STvEA is an analysis pipeline for cleaning, clustering, and plotting CODEX and CITE-seq
   protein data, mapping a CODEX dataset to a matching CITE-seq dataset, and assessing colocalization
   of features using the Adjacency Score.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
