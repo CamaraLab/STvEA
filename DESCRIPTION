@@ -20,6 +20,7 @@ Imports:
     irlba,
     Matrix,
     mclust,
+    methods,
     RANN,
     stringr,
     tidyr
