@@ -6,21 +6,27 @@ Authors@R: person("Kiya W.", "Govek", email = "govekk@pennmedicine.upenn.edu", r
 Description: STvEA is an analysis pipeline for cleaning, clustering, and plotting CODEX and CITE-seq
   protein data, mapping a CODEX dataset to a matching CITE-seq dataset, and assessing colocalization
   of features using the Adjacency Score.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Imports:
-    irlba,
-    mclust,
-    RANN,
-    tidyr,
-    ggplot2,
-    igraph,
+    AdjacencyScore,
     cluster,
     colorspace,
-    AdjacencyScore
+    flowCore,
+    ggplot2,
+    igraph,
+    irlba,
+    Matrix,
+    mclust,
+    methods,
+    RANN,
+    stringr,
+    tidyr
 Suggests:
     umap,
     reticulate
-Remotes: CamaraLab/AdjacencyScore
-biocViews: flowCore
+Remotes:
+    CamaraLab/AdjacencyScore
+biocViews:
