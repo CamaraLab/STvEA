@@ -96,6 +96,7 @@ CleanCODEX <- function(stvea_object,
   } else if (model == "arcsinh") {
     asinhTrans <- arcsinhTransform(a=0, b=1/5)
     translist <- transformList(colnames(stvea_object@codex_protein), asinhTrans)
+    assign("translist", translist, env = parent.frame()) # tranform() looks for translist in parent frame
     codex_protein_clean <- transform(stvea_object@codex_protein, translist)
     # Normalize each protein between [0,1]
     codex_protein_clean <- t(codex_protein_clean) - apply(codex_protein_clean,2,min)
