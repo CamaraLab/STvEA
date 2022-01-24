@@ -1,0 +1,28 @@
+#rm(list=ls()) # temp
+library(shiny)
+source("ui.R")
+#source("data.R") # temp
+source("server.R")
+
+shinyApp(ui = build.ui(), server = server)
+
+# todo -
+# cosmetic issues. plot selected point larger. play with k=10.
+# caching too much right now too
+
+
+## genepl <- "Fcer2a" 
+## ggplot(as.data.frame(umap), aes(V2,V3, color=log2(1+5000*(counts[genepl,row.names(umap)]/colSums(counts[,row.names(umap)]))))) + geom_point(show.legend = FALSE, size=0.3) + theme_void() + scale_color_gradient(low = "grey", high = "red")
+
+
+
+## plot_expression <- function(x, y, antibody_expression, title) {
+##   plot_data <- cbind(x, y, antibody=antibody_expression)
+##   print(ggplot(as.data.frame(plot_data), aes(x=x,y=y,color=antibody)) +
+##   geom_point(size=0.3) +
+##   scale_color_gradient(low="white", high="purple") +
+##   guides(color = FALSE) +
+##   ylim(0, max(y)) +
+##   ggtitle(title) +
+##   theme_void() + coord_fixed())
+## }

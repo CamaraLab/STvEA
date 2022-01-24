@@ -1,0 +1,32 @@
+library(shiny)
+
+build.ui = function() {
+    pageWithSidebar(
+        headerPanel('Mapping between CODEX and CITE-seq'),
+        sidebarPanel(
+            selectizeInput(
+                inputId = 'gene',
+                label = 'Gene',
+                choices = NULL),
+            
+            selectizeInput(
+                inputId = 'protein',
+                label = 'Protein',
+                choices = NULL),
+
+            plotOutput('clusters')
+        ),
+        
+        mainPanel(
+           h3('CITE-seq mRNA UMAP'),
+           #plotOutput('cite', hover="cite_hover", width="50%"),
+           plotOutput('cite', click="cite_hover", width="50%"),
+           h3('CODEX spatial plots'),
+           fluidRow(
+               column(3, plotOutput('codex1')),
+               column(3, plotOutput('codex2')),
+               column(3, plotOutput('codex3'))
+           )
+        )
+    )
+}

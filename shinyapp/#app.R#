@@ -1,0 +1,12 @@
+#rm(list=ls())
+library(shiny)
+source("ui.R")
+source("server.R")
+
+shinyApp(ui = build.ui(), server = server)
+
+# todo
+# 0. to optimise closest points - split into grids
+# 1. cosmetic issues, do all 3 mice. plot selected point larger. add clustering image on lhs. maybe do the codex mouse on another drop down rather than tabs. or maybe just plot side by side. need to check whether input$gene or input$protein are valid. if not, plot nothing
+# 2. refactor to use shiny r modules so that i can split out parts of the code
+

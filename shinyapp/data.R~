@@ -1,0 +1,32 @@
+library(purrr)
+
+cite_umap_emb = read.table("umap_embedding_v2.csv", sep=",", header=FALSE, row.names=1, stringsAsFactors = FALSE)# rename
+cite_protein <- read.csv("protein_expr_corrected_clean.csv", row.names=1, stringsAsFactors = FALSE)
+colnames(cite_protein) <- colnames(cite_protein) %>% map_chr(function(x) sub("ADT_", "", x))
+
+spatial1 = read.table("CODEX_BALBc-1_filtered_spatial.txt")
+spatial2 = read.table("CODEX_BALBc-2_filtered_spatial.txt")
+spatial3 = read.table("CODEX_BALBc-3_filtered_spatial.txt")
+
+codex_exp_clean_BALBc1 = readRDS("codex_exp_clean_BALBc1.rds")
+codex_exp_clean_BALBc2 = readRDS("codex_exp_clean_BALBc2.rds")
+codex_exp_clean_BALBc3 = readRDS("codex_exp_clean_BALBc3.rds")
+
+cite_nn1 = readRDS("cite_nn_exp_BALBc-1.rds")
+cite_nn2 = readRDS("cite_nn_exp_BALBc-2.rds")
+cite_nn3 = readRDS("cite_nn_exp_BALBc-3.rds")
+
+codex_nn1 = readRDS("codex_nn_exp_BALBc-1.rds") %>% as.matrix
+codex_nn2 = readRDS("codex_nn_exp_BALBc-2.rds") %>% as.matrix
+codex_nn3 = readRDS("codex_nn_exp_BALBc-3.rds") %>% as.matrix
+
+genes = read.table("genes.tsv", row.names=1, header=FALSE, sep="\t", stringsAsFactors = FALSE)
+cite_gene <- read.csv("gene_matrix_all_uncut.csv",row.names=1, stringsAsFactors = FALSE)
+cite_gene <- t(t(cite_gene)/colSums(cite_gene))
+cite_gene <- log(1 + 5000*cite_gene)
+row_names <- genes[row.names(cite_gene),1]
+cite_gene <- cite_gene[!duplicated(row_names),]
+row_names <- row_names[!duplicated(row_names)]
+row.names(cite_gene) <- row_names
+
+clusters = read.csv("cluster_labels.csv", header=FALSE, row.names=1)
