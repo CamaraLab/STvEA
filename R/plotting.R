@@ -90,8 +90,15 @@ PlotExprCITE <- function(stvea_object, name,
     stop("type must be either \"RNA\" or \"protein\"", call. =FALSE)
   }
 
+  if (is.null(stvea_object@cite_emb)) {
+    stop("No available 2D representation for CITE-seq. Please call GetUmapCITE() or provide other 2D embedding in stvea_object@cite_emb.")
+  }
   if (length(name) > 2) {
     stop("name must be at most length 2", call. =FALSE)
+  }
+  if (!all(name %in% colnames(plotting_data))) {
+    stop(sprintf("\"%s\" not in colnames of %s matrix. Change type parameter to select other matrix",
+                 paste(name[!name %in% colnames(plotting_data)],collapse="\", \""),type))
   }
 
   rbPal1 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color,1)), alpha=TRUE)
@@ -127,6 +134,9 @@ PlotIndexCITE <- function(stvea_object, index,
                           high_color="red",
                           low_color="gray",
                           pt_size =0.8) {
+  if (is.null(stvea_object@cite_emb)) {
+    stop("No available 2D representation for CITE-seq. Please call GetUmapCITE() or provide other 2D embedding in stvea_object@cite_emb.")
+  }
   temp_df <- as.data.frame(rbind(stvea_object@cite_emb[-index,],stvea_object@cite_emb[index,]))
   ggplot(temp_df, aes_string(x=colnames(temp_df)[1],
                              y=colnames(temp_df)[2],
@@ -146,14 +156,22 @@ PlotIndexCITE <- function(stvea_object, index,
 #' @export
 #'
 PlotClusterCITE <- function(stvea_object, pt_size=0.5) {
-  if (-1 %in% stvea_object@cite_clusters) {
-    colors <- c("gray", rainbow_hcl(length(unique(stvea_object@cite_clusters))-1, c = 80))
+  if (is.null(stvea_object@cite_emb)) {
+    stop("No available 2D representation for CITE-seq. Please call GetUmapCITE() or provide other 2D embedding in stvea_object@cite_emb.")
+  }
+  if (!length(stvea_object@cite_clusters) == 0) {
+    cite_clusters <- stvea_object@cite_clusters
   } else {
-    colors <- rainbow_hcl(length(unique(stvea_object@cite_clusters)), c = 80)
+    cite_clusters <- rep(-1, nrow(stvea_object@cite_emb))
+  }
+  if (-1 %in% cite_clusters) {
+    colors <- c("gray", rainbow_hcl(length(unique(cite_clusters))-1, c = 80))
+  } else {
+    colors <- rainbow_hcl(length(unique(cite_clusters)), c = 80)
   }
   ggplot(stvea_object@cite_emb, aes_string(x=colnames(stvea_object@cite_emb)[1],
                                     y=colnames(stvea_object@cite_emb)[2],
-                                    color=factor(stvea_object@cite_clusters))) +
+                                    color=factor(cite_clusters))) +
     geom_point(size=pt_size) +
     scale_color_manual(values = colors, name="cluster") +
     guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -170,14 +188,22 @@ PlotClusterCITE <- function(stvea_object, pt_size=0.5) {
 #' @export
 #'
 PlotClusterCODEXemb <- function(stvea_object, pt_size=0.5) {
-  if (-1 %in% stvea_object@codex_clusters) {
-    colors <- c("gray", rainbow_hcl(length(unique(stvea_object@codex_clusters))-1, c = 80))
+  if (is.null(stvea_object@codex_emb)) {
+    stop("No available 2D representation for CODEX. Please call GetUmapCODEX() or provide other 2D embedding in stvea_object@codex_emb.")
+  }
+  if (!length(stvea_object@codex_clusters) == 0) {
+    codex_clusters <- stvea_object@codex_clusters
   } else {
-    colors <- rainbow_hcl(length(unique(stvea_object@codex_clusters)), c = 80)
+    codex_clusters <- rep(-1, nrow(stvea_object@codex_emb))
+  }
+  if (-1 %in% codex_clusters) {
+    colors <- c("gray", rainbow_hcl(length(unique(codex_clusters))-1, c = 80))
+  } else {
+    colors <- rainbow_hcl(length(unique(codex_clusters)), c = 80)
   }
   ggplot(stvea_object@codex_emb, aes_string(x=colnames(stvea_object@codex_emb)[1],
                                      y=colnames(stvea_object@codex_emb)[2],
-                                     color=factor(stvea_object@codex_clusters))) +
+                                     color=factor(codex_clusters))) +
     geom_point(size=pt_size) +
     scale_color_manual(values = colors, name="cluster") +
     guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -219,8 +245,15 @@ PlotExprCODEXemb <- function(stvea_object, name,
     stop("type must be either \"RNA\" or \"protein\"", call. =FALSE)
   }
 
+  if (is.null(stvea_object@codex_emb)) {
+    stop("No available 2D representation for CODEX. Please call GetUmapCODEX() or provide other 2D embedding in stvea_object@codex_emb.")
+  }
   if (length(name) > 2) {
     stop("name must be at most length 2", call. =FALSE)
+  }
+  if (!all(name %in% colnames(plotting_data))) {
+    stop(sprintf("\"%s\" not in colnames of %s matrix. Change type parameter to select other matrix",
+                 paste(name[!name %in% colnames(plotting_data)],collapse="\", \""),type))
   }
 
   rbPal1 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color,1)), alpha=TRUE)
@@ -285,6 +318,11 @@ PlotExprCODEXspatial <- function(stvea_object, name,
     stop("name must be at most length 2", call. =FALSE)
   }
 
+  if (!all(name %in% colnames(plotting_data))) {
+    stop(sprintf("\"%s\" not in colnames of %s matrix. Change type parameter to select other matrix",
+                 paste(name[!name %in% colnames(plotting_data)],collapse="\", \""),type))
+  }
+
   rbPal1 <- colorRampPalette(c(alpha(low_color,0),alpha(high_color,1)), alpha=TRUE)
   color <- rbPal1(100)[as.numeric(cut(plotting_data[,name[1]],breaks = 100))]
   subtitle <- paste("Expression of ", name[1], " (", high_color, ")", sep="")
@@ -326,6 +364,9 @@ PlotIndexCODEXemb <- function(stvea_object, index,
                                high_color="red",
                                low_color="gray",
                                pt_size =0.8) {
+  if (is.null(stvea_object@codex_emb)) {
+    stop("No available 2D representation for CODEX. Please call GetUmapCODEX() or provide other 2D embedding in stvea_object@codex_emb.")
+  }
   temp_df <- as.data.frame(rbind(stvea_object@codex_emb[-index,],stvea_object@codex_emb[index,]))
   ggplot(temp_df,
          aes_string(x=colnames(temp_df)[1],y=colnames(temp_df)[2],color=factor(c(rep(0,nrow(temp_df)-1),1)))) +

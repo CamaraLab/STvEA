@@ -39,7 +39,7 @@ FilterCODEX <- function(stvea_object,
   if (!is.null(stvea_object@codex_spatial)) {
     stvea_object@codex_spatial <- stvea_object@codex_spatial[filter,]
   }
-  if (!is.null(stvea_object@codex_clusters)) {
+  if (!length(stvea_object@codex_clusters)==0) {
     stvea_object@codex_clusters <- stvea_object@codex_clusters[filter]
   }
   if (!is.null(stvea_object@codex_emb)) {
