@@ -48,6 +48,10 @@ SetDataCODEX <- function(codex_protein,
                          codex_size,
                          codex_spatial = NULL,
                          stvea_object = NULL) {
+  if (is.null(colnames(codex_protein))) {
+    warning("No protein names in CODEX protein matrix. Assigning names CODEXprotein1, CODEXprotein2, ...")
+    colnames(codex_protein) <- paste("CODEXprotein",1:ncol(codex_protein),sep="")
+  }
   if (is.null(stvea_object)) {
     stvea_object <- new(
       Class = "STvEA.data",
@@ -83,6 +87,10 @@ SetDataCITE <- function(cite_mRNA,
                         cite_mRNA_norm = NULL,
                         cite_latent = NULL,
                         stvea_object = NULL) {
+  if (is.null(colnames(cite_protein))) {
+    warning("No protein names in CITE-seq protein matrix. Assigning names CITEprotein1, CITEprotein2, ...")
+    colnames(cite_protein) <- paste("CITEprotein",1:ncol(cite_protein),sep="")
+  }
   if (is.null(cite_mRNA_norm)) {
     cite_mRNA_norm <- log(1 + 1e4*(cite_mRNA/rowSums(cite_mRNA)))
   }
