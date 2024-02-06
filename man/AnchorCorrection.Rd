@@ -4,9 +4,18 @@
 \alias{AnchorCorrection}
 \title{Run all methods for anchor correction}
 \usage{
-AnchorCorrection(ref_mat, query_mat, rna_mat, cite_index, num.cc = NULL,
-  k.anchor = 20, k.filter = 100, k.score = 80, k.weight = 100,
-  verbose = FALSE)
+AnchorCorrection(
+  ref_mat,
+  query_mat,
+  rna_mat,
+  cite_index,
+  num.cc = NULL,
+  k.anchor = 20,
+  k.filter = 100,
+  k.score = 80,
+  k.weight = 100,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{ref_mat}{a (cell x feature) protein expression matrix}

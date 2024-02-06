@@ -6,8 +6,12 @@
 based on the corrected data matrix from AnchorCorrection
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-GetTransferMatrix.internal(from_dataset, to_dataset,
-  k = floor(nrow(to_dataset) * 0.002), c = 0.1)
+GetTransferMatrix.internal(
+  from_dataset,
+  to_dataset,
+  k = floor(nrow(to_dataset) * 0.002),
+  c = 0.1
+)
 }
 \arguments{
 \item{from_dataset}{a (cell x feature) matrix or dataframe}

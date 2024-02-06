@@ -4,8 +4,12 @@
 \alias{TransferDataSeurat2}
 \title{Transfer data from a Seurat object to STvEA.data object}
 \usage{
-TransferDataSeurat2(seurat_object, embedding_reduction = NULL,
-  latent_reduction = NULL, latent_dims = 20)
+TransferDataSeurat2(
+  seurat_object,
+  embedding_reduction = NULL,
+  latent_reduction = NULL,
+  latent_dims = 20
+)
 }
 \arguments{
 \item{seurat_object}{Seurat class object}

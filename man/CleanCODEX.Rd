@@ -7,8 +7,15 @@ mixture and computing each expression measurement
 as the cumulative distribution of the Gaussian with
 the higher mean.}
 \usage{
-CleanCODEX(stvea_object, model = "gaussian", num_cores = 1, maxit = 500,
-  factr = 1e-09, optim_inits = NULL, normalize = FALSE)
+CleanCODEX(
+  stvea_object,
+  model = "gaussian",
+  num_cores = 1,
+  maxit = 500,
+  factr = 1e-09,
+  optim_inits = NULL,
+  normalize = FALSE
+)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CODEX data after FilterCODEX}

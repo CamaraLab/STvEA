@@ -4,8 +4,13 @@
 \alias{SetDataCITE}
 \title{Set CITE-seq data in STvEA.data object}
 \usage{
-SetDataCITE(cite_mRNA, cite_protein, cite_mRNA_norm = NULL,
-  cite_latent = NULL, stvea_object = NULL)
+SetDataCITE(
+  cite_mRNA,
+  cite_protein,
+  cite_mRNA_norm = NULL,
+  cite_latent = NULL,
+  stvea_object = NULL
+)
 }
 \arguments{
 \item{cite_mRNA}{Raw count data for CITE-seq mRNA (cell x gene)}

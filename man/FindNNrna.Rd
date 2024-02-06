@@ -4,8 +4,15 @@
 \alias{FindNNrna}
 \title{Find nearest neighbors}
 \usage{
-FindNNrna(ref_emb, query_emb, rna_mat, cite_index = 1, k = 300, eps = 0,
-  verbose = FALSE)
+FindNNrna(
+  ref_emb,
+  query_emb,
+  rna_mat,
+  cite_index = 1,
+  k = 300,
+  eps = 0,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{ref_emb}{a (cell x feature) embedding of a protein expression matrix}

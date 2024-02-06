@@ -10,8 +10,14 @@ Normalizes CITE-seq protein data by the original
 total counts per cell.
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-CleanCITE.nb.internal(cite_protein, num_cores = 1, maxit = 500,
-  factr = 1e-09, optim_inits = NULL, normalize = TRUE)
+CleanCITE.nb.internal(
+  cite_protein,
+  num_cores = 1,
+  maxit = 500,
+  factr = 1e-09,
+  optim_inits = NULL,
+  normalize = TRUE
+)
 }
 \arguments{
 \item{cite_protein}{Raw CITE-seq protein data (cell x protein)}

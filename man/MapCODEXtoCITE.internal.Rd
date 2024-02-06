@@ -7,9 +7,19 @@ Since the CODEX dataset is usually much bigger, allows to subsample equal-sized
 chunks of the CODEX dataset to map individually
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-MapCODEXtoCITE.internal(cite_protein, codex_protein, cite_latent, num_chunks,
-  seed = NULL, num_cores = 1, num.cc = NULL, k.anchor = 20,
-  k.filter = 100, k.score = 80, k.weight = 100)
+MapCODEXtoCITE.internal(
+  cite_protein,
+  codex_protein,
+  cite_latent,
+  num_chunks,
+  seed = NULL,
+  num_cores = 1,
+  num.cc = NULL,
+  k.anchor = 20,
+  k.filter = 100,
+  k.score = 80,
+  k.weight = 100
+)
 }
 \arguments{
 \item{cite_protein}{a (n cell x f feature) protein expression matrix}

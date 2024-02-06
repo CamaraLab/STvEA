@@ -6,8 +6,15 @@
 edited to take matrices as input rather than Seurat objects and to be run on
 only two datasets}
 \usage{
-RunCCA(object1, object2, standardize = FALSE, l2.norm = FALSE,
-  num.cc = 20, setseed = TRUE, ...)
+RunCCA(
+  object1,
+  object2,
+  standardize = FALSE,
+  l2.norm = FALSE,
+  num.cc = 20,
+  setseed = TRUE,
+  ...
+)
 }
 \arguments{
 \item{object1}{a (k features x n cells) matrix}

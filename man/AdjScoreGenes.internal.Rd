@@ -6,8 +6,15 @@
 pairs of genes mapped to the CODEX spatial positions
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-AdjScoreGenes.internal(adj_matrix, codex_mRNA, gene_pairs, c = 0,
-  num_cores = 1, num_perms = 1000, perm_estimate = T)
+AdjScoreGenes.internal(
+  adj_matrix,
+  codex_mRNA,
+  gene_pairs,
+  c = 0,
+  num_cores = 1,
+  num_perms = 1000,
+  perm_estimate = T
+)
 }
 \arguments{
 \item{adj_matrix}{a (preferrably sparse) binary matrix of

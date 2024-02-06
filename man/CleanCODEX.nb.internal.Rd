@@ -10,8 +10,14 @@ Normalizes CODEX protein data by the original
 total counts per cell.
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-CleanCODEX.nb.internal(codex_protein, num_cores = 1, maxit = 500,
-  factr = 1e-09, optim_inits = NULL, normalize = FALSE)
+CleanCODEX.nb.internal(
+  codex_protein,
+  num_cores = 1,
+  maxit = 500,
+  factr = 1e-09,
+  optim_inits = NULL,
+  normalize = FALSE
+)
 }
 \arguments{
 \item{codex_protein}{Raw CODEX protein data (cell x protein)}

@@ -6,8 +6,15 @@
 of CITE-seq clusters mapped to the CODEX spatial positions
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-AdjScoreClustersCITE.internal(adj_matrix, cite_clusters, transfer_matrix,
-  c = 0, num_cores = 1, num_perms = 1000, perm_estimate = T)
+AdjScoreClustersCITE.internal(
+  adj_matrix,
+  cite_clusters,
+  transfer_matrix,
+  c = 0,
+  num_cores = 1,
+  num_perms = 1000,
+  perm_estimate = T
+)
 }
 \arguments{
 \item{adj_matrix}{a (preferrably sparse) binary matrix of

@@ -4,9 +4,17 @@
 \alias{MapCODEXtoCITE}
 \title{Wraps MapCODEXtoCITE.internal using STvEA.data class}
 \usage{
-MapCODEXtoCITE(stvea_object, num_chunks, seed = NULL, num_cores = 1,
-  num.cc = NULL, k.anchor = 20, k.filter = 100, k.score = 80,
-  k.weight = 100)
+MapCODEXtoCITE(
+  stvea_object,
+  num_chunks,
+  seed = NULL,
+  num_cores = 1,
+  num.cc = NULL,
+  k.anchor = 20,
+  k.filter = 100,
+  k.score = 80,
+  k.weight = 100
+)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CODEX and CITE-seq data}

@@ -4,8 +4,13 @@
 \alias{TransformDataMatrix}
 \title{Correct the query dataset by subtracting the weighted anchor vectors}
 \usage{
-TransformDataMatrix(ref_mat, query_mat, integration.matrix, weights,
-  verbose = FALSE)
+TransformDataMatrix(
+  ref_mat,
+  query_mat,
+  integration.matrix,
+  weights,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{ref_mat}{a (cell x feature) protein expression matrix}

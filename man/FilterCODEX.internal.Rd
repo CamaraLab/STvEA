@@ -7,8 +7,14 @@ as determined by the gating strategy on the blank channels
 from the CODEX paper, then normalizes data by total counts per cell
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-FilterCODEX.internal(codex_raw, size, blanks, size_lim = NULL,
-  blank_upper = NULL, blank_lower = NULL)
+FilterCODEX.internal(
+  codex_raw,
+  size,
+  blanks,
+  size_lim = NULL,
+  blank_upper = NULL,
+  blank_lower = NULL
+)
 }
 \arguments{
 \item{codex_raw}{CODEX expression matrix after spillover correction,

@@ -7,8 +7,12 @@ Must use Python HDBSCAN because it has 2 important parameters
 (min_cluster_size and min_samples) but R HDBSCAN only has one (minPts)
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-ParameterScan.internal(cite_latent, min_cluster_size_range, min_sample_range,
-  ...)
+ParameterScan.internal(
+  cite_latent,
+  min_cluster_size_range,
+  min_sample_range,
+  ...
+)
 }
 \arguments{
 \item{cite_latent}{CITE-seq latent space (cells x dimensions)}

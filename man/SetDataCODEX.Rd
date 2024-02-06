@@ -4,8 +4,13 @@
 \alias{SetDataCODEX}
 \title{Set CODEX data in STvEA.data object}
 \usage{
-SetDataCODEX(codex_protein, codex_blanks, codex_size, codex_spatial = NULL,
-  stvea_object = NULL)
+SetDataCODEX(
+  codex_protein,
+  codex_blanks,
+  codex_size,
+  codex_spatial = NULL,
+  stvea_object = NULL
+)
 }
 \arguments{
 \item{codex_protein}{Segmented and spillover corrected CODEX protein expression (cell x protein)}

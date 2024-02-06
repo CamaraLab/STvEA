@@ -6,9 +6,7 @@
 \alias{STvEA-package}
 \title{STvEA: Spatially-resolved Transcriptomics via Epitope Anchoring}
 \description{
-STvEA is an analysis pipeline for cleaning, clustering, and plotting CODEX and CITE-seq
-protein data, mapping a CODEX dataset to a matching CITE-seq dataset, and assessing colocalization
-of features using the Adjacency Score.
+STvEA is an analysis pipeline for cleaning, clustering, and plotting CODEX and CITE-seq protein data, mapping a CODEX dataset to a matching CITE-seq dataset, and assessing colocalization of features using the Adjacency Score.
 }
 \author{
 \strong{Maintainer}: Kiya W. Govek \email{govekk@pennmedicine.upenn.edu}

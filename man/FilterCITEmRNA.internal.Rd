@@ -6,8 +6,11 @@
 and the number of cells each gene is expressed in
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-FilterCITEmRNA.internal(cite_mRNA, min_transcripts = 1200,
-  min_cells_per_gene = 30)
+FilterCITEmRNA.internal(
+  cite_mRNA,
+  min_transcripts = 1200,
+  min_cells_per_gene = 30
+)
 }
 \arguments{
 \item{cite_mRNA}{a (cell x gene) matrix of CITE-seq mRNA data}

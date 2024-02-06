@@ -4,9 +4,15 @@
 \alias{PlotExprCODEXspatial}
 \title{Plot expression of a gene or protein in the CODEX spatial coordinates}
 \usage{
-PlotExprCODEXspatial(stvea_object, name, type = "protein",
-  high_color = "red", high_color2 = "green", low_color = "white",
-  pt_size = 0.8)
+PlotExprCODEXspatial(
+  stvea_object,
+  name,
+  type = "protein",
+  high_color = "red",
+  high_color2 = "green",
+  low_color = "white",
+  pt_size = 0.8
+)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CODEX expression and spatial xy}

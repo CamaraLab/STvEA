@@ -5,8 +5,7 @@
 \title{Filter CITE-seq mRNA data based on number of transcripts per cell
 and the number of cells each gene is expressed in}
 \usage{
-FilterCITEmRNA(stvea_object, min_transcripts = 1200,
-  min_cells_per_gene = 30)
+FilterCITEmRNA(stvea_object, min_transcripts = 1200, min_cells_per_gene = 30)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CITE-seq mRNA data}

@@ -7,8 +7,12 @@ and create a dissimilarity matrix between cells from the clusterings
 Perform agglomerative hierarchical clustering on the
 consensus dissimilarity matrix}
 \usage{
-ConsensusCluster(stvea_object, silhouette_cutoff, inconsistent_value,
-  min_cluster_size)
+ConsensusCluster(
+  stvea_object,
+  silhouette_cutoff,
+  inconsistent_value,
+  min_cluster_size
+)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class object after ParameterScan has been run}

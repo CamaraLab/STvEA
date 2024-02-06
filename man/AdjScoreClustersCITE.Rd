@@ -5,8 +5,14 @@
 \title{Use the Adjacency Score to evaluate colocaliztion of all pairs
 of CITE-seq clusters mapped to the CODEX spatial positions}
 \usage{
-AdjScoreClustersCITE(stvea_object, k, c = 0, num_cores = 1,
-  num_perms = 1000, perm_estimate = T)
+AdjScoreClustersCITE(
+  stvea_object,
+  k,
+  c = 0,
+  num_cores = 1,
+  num_perms = 1000,
+  perm_estimate = T
+)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class object containing CITE-seq

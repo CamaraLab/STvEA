@@ -4,8 +4,15 @@
 \alias{PlotExprCITE}
 \title{Plot expression of a gene or protein in the CITE-seq UMAP or t-SNE embedding}
 \usage{
-PlotExprCITE(stvea_object, name, type = "RNA", high_color = "red",
-  high_color2 = "green", low_color = "light gray", pt_size = 0.8)
+PlotExprCITE(
+  stvea_object,
+  name,
+  type = "RNA",
+  high_color = "red",
+  high_color2 = "green",
+  low_color = "light gray",
+  pt_size = 0.8
+)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CITE-seq expression and embedding}
@@ -21,8 +28,6 @@ PlotExprCITE(stvea_object, name, type = "RNA", high_color = "red",
 \item{low_color}{color of low/no expression on the color ramp}
 
 \item{pt_size}{ggplot geom_point size}
-
-\item{importFrom}{scales alpha}
 
 \item{importFrom}{grDevices colorRampPalette}
 }

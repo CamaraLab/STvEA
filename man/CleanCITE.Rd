@@ -7,8 +7,15 @@ a two component mixture model and computing each
 expression measurement as the cumulative distribution
 of the component with the higher median.}
 \usage{
-CleanCITE(stvea_object, model = "nb", num_cores = 1, maxit = 500,
-  factr = 1e-09, optim_inits = NULL, normalize = TRUE)
+CleanCITE(
+  stvea_object,
+  model = "nb",
+  num_cores = 1,
+  maxit = 500,
+  factr = 1e-09,
+  optim_inits = NULL,
+  normalize = TRUE
+)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CITE-seq protein data}

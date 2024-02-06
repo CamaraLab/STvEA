@@ -8,8 +8,13 @@ Perform agglomerative hierarchical clustering on the
 consensus dissimilarity matrix
 Takes matrices and data frames instead of STvEA.data class}
 \usage{
-ConsensusCluster.internal(hdbscan_results, cite_latent, silhouette_cutoff,
-  inconsistent_value, min_cluster_size)
+ConsensusCluster.internal(
+  hdbscan_results,
+  cite_latent,
+  silhouette_cutoff,
+  inconsistent_value,
+  min_cluster_size
+)
 }
 \arguments{
 \item{hdbscan_results}{output of ParameterScan.internal}

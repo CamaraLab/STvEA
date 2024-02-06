@@ -4,9 +4,18 @@
 \alias{ReadDataFCS}
 \title{Read in FCS file}
 \usage{
-ReadDataFCS(path_to_fcs, is_protein, is_blank, protein_names = NULL,
-  tile_relative = FALSE, num_tile_x = 9, x_pix_size = 188,
-  y_pix_size = 188, z_pix_size = 900, stvea_object = NULL)
+ReadDataFCS(
+  path_to_fcs,
+  is_protein,
+  is_blank,
+  protein_names = NULL,
+  tile_relative = FALSE,
+  num_tile_x = 9,
+  x_pix_size = 188,
+  y_pix_size = 188,
+  z_pix_size = 900,
+  stvea_object = NULL
+)
 }
 \arguments{
 \item{path_to_fcs}{readable path to FCS file}

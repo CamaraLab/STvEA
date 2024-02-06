@@ -6,8 +6,12 @@
 as determined by the gating strategy on the blank channels
 from the CODEX paper}
 \usage{
-FilterCODEX(stvea_object, size_lim = NULL, blank_upper = NULL,
-  blank_lower = NULL)
+FilterCODEX(
+  stvea_object,
+  size_lim = NULL,
+  blank_upper = NULL,
+  blank_lower = NULL
+)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CODEX data}

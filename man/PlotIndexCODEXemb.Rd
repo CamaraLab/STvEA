@@ -4,8 +4,13 @@
 \alias{PlotIndexCODEXemb}
 \title{Plot location of a CODEX cell in the CODEX UMAP or t-SNE embedding}
 \usage{
-PlotIndexCODEXemb(stvea_object, index, high_color = "red",
-  low_color = "gray", pt_size = 0.8)
+PlotIndexCODEXemb(
+  stvea_object,
+  index,
+  high_color = "red",
+  low_color = "gray",
+  pt_size = 0.8
+)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with CODEX embedding}

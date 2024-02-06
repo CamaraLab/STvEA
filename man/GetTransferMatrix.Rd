@@ -4,20 +4,21 @@
 \alias{GetTransferMatrix}
 \title{Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in STvEA.data}
 \usage{
-GetTransferMatrix(stvea_object, k.codex = floor(nrow(stvea_object@cite_clean)
-  * 0.002), k.cite = floor(nrow(stvea_object@corrected_codex) * 0.002),
-  c.codex = 0.1, c.cite = 0.1)
+GetTransferMatrix(
+  stvea_object,
+  k.cite = floor(nrow(stvea_object@corrected_codex) * 0.002),
+  c.cite = 0.1,
+  transfer.rna = TRUE
+)
 }
 \arguments{
 \item{stvea_object}{STvEA.data class with mapping correction run}
 
-\item{k.codex}{number of nearest CITE-seq neighbors to find for each CODEX cell}
-
 \item{k.cite}{number of nearest CODEX neighbors to find for each CITE-seq cell}
 
-\item{c.codex}{width of Gaussian kernel in CODEX dataset}
-
 \item{c.cite}{width of Gaussian kernel in CITE-seq dataset}
+
+\item{transfer_rna}{if set to TRUE (default), also transfers the mRNA data from CITE-seq to CODEX. Requires extra memory.}
 }
 \description{
 Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in STvEA.data

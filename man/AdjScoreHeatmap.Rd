@@ -5,12 +5,18 @@
 \title{Visualize heatmap of Adjacency Score run on
 all combinations of feature pairs}
 \usage{
-AdjScoreHeatmap(adj_score_output)
+AdjScoreHeatmap(adj_score_output, scaling = 1e-10, style = "heatmap")
 }
 \arguments{
 \item{adj_score_output}{output of any of the AdjScore functions
 - a matrix where each row contains the features in a pair and their
 Adjacency Score and q values}
+
+\item{scaling}{scaling factor applied in the visualization of q-values.
+The q-value are transformed according to -log10(scaling + q-value)}
+
+\item{style}{plotting style for the heatmap, to choose between "heatmap"
+(default) and "pheatmap"}
 }
 \description{
 Visualize heatmap of Adjacency Score run on

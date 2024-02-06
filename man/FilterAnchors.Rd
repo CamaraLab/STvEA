@@ -5,8 +5,14 @@
 \title{Filter anchors, keeping those that are also in the knn
  of the L2Norm of the original feature space}
 \usage{
-FilterAnchors(ref_mat, query_mat, anchors, k.filter = 200, eps = 0,
-  verbose = FALSE)
+FilterAnchors(
+  ref_mat,
+  query_mat,
+  anchors,
+  k.filter = 200,
+  eps = 0,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{ref_mat}{a (cell x feature) protein expression matrix}
