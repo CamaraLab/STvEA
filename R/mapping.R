@@ -76,7 +76,7 @@ GetTransferMatrix <- function(stvea_object,
       stvea_object@codex_mRNA <- as.matrix(stvea_object@transfer_matrix) %*%
         as.matrix(stvea_object@cite_mRNA/rowSums(stvea_object@cite_mRNA))
   }
-  if (!is.null(stvea_object@cite_clusters) {
+  if (!is.null(stvea_object@cite_clusters)) {
     cluster_ids <- as.character(unique(stvea_object@cite_clusters))
     cluster_ids <- cluster_ids[order(cluster_ids)]
     cluster_matrix <- t(sapply(cluster_ids, function(x) (stvea_object@cite_clusters==x)*1))
