@@ -55,18 +55,16 @@ MapCODEXtoCITE <- function(stvea_object,
 #' Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in STvEA.data
 #'
 #' @param stvea_object STvEA.data class with mapping correction run
-#' @param k.codex number of nearest CITE-seq neighbors to find for each CODEX cell
 #' @param k.cite number of nearest CODEX neighbors to find for each CITE-seq cell
-#' @param c.codex width of Gaussian kernel in CODEX dataset
 #' @param c.cite width of Gaussian kernel in CITE-seq dataset
+#' @param transfer_rna if set to TRUE (default), also transfers the mRNA data from CITE-seq to CODEX. Requires extra memory.
 #'
 #' @export
 #'
 GetTransferMatrix <- function(stvea_object,
-                        k.codex = floor(nrow(stvea_object@cite_clean)*0.002),
                         k.cite = floor(nrow(stvea_object@corrected_codex)*0.002),
-                        c.codex = 0.1,
-                        c.cite = 0.1) {
+                        c.cite = 0.1,
+                        transfer.rna = TRUE) {
   if (is.null(stvea_object@corrected_codex)) {
     stop("MapCODEXtoCITE must be run on the input object first", call. =FALSE)
   }
@@ -74,8 +72,18 @@ GetTransferMatrix <- function(stvea_object,
                                                  stvea_object@corrected_codex,
                                                  k=k.cite,
                                                  c=c.cite)
-  stvea_object@codex_mRNA <- as.matrix(stvea_object@transfer_matrix) %*%
-    as.matrix(stvea_object@cite_mRNA/rowSums(stvea_object@cite_mRNA))
+  if (transfer_rna) {
+      stvea_object@codex_mRNA <- as.matrix(stvea_object@transfer_matrix) %*%
+        as.matrix(stvea_object@cite_mRNA/rowSums(stvea_object@cite_mRNA))
+  }
+  if (!is.null(stvea_object@cite_clusters) {
+    cluster_ids <- as.character(unique(stvea_object@cite_clusters))
+    cluster_ids <- cluster_ids[order(cluster_ids)]
+    cluster_matrix <- t(sapply(cluster_ids, function(x) (stvea_object@cite_clusters==x)*1))
+    row.names(cluster_matrix) <- cluster_ids
+    codex_cluster_matrix <- stvea_object@transfer_matrix %*% t(cluster_matrix)
+    stvea_object@codex_clusters <- c(-1, cluster_ids)[(apply(codex_cluster_matrix, 1, max)!=0)*apply(codex_cluster_matrix, 1, which.max)+1]
+  }
   return(stvea_object)
 }
 
