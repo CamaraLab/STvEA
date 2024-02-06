@@ -1,4 +1,5 @@
 #' @import AdjacencyScore
+#' @import pheatmap
 #'
 NULL
 
@@ -9,18 +10,26 @@ NULL
 #' @param adj_score_output output of any of the AdjScore functions
 #' - a matrix where each row contains the features in a pair and their
 #' Adjacency Score and q values
+#' @param scaling scaling factor applied in the visualization of q-values.
+#' The q-value are transformed according to -log10(scaling + q-value)
+#' @param style plotting style for the heatmap, to choose between "heatmap"
+#' (default) and "pheatmap"
 #'
 #' @export
 #'
-AdjScoreHeatmap <- function(adj_score_output) {
+AdjScoreHeatmap <- function(adj_score_output, scaling = 1e-10, style = "heatmap") {
   heatmap_matrix <- matrix(rep(0,length(unique(adj_score_output$f))*length(unique(adj_score_output$g))), ncol=length(unique(adj_score_output$g)))
   row.names(heatmap_matrix) <- unique(adj_score_output$f)[order(unique(adj_score_output$f))]
   colnames(heatmap_matrix) <- unique(adj_score_output$g)[order(unique(adj_score_output$g))]
   for (i in 1:nrow(adj_score_output)) {
-    heatmap_matrix[adj_score_output[i,"f"],adj_score_output[i,"g"]] <- log10(adj_score_output[i,"q"]+1e-15)
-    heatmap_matrix[adj_score_output[i,"g"],adj_score_output[i,"f"]] <- log10(adj_score_output[i,"q"]+1e-15)
+    heatmap_matrix[adj_score_output[i,"f"],adj_score_output[i,"g"]] <- -log10(adj_score_output[i,"q"]+scaling)
+    heatmap_matrix[adj_score_output[i,"g"],adj_score_output[i,"f"]] <- -log10(adj_score_output[i,"q"]+scaling)
   }
-  heatmap(heatmap_matrix, margins=c(10,10), symm=T)
+  if (style=="heatmap") {
+    heatmap(heatmap_matrix, margins=c(10,10), symm=T)
+  } else if (style=="pheatmap") {
+    pheatmap(heatmap_matrix, main=paste0("-log10(",as.character(scaling)," + q-value)"))
+  }
 }
 
 

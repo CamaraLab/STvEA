@@ -21,6 +21,7 @@ Imports:
     Matrix,
     mclust,
     methods,
+    pheatmap,
     RANN,
     stringr,
     tidyr
