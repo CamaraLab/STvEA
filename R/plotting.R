@@ -211,6 +211,41 @@ PlotClusterCODEXemb <- function(stvea_object, pt_size=0.5) {
 }
 
 
+#' Plot clusters of CODEX cells in the CODEX spatial coordinates
+#'
+#' @param stvea_object STvEA.data class with CODEX spatial information and clustering
+#'
+#' @importFrom colorspace rainbow_hcl
+#'
+#' @export
+#'
+PlotClusterCODEXspatial <- function(stvea_object, pt_size=0.5) {
+  if (is.null(stvea_object@codex_spatial)) {
+    stop("stvea_object does not contain CODEX spatial information")
+  }
+  if (!length(stvea_object@codex_clusters) == 0) {
+    codex_clusters <- stvea_object@codex_clusters
+  } else {
+    codex_clusters <- rep(-1, nrow(stvea_object@codex_spatial))
+  }
+  if (-1 %in% codex_clusters) {
+    colors <- c("gray", rainbow_hcl(length(unique(codex_clusters))-1, c = 80))
+  } else {
+    colors <- rainbow_hcl(length(unique(codex_clusters)), c = 80)
+  }
+  x_tmp <- stvea_object@codex_spatial[,"x"]
+  x_tmp <- x_tmp - min(x_tmp)
+  y_tmp <- stvea_object@codex_spatial[,"y"]
+  y_tmp <- y_tmp - min(y_tmp)
+  spatial_tmp <- as.data.frame(cbind(x = x_tmp, y = y_tmp))
+  ggplot(spatial_tmp, aes_string(x=x_tmp, y=y_tmp, color=factor(codex_clusters))) +
+    geom_point(size=pt_size) +
+    scale_color_manual(values = colors, name="cluster") +
+    guides(colour = guide_legend(override.aes = list(size=5))) + coord_fixed() +
+    theme_void()
+}
+
+
 #' Plot expression of a gene or protein in the CODEX UMAP or t-SNE embedding
 #'
 #' @param stvea_object STvEA.data class with CODEX expression and embedding
