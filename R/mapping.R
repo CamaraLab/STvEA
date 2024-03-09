@@ -52,37 +52,52 @@ MapCODEXtoCITE <- function(stvea_object,
 }
 
 
-#' Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in STvEA.data
+#' Gets NN matrix for CITE->CODEX, stores in STvEA.data
 #'
 #' @param stvea_object STvEA.data class with mapping correction run
 #' @param k.cite number of nearest CODEX neighbors to find for each CITE-seq cell
 #' @param c.cite width of Gaussian kernel in CITE-seq dataset
-#' @param transfer_rna if set to TRUE (default), also transfers the mRNA data from CITE-seq to CODEX. Requires extra memory.
+#' @param transfer_rna if set to TRUE (default), also transfers the mRNA data from CITE-seq to CODEX. Requires extra memory
+#' @param fastknn if set to TRUE, skips the computation of the NN matrix and uses the FastKNN library to transfer
+#' the CITE-seq labels into the CODEX data
 #'
 #' @export
 #'
 GetTransferMatrix <- function(stvea_object,
                         k.cite = floor(nrow(stvea_object@corrected_codex)*0.002),
                         c.cite = 0.1,
-                        transfer.rna = TRUE) {
+                        transfer.rna = TRUE,
+                        fastknn = FALSE) {
   if (is.null(stvea_object@corrected_codex)) {
     stop("MapCODEXtoCITE must be run on the input object first", call. =FALSE)
   }
-  stvea_object@transfer_matrix <- GetTransferMatrix.internal(stvea_object@cite_clean[,colnames(stvea_object@corrected_codex)],
-                                                 stvea_object@corrected_codex,
-                                                 k=k.cite,
-                                                 c=c.cite)
-  if (transfer_rna) {
-      stvea_object@codex_mRNA <- as.matrix(stvea_object@transfer_matrix) %*%
-        as.matrix(stvea_object@cite_mRNA/rowSums(stvea_object@cite_mRNA))
-  }
-  if (!is.null(stvea_object@cite_clusters)) {
-    cluster_ids <- as.character(unique(stvea_object@cite_clusters))
-    cluster_ids <- cluster_ids[order(cluster_ids)]
-    cluster_matrix <- t(sapply(cluster_ids, function(x) (stvea_object@cite_clusters==x)*1))
-    row.names(cluster_matrix) <- cluster_ids
-    codex_cluster_matrix <- stvea_object@transfer_matrix %*% t(cluster_matrix)
-    stvea_object@codex_clusters <- c(-1, cluster_ids)[(apply(codex_cluster_matrix, 1, max)!=0)*apply(codex_cluster_matrix, 1, which.max)+1]
+  if (fastknn) {
+    if (!requireNamespace("fastknn", quietly = TRUE)) {
+      stop("Package \"fastknn\" needed for this function to work. Please install it.",
+           call. = FALSE)
+    }
+    stvea_object@codex_clusters <- fastknn(as.matrix(stvea_object@cite_clean[,colnames(stvea_object@corrected_codex)]),
+                        as.factor(stvea_object@cite_clusters),
+                        as.matrix(stvea_object@corrected_codex),
+                        k = k.cite,
+                        method = "dist")$class
+  } else {
+    stvea_object@transfer_matrix <- GetTransferMatrix.internal(stvea_object@cite_clean[,colnames(stvea_object@corrected_codex)],
+                                                     stvea_object@corrected_codex,
+                                                     k=k.cite,
+                                                     c=c.cite)
+    if (transfer_rna) {
+        stvea_object@codex_mRNA <- as.matrix(stvea_object@transfer_matrix) %*%
+          as.matrix(stvea_object@cite_mRNA/rowSums(stvea_object@cite_mRNA))
+    }
+    if (!is.null(stvea_object@cite_clusters)) {
+      cluster_ids <- as.character(unique(stvea_object@cite_clusters))
+      cluster_ids <- cluster_ids[order(cluster_ids)]
+      cluster_matrix <- t(sapply(cluster_ids, function(x) (stvea_object@cite_clusters==x)*1))
+      row.names(cluster_matrix) <- cluster_ids
+      codex_cluster_matrix <- stvea_object@transfer_matrix %*% t(cluster_matrix)
+      stvea_object@codex_clusters <- c(-1, cluster_ids)[(apply(codex_cluster_matrix, 1, max)!=0)*apply(codex_cluster_matrix, 1, which.max)+1]
+    }
   }
   return(stvea_object)
 }

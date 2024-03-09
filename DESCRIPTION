@@ -30,4 +30,5 @@ Suggests:
     reticulate
 Remotes:
     CamaraLab/AdjacencyScore
+    davpinto/fastknn
 biocViews:

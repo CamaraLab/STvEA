@@ -2,13 +2,14 @@
 % Please edit documentation in R/mapping.R
 \name{GetTransferMatrix}
 \alias{GetTransferMatrix}
-\title{Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in STvEA.data}
+\title{Gets NN matrix for CITE->CODEX, stores in STvEA.data}
 \usage{
 GetTransferMatrix(
   stvea_object,
   k.cite = floor(nrow(stvea_object@corrected_codex) * 0.002),
   c.cite = 0.1,
-  transfer.rna = TRUE
+  transfer.rna = TRUE,
+  fastknn = FALSE
 )
 }
 \arguments{
@@ -18,8 +19,11 @@ GetTransferMatrix(
 
 \item{c.cite}{width of Gaussian kernel in CITE-seq dataset}
 
-\item{transfer_rna}{if set to TRUE (default), also transfers the mRNA data from CITE-seq to CODEX. Requires extra memory.}
+\item{fastknn}{if set to TRUE, skips the computation of the NN matrix and uses the FastKNN library to transfer
+the CITE-seq labels into the CODEX data}
+
+\item{transfer_rna}{if set to TRUE (default), also transfers the mRNA data from CITE-seq to CODEX. Requires extra memory}
 }
 \description{
-Gets NN matrix for both CITE->CODEX and CODEX->CITE, stores in STvEA.data
+Gets NN matrix for CITE->CODEX, stores in STvEA.data
 }
