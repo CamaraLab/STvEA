@@ -76,6 +76,7 @@ GetTransferMatrix <- function(stvea_object,
       stop("Package \"fastknn\" needed for this function to work. Please install it.",
            call. = FALSE)
     }
+    library(fastknn)
     stvea_object@codex_clusters <- fastknn(as.matrix(stvea_object@cite_clean[,colnames(stvea_object@corrected_codex)]),
                         as.factor(stvea_object@cite_clusters),
                         as.matrix(stvea_object@corrected_codex),
