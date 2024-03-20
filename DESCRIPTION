@@ -29,6 +29,6 @@ Suggests:
     umap,
     reticulate
 Remotes:
-    CamaraLab/AdjacencyScore
+    CamaraLab/AdjacencyScore,
     davpinto/fastknn
 biocViews:
